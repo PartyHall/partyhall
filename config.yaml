@@ -14,6 +14,7 @@ web:
 mosquitto:
   address: 127.0.0.1:1883
 
+# This is the config for the command that controls the Arduino
 hardware_handler:
   baud_rate: 57600
   mappings:

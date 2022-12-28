@@ -4,7 +4,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -18,6 +17,7 @@ import (
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/orm"
 	"github.com/partyhall/partyhall/services"
+	"github.com/partyhall/partyhall/utils"
 	"golang.org/x/exp/slices"
 )
 
@@ -47,22 +47,12 @@ func socket(w http.ResponseWriter, r *http.Request) {
 
 	// PartyHall should not be allowed from another computer
 	if socketType == services.SOCKET_TYPE_BOOTH {
-		host, _, err := net.SplitHostPort(r.RemoteAddr)
-		if err != nil {
-			logs.Error("Failed to parse hostport: ", err)
-			logs.Error("Got hostport: ", r.RemoteAddr)
-
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		if !slices.Contains([]string{"[::1]", "127.0.0.1"}, host) {
-			if !config.GET.DebugMode {
+		if utils.IsRemote(r) {
+			if !config.GET.DebugMode && !config.IsInDev() {
 				w.WriteHeader(http.StatusForbidden)
 				return
 			}
-
-			logs.Debug("Letting a remote connection from ", host)
+			logs.Debug("Letting a remote connection")
 		}
 	} else {
 		// @TODO: Handle authentication

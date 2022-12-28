@@ -34,7 +34,7 @@ func (s Sockets) broadcastTo(to string, msgType string, data interface{}) {
 	}
 }
 
-func (s Sockets) BroadcastPartyHall(msgType string, data interface{}) {
+func (s Sockets) BroadcastBooth(msgType string, data interface{}) {
 	s.broadcastTo(SOCKET_TYPE_BOOTH, msgType, data)
 }
 

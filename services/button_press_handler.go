@@ -2,7 +2,6 @@ package services
 
 import (
 	"os/exec"
-	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/partyhall/partyhall/config"
@@ -43,17 +42,9 @@ func (bph *ButtonPressHandler) onTakePicture(client mqtt.Client) {
 }
 
 func (bph *ButtonPressHandler) onDisplayDebug(client mqtt.Client) {
-	if bph.pb.DisplayDebug {
-		return
-	}
-
-	bph.pb.DisplayDebug = true
+	logs.Debug("HW Display debug request")
 	GET.Sockets.BroadcastState()
-	go func() {
-		time.Sleep(30 * time.Second)
-		bph.pb.DisplayDebug = false
-		GET.Sockets.BroadcastState()
-	}()
+	GET.Sockets.BroadcastBooth("DISPLAY_DEBUG", nil)
 }
 
 func (bph *ButtonPressHandler) onShutdown(client mqtt.Client) {

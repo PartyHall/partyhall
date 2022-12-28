@@ -21,7 +21,6 @@ import (
 
 var (
 	WEBAPP_FS     *fs.FS
-	ADMIN_FS      *fs.FS
 	DB_SCRIPTS_FS embed.FS
 )
 
@@ -37,10 +36,9 @@ type Provider struct {
 
 func (p *Provider) GetFrontendSettings() *models.FrontendSettings {
 	settings := models.FrontendSettings{
-		AppState:     p.PartyHall.CurrentState,
-		Photobooth:   config.GET.Photobooth,
-		DebugDisplay: p.PartyHall.DisplayDebug,
-		CurrentMode:  p.PartyHall.CurrentMode,
+		AppState:    p.PartyHall.CurrentState,
+		Photobooth:  config.GET.Photobooth,
+		CurrentMode: p.PartyHall.CurrentMode,
 
 		IPAddress:  map[string][]string{},
 		KnownModes: config.MODES,

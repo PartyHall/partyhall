@@ -15,7 +15,6 @@ type PartyHall struct {
 	CurrentState    models.AppState
 	IsTakingPicture bool
 	CurrentMode     string
-	DisplayDebug    bool
 }
 
 func (pb *PartyHall) OnSyncRequested(client mqtt.Client, msg mqtt.Message) {

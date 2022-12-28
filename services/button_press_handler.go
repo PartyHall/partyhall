@@ -5,6 +5,7 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
 )
 
@@ -56,6 +57,11 @@ func (bph *ButtonPressHandler) onDisplayDebug(client mqtt.Client) {
 }
 
 func (bph *ButtonPressHandler) onShutdown(client mqtt.Client) {
+	if config.IsInDev() {
+		logs.Info("[IN DEV] Shutdown requested")
+		return
+	}
+
 	if err := GET.Shutdown(); err != nil {
 		GET.Sockets.broadcastTo("", "ERR_MODAL", "Failed to shutdown: "+err.Error())
 		return

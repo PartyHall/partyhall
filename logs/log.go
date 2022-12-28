@@ -3,9 +3,9 @@ package logs
 import (
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
+	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/utils"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -14,7 +14,7 @@ import (
 var logger *zap.SugaredLogger
 
 func Init() {
-	isDebug := strings.HasPrefix(os.Args[0], "/tmp/")
+	isDebug := config.IsInDev()
 	if isDebug {
 		isDebug = os.Getenv("ENV") != "prod"
 	}

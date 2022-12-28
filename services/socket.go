@@ -75,7 +75,7 @@ func (s *Socket) TakePicture() {
 
 	logs.Info("Taking picture...")
 	go func() {
-		timeout := config.GET.PartyHall.DefaultTimer
+		timeout := config.GET.Photobooth.DefaultTimer
 
 		for timeout >= 0 {
 			s.Send("TIMER", timeout)
@@ -231,10 +231,10 @@ func (p *Provider) Join(socketType string, socket *websocket.Conn) {
 		}
 	}()
 
-	if socketType == SOCKET_TYPE_BOOTH && config.GET.PartyHall.UnattendedInterval > 1 {
+	if socketType == SOCKET_TYPE_BOOTH && config.GET.Photobooth.UnattendedInterval > 1 {
 		go func() {
 			for sock.Open {
-				time.Sleep(time.Duration(config.GET.PartyHall.UnattendedInterval) * time.Minute)
+				time.Sleep(time.Duration(config.GET.Photobooth.UnattendedInterval) * time.Minute)
 				logs.Info("Unattended picture")
 				sock.Send("UNATTENDED_PICTURE", nil)
 			}

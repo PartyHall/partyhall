@@ -38,7 +38,7 @@ type Provider struct {
 func (p *Provider) GetFrontendSettings() *models.FrontendSettings {
 	settings := models.FrontendSettings{
 		AppState:     p.PartyHall.CurrentState,
-		Photobooth:   config.GET.PartyHall,
+		Photobooth:   config.GET.Photobooth,
 		DebugDisplay: p.PartyHall.DisplayDebug,
 		CurrentMode:  p.PartyHall.CurrentMode,
 
@@ -177,10 +177,10 @@ func Load() error {
 	initButtonHandler(&prv.PartyHall)
 
 	actions := map[string]mqtt.MessageHandler{
-		"partyhall/button_press":   BPH.OnButtonPress,
-		"partyhall/sync":           prv.PartyHall.OnSyncRequested,
-		"partyhall/export":         prv.PartyHall.OnExportEvent,
-		"partyhall/admin/set_mode": prv.Admin.OnSetMode,
+		config.GetMqttTopic("button_press"):   BPH.OnButtonPress,
+		config.GetMqttTopic("sync"):           prv.PartyHall.OnSyncRequested,
+		config.GetMqttTopic("export"):         prv.PartyHall.OnExportEvent,
+		config.GetMqttTopic("admin/set_mode"): prv.Admin.OnSetMode,
 	}
 
 	for topic, action := range actions {

@@ -2,10 +2,11 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
+	"go.bug.st/serial"
 	"gopkg.in/yaml.v2"
 )
 
@@ -39,6 +40,12 @@ type MosquittoConfig struct {
 	Address string `json:"address"`
 }
 
+type HardwareHandlerConfig struct {
+	Mappings   map[string]string `yaml:"mappings"`
+	BaudRate   int               `yaml:"baud_rate"`
+	SerialMode *serial.Mode      `yaml:"-"`
+}
+
 type Config struct {
 	Web struct {
 		ListeningAddr string `yaml:"listening_addr"`
@@ -50,8 +57,10 @@ type Config struct {
 	RootPath    string `yaml:"root_path"`
 	DefaultMode string `yaml:"default_mode"`
 
-	Mosquitto MosquittoConfig  `yaml:"mosquitto"`
-	PartyHall PhotoboothConfig `yaml:"partyhall"`
+	Mosquitto  MosquittoConfig  `yaml:"mosquitto"`
+	Photobooth PhotoboothConfig `yaml:"photobooth"`
+
+	HardwareHandler HardwareHandlerConfig `yaml:"hardware_handler"`
 }
 
 func (c *Config) GetImageFolder(eventId int64, unattended bool) (string, error) {
@@ -81,7 +90,7 @@ func Load() error {
 		configPath = "/etc/partyhall.yaml"
 	}
 
-	data, err := ioutil.ReadFile(configPath)
+	data, err := os.ReadFile(configPath)
 	if err != nil {
 		return err
 	}
@@ -91,15 +100,30 @@ func Load() error {
 		return err
 	}
 
-	if cfg.PartyHall.DefaultTimer == 0 {
-		cfg.PartyHall.DefaultTimer = 3
+	if cfg.Photobooth.DefaultTimer == 0 {
+		cfg.Photobooth.DefaultTimer = 3
 	}
 
 	if len(cfg.DefaultMode) == 0 {
 		cfg.DefaultMode = MODE_PHOTOBOOTH
 	}
 
+	cfg.HardwareHandler.SerialMode = &serial.Mode{
+		BaudRate: cfg.HardwareHandler.BaudRate,
+		Parity:   serial.NoParity,
+		DataBits: 8,
+		StopBits: serial.OneStopBit,
+	}
+
 	GET = cfg
 
 	return nil
+}
+
+func GetMqttTopic(topic string) string {
+	return fmt.Sprintf("partyhall/%v", topic)
+}
+
+func IsInDev() bool {
+	return strings.HasPrefix(os.Args[0], "/tmp")
 }

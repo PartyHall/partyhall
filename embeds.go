@@ -3,9 +3,8 @@ package main
 import (
 	"embed"
 	"io/fs"
-	"os"
-	"strings"
 
+	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/services"
 )
@@ -20,8 +19,7 @@ var adminapp embed.FS
 var dbScripts embed.FS
 
 func init() {
-	execPath := os.Args[0]
-	if !strings.HasPrefix(execPath, "/tmp/") {
+	if !config.IsInDev() {
 		subfs, err := fs.Sub(webapp, "gui/dist")
 		if err != nil {
 			logs.Warn("Failed to get webapp path. Not loading the webapp", err)

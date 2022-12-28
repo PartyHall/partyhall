@@ -84,5 +84,6 @@ func Execute() {
 }
 
 func init() {
+	rootCmd.AddCommand(hwhandlerCmd)
 	rootCmd.AddCommand(versionCmd)
 }

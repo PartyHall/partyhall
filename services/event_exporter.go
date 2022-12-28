@@ -12,10 +12,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/oxodao/photobooth/logs"
-	"github.com/oxodao/photobooth/models"
-	"github.com/oxodao/photobooth/orm"
-	"github.com/oxodao/photobooth/utils"
+	"github.com/partyhall/partyhall/logs"
+	"github.com/partyhall/partyhall/models"
+	"github.com/partyhall/partyhall/orm"
+	"github.com/partyhall/partyhall/utils"
 )
 
 type EventExporter struct {

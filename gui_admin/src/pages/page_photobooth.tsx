@@ -6,16 +6,26 @@ import App from "./App";
 export default function PagePhotobooth() {
     const { appState, sendMessage } = useWebsocket();
 
+    const hasEvent = !!(appState?.app_state.current_event);
+
     return <App>
         <Card>
             <CardContent>
-                <Typography variant="h2" fontSize={18}>
-                    Current event:  {!!appState?.app_state.current_event && <>{appState?.app_state.current_event?.name}</>}
-                </Typography>
-                <ul>
-                    <li>Amount of picture handtaken: {appState?.app_state?.current_event?.amt_images_handtaken}</li>
-                    <li>Amount of picture unattended: {appState?.app_state?.current_event?.amt_images_unattended}</li>
-                </ul>
+                {
+                    hasEvent &&
+                    <>
+                        <Typography variant="h2" fontSize={18}>
+                            Current event:  {appState?.app_state.current_event?.name}
+                        </Typography>
+                        <ul>
+                            <li>Amount of picture handtaken: {appState?.app_state?.current_event?.amt_images_handtaken}</li>
+                            <li>Amount of picture unattended: {appState?.app_state?.current_event?.amt_images_unattended}</li>
+                        </ul>
+                    </>
+                }
+                {
+                    !hasEvent && <p>No event selected</p>
+                }
             </CardContent>
         </Card>
         <Card>

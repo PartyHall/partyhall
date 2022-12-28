@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/oxodao/photobooth/config"
+	"github.com/partyhall/partyhall/config"
 )
 
 func GetPath(path ...string) string {

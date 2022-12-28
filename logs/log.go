@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/oxodao/photobooth/utils"
+	"github.com/partyhall/partyhall/utils"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )

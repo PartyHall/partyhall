@@ -1,18 +1,28 @@
 package services
 
 import (
+	"embed"
+	"fmt"
 	"io/fs"
 	"net"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/oxodao/photobooth/config"
-	"github.com/oxodao/photobooth/logs"
-	"github.com/oxodao/photobooth/models"
-	"github.com/oxodao/photobooth/orm"
-	"github.com/oxodao/photobooth/utils"
+	"github.com/partyhall/partyhall/config"
+	"github.com/partyhall/partyhall/logs"
+	"github.com/partyhall/partyhall/migrations"
+	"github.com/partyhall/partyhall/models"
+	"github.com/partyhall/partyhall/orm"
+	"github.com/partyhall/partyhall/utils"
+)
+
+var (
+	WEBAPP_FS     *fs.FS
+	ADMIN_FS      *fs.FS
+	DB_SCRIPTS_FS embed.FS
 )
 
 var GET *Provider
@@ -21,25 +31,22 @@ type Provider struct {
 	Sockets    Sockets
 	MqttClient *mqtt.Client
 
-	Admin      Admin
-	Photobooth Photobooth
-
-	WebappFS   *fs.FS
-	AdminappFS *fs.FS
+	Admin     Admin
+	PartyHall PartyHall
 }
 
 func (p *Provider) GetFrontendSettings() *models.FrontendSettings {
 	settings := models.FrontendSettings{
-		AppState:     p.Photobooth.CurrentState,
-		Photobooth:   config.GET.Photobooth,
-		DebugDisplay: p.Photobooth.DisplayDebug,
-		CurrentMode:  p.Photobooth.CurrentMode,
+		AppState:     p.PartyHall.CurrentState,
+		Photobooth:   config.GET.PartyHall,
+		DebugDisplay: p.PartyHall.DisplayDebug,
+		CurrentMode:  p.PartyHall.CurrentMode,
 
 		IPAddress:  map[string][]string{},
 		KnownModes: config.MODES,
 
-		PhotoboothVersion: utils.CURRENT_VERSION,
-		PhotoboothCommit:  utils.CURRENT_COMMIT,
+		PartyHallVersion: utils.CURRENT_VERSION,
+		PartyHallCommit:  utils.CURRENT_COMMIT,
 	}
 
 	events, err := orm.GET.Events.GetEvents()
@@ -48,10 +55,10 @@ func (p *Provider) GetFrontendSettings() *models.FrontendSettings {
 		return nil
 	}
 
-	if GET.Photobooth.CurrentState.CurrentEvent != nil {
-		evt, err := orm.GET.Events.GetEvent(*GET.Photobooth.CurrentState.CurrentEvent)
+	if GET.PartyHall.CurrentState.CurrentEvent != nil {
+		evt, err := orm.GET.Events.GetEvent(*GET.PartyHall.CurrentState.CurrentEvent)
 		if err == nil {
-			GET.Photobooth.CurrentState.CurrentEventObj = evt
+			GET.PartyHall.CurrentState.CurrentEventObj = evt
 			settings.AppState.CurrentEventObj = evt
 		}
 	}
@@ -111,24 +118,34 @@ func (prv *Provider) loadState() error {
 		state.CurrentEventObj = evt
 	}
 
-	prv.Photobooth.CurrentState = state
+	prv.PartyHall.CurrentState = state
 
 	return nil
 }
 
-func Load(webapp, adminapp *fs.FS) error {
+func Load() error {
+	err := utils.MakeOrCreateFolder("")
+	if err != nil {
+		fmt.Println("Failed to create root folder")
+		os.Exit(1)
+	}
+
+	if err := migrations.CheckDbExists(DB_SCRIPTS_FS); err != nil {
+		logs.Error(err)
+		os.Exit(1)
+	}
 	for _, folder := range []string{"images"} {
 		if err := utils.MakeOrCreateFolder(folder); err != nil {
 			return err
 		}
 	}
 
-	err := orm.Load()
+	err = orm.Load()
 	if err != nil {
 		return err
 	}
 
-	opts := mqtt.NewClientOptions().AddBroker(config.GET.Mosquitto.Address).SetClientID("photobooth").SetPingTimeout(10 * time.Second).SetKeepAlive(10 * time.Second)
+	opts := mqtt.NewClientOptions().AddBroker(config.GET.Mosquitto.Address).SetClientID("partyhall").SetPingTimeout(10 * time.Second).SetKeepAlive(10 * time.Second)
 	opts.SetAutoReconnect(true).SetMaxReconnectInterval(10 * time.Second)
 	opts.SetConnectionLostHandler(func(c mqtt.Client, err error) {
 		logs.Errorf("[MQTT] Connection lost: %s\n" + err.Error())
@@ -138,13 +155,11 @@ func Load(webapp, adminapp *fs.FS) error {
 	})
 
 	prv := &Provider{
-		Sockets:    []*Socket{},
-		WebappFS:   webapp,
-		AdminappFS: adminapp,
+		Sockets: []*Socket{},
 	}
 
 	prv.Admin = Admin{prv: prv}
-	prv.Photobooth = Photobooth{
+	prv.PartyHall = PartyHall{
 		prv:         prv,
 		CurrentMode: config.GET.DefaultMode,
 	}
@@ -159,13 +174,13 @@ func Load(webapp, adminapp *fs.FS) error {
 		return token.Error()
 	}
 
-	initButtonHandler(&prv.Photobooth)
+	initButtonHandler(&prv.PartyHall)
 
 	actions := map[string]mqtt.MessageHandler{
-		"photobooth/button_press":   BPH.OnButtonPress,
-		"photobooth/sync":           prv.Photobooth.OnSyncRequested,
-		"photobooth/export":         prv.Photobooth.OnExportEvent,
-		"photobooth/admin/set_mode": prv.Admin.OnSetMode,
+		"partyhall/button_press":   BPH.OnButtonPress,
+		"partyhall/sync":           prv.PartyHall.OnSyncRequested,
+		"partyhall/export":         prv.PartyHall.OnExportEvent,
+		"partyhall/admin/set_mode": prv.Admin.OnSetMode,
 	}
 
 	for topic, action := range actions {

@@ -53,7 +53,7 @@ export default function ExportListing() {
                 throw 'Failed to download file';
             }
 
-            const filename = resp.headers.get('Content-Disposition')?.split('filename=')[1] ?? 'photobooth.zip';
+            const filename = resp.headers.get('Content-Disposition')?.split('filename=')[1] ?? 'partyhall.zip';
             const data = await resp.blob();
             const anchor = document.createElement('a');
 

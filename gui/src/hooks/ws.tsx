@@ -31,7 +31,7 @@ const WebsocketContext = createContext<WebsocketContextProps>({
 });
 
 export default function WebsocketProvider({ children }: { children: ReactNode }) {
-    const HOST = `ws://${window.location.host}/api/socket/photobooth`
+    const HOST = `ws://${window.location.host}/api/socket/booth`
     const [killSwitch, setKillswitch] = useState<number>(-1);
     const { sendMessage, lastMessage, readyState } = useWebSocket(HOST);
     const [ctx, setContext] = useState<WebsocketProps>(defaultState);

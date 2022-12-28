@@ -1,6 +1,6 @@
 package models
 
-import "github.com/oxodao/photobooth/config"
+import "github.com/partyhall/partyhall/config"
 
 type FrontendSettings struct {
 	AppState   AppState                `json:"app_state"`
@@ -13,8 +13,8 @@ type FrontendSettings struct {
 
 	CurrentMode string `json:"current_mode"`
 
-	PhotoboothVersion string `json:"photobooth_version"`
-	PhotoboothCommit  string `json:"photobooth_commit"`
+	PartyHallVersion string `json:"partyhall_version"`
+	PartyHallCommit  string `json:"partyhall_commit"`
 }
 
 type AdminSettings struct {

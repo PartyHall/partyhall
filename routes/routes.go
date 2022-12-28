@@ -14,10 +14,10 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
-	"github.com/oxodao/photobooth/config"
-	"github.com/oxodao/photobooth/logs"
-	"github.com/oxodao/photobooth/orm"
-	"github.com/oxodao/photobooth/services"
+	"github.com/partyhall/partyhall/config"
+	"github.com/partyhall/partyhall/logs"
+	"github.com/partyhall/partyhall/orm"
+	"github.com/partyhall/partyhall/services"
 	"golang.org/x/exp/slices"
 )
 
@@ -45,8 +45,8 @@ func socket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Photobooth should not be allowed from another computer
-	if socketType == services.SOCKET_TYPE_PHOTOBOOTH {
+	// PartyHall should not be allowed from another computer
+	if socketType == services.SOCKET_TYPE_BOOTH {
 		host, _, err := net.SplitHostPort(r.RemoteAddr)
 		if err != nil {
 			logs.Error("Failed to parse hostport: ", err)

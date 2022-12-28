@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
-	"github.com/oxodao/photobooth/config"
-	"github.com/oxodao/photobooth/models"
-	"github.com/oxodao/photobooth/orm"
+	"github.com/partyhall/partyhall/config"
+	"github.com/partyhall/partyhall/models"
+	"github.com/partyhall/partyhall/orm"
 )
 
 type ContextKey string

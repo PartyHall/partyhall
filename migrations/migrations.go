@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/oxodao/photobooth/logs"
-	"github.com/oxodao/photobooth/utils"
+	"github.com/partyhall/partyhall/logs"
+	"github.com/partyhall/partyhall/utils"
 )
 
 var MIGRATIONS = []migration{}
@@ -19,7 +19,7 @@ type migration interface {
 }
 
 func CheckDbExists(scripts embed.FS) error {
-	path := utils.GetPath("photobooth.db")
+	path := utils.GetPath("partyhall.db")
 	if _, err := os.Stat(path); !os.IsNotExist(err) {
 		return nil
 	}
@@ -60,8 +60,8 @@ func CheckDbExists(scripts embed.FS) error {
 		}
 	}
 
-	envHwid := os.Getenv("PHOTOBOOTH_HWID")
-	envToken := os.Getenv("PHOTOBOOTH_TOKEN")
+	envHwid := os.Getenv("PARTYHALL_HWID")
+	envToken := os.Getenv("PARTYHALL_TOKEN")
 	token := ""
 	if len(envToken) > 0 {
 		token = envToken

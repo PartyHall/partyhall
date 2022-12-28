@@ -55,7 +55,7 @@ export default function ApiProvider({ children }: { children: ReactNode }) {
             const data = await resp.text();
 
             if (data !== 'yes') {
-                setContext({ ...ctx, snackbarMessage: buildSnackbarMessage('Wrong response from the photobooth') })
+                setContext({ ...ctx, snackbarMessage: buildSnackbarMessage('Wrong response from the partyhall') })
                 return;
             } else {
                 localStorage.setItem('password', password);

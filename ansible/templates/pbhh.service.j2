@@ -1,10 +1,10 @@
 [Unit]
-Description=Photobooth HwHandler service
-Before=photobooth.service
+Description=PartyHall HwHandler service
+Before=partyhall.service
 
 [Service]
 WorkingDirectory=/home/{{ansible_user}}
-ExecStart=/opt/photobooth/pbhh
+ExecStart=/opt/partyhall/pbhh
 Restart=always
 RestartSec=3s
 

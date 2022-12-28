@@ -4,12 +4,12 @@ import (
 	"strconv"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/oxodao/photobooth/logs"
-	"github.com/oxodao/photobooth/models"
-	"github.com/oxodao/photobooth/orm"
+	"github.com/partyhall/partyhall/logs"
+	"github.com/partyhall/partyhall/models"
+	"github.com/partyhall/partyhall/orm"
 )
 
-type Photobooth struct {
+type PartyHall struct {
 	prv *Provider
 
 	CurrentState    models.AppState
@@ -18,11 +18,11 @@ type Photobooth struct {
 	DisplayDebug    bool
 }
 
-func (pb *Photobooth) OnSyncRequested(client mqtt.Client, msg mqtt.Message) {
+func (pb *PartyHall) OnSyncRequested(client mqtt.Client, msg mqtt.Message) {
 	logs.Info("Sync requested")
 }
 
-func (pb *Photobooth) OnExportEvent(client mqtt.Client, msg mqtt.Message) {
+func (pb *PartyHall) OnExportEvent(client mqtt.Client, msg mqtt.Message) {
 	eventIdStr := string(msg.Payload())
 	eventId, err := strconv.ParseInt(eventIdStr, 10, 64)
 	if err != nil {

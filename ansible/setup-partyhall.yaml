@@ -1,39 +1,39 @@
 ---
 - hosts: all
-  tags: [photobooth]
+  tags: [partyhall]
 
   tasks:
-    - name: Make photobooth dirs
+    - name: Make partyhall dirs
       become: yes
       file:
-        path: /opt/photobooth
+        path: /opt/partyhall
         state: 'directory'
         mode: '0777' # fck
 
-    - name: Fetch the photobooth release URL
+    - name: Fetch the partyhall release URL
       get_release_url: 
-        repository: oxodao/photobooth
+        repository: partyhall/partyhall
       register: pburl
 
     - name: Downloading the latest release
       become: yes
       get_url:
         url: "{{pburl.meta}}"
-        dest: /opt/photobooth/photobooth
+        dest: /opt/partyhall/partyhall
         mode: '0777'
 
     - name: Symlink the executable
       become: yes
       file:
-        src: /opt/photobooth/photobooth
-        dest: /usr/bin/photobooth
+        src: /opt/partyhall/partyhall
+        dest: /usr/bin/partyhall
         state: link
 
-    - name: Pushing the photobooth config
+    - name: Pushing the partyhall config
       become: yes
       template:
-        src: templates/photobooth.yaml.j2
-        dest: /etc/photobooth.yaml
+        src: templates/partyhall.yaml.j2
+        dest: /etc/partyhall.yaml
         mode: 0664
 
     - name: Make data directory
@@ -45,13 +45,13 @@
     - name: Pushing the service
       become: yes
       template:
-        src: templates/photobooth.service.j2
-        dest: /usr/lib/systemd/user/photobooth.service
+        src: templates/partyhall.service.j2
+        dest: /usr/lib/systemd/user/partyhall.service
         mode: '0644'
 
     - name: Enabling the service
       systemd:
-        name: photobooth
+        name: partyhall
         daemon_reload: yes
         state: started
         enabled: yes

@@ -1,32 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
-import '../assets/css/photobooth.scss';
 import LockedModal from "../components/locked_modal";
 import { useWebsocket } from "../hooks/ws";
 
-const debugOpenImage = (img: string) => {
-    const contentType = 'image/jpeg';
-
-    const byteCharacters = atob(img.substr(`data:${contentType};base64,`.length));
-    const byteArrays = [];
-
-    for (let offset = 0; offset < byteCharacters.length; offset += 1024) {
-        const slice = byteCharacters.slice(offset, offset + 1024);
-
-        const byteNumbers = new Array(slice.length);
-        for (let i = 0; i < slice.length; i++) {
-            byteNumbers[i] = slice.charCodeAt(i);
-        }
-
-        const byteArray = new Uint8Array(byteNumbers);
-
-        byteArrays.push(byteArray);
-    }
-    const blob = new Blob(byteArrays, { type: contentType });
-    const blobUrl = URL.createObjectURL(blob);
-
-    window.open(blobUrl, '_blank');
-};
+import '../assets/css/photobooth.scss';
 
 export default function Photobooth() {
     const webcamRef = useRef<Webcam>(null);

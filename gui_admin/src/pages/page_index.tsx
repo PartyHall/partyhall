@@ -11,18 +11,6 @@ import { EditedEvent, Event } from '../types/appstate';
 import App from "./App";
 import EventEditor from "../components/event_editor";
 
-const style = {
-    position: 'absolute' as 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: '#0e0e0e',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-};
-
 export default function PageIndex() {
     const { sendMessage, appState, currentTime } = useWebsocket();
 
@@ -152,7 +140,7 @@ export default function PageIndex() {
         <Dialog open={shutdown} onClose={() => setShutdown(false)}>
             <DialogTitle>Shutting down</DialogTitle>
             <DialogContent>
-                <DialogContentText>You are trying to shutdown the photobooth. Are you sure ?</DialogContentText>
+                <DialogContentText>You are trying to shutdown the partyhall. Are you sure ?</DialogContentText>
             </DialogContent>
             <DialogActions>
                 <Button onClick={() => setShutdown(false)}>Cancel</Button>

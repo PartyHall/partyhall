@@ -1,10 +1,10 @@
 [Unit]
-Description=Photobooth service
+Description=PartyHall service
 Before=graphical.target systemd-user-sessions.service
 
 [Service]
 WorkingDirectory=/home/{{ansible_user}}
-ExecStart=/opt/photobooth/photobooth
+ExecStart=/opt/partyhall/partyhall
 Restart=always
 RestartSec=3s
 

@@ -1,4 +1,4 @@
-module github.com/oxodao/photobooth
+module github.com/partyhall/partyhall
 
 go 1.19
 

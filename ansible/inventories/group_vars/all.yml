@@ -1,12 +1,12 @@
 ---
-photobooth_debug_mode: false
-photobooth_listen_port: 8039 # Don't use anything user 1024. Later an nginx will be setup to forward the request. For now, it's not possible as the debug mode check the IP and would not work behind a reverse proxy
-photobooth_has_hardware_flash: false
-photobooth_default_timer: 3
-photobooth_unattended_interval: 5
+partyhall_debug_mode: false
+partyhall_listen_port: 8039 # Don't use anything user 1024. Later an nginx will be setup to forward the request. For now, it's not possible as the debug mode check the IP and would not work behind a reverse proxy
+partyhall_has_hardware_flash: false
+partyhall_default_timer: 3
+partyhall_unattended_interval: 5
 
-photobooth_webcam_width: 1280
-photobooth_webcam_height: 720
+partyhall_webcam_width: 1280
+partyhall_webcam_height: 720
 
 ntp_enabled: true
 ntp_timezone: Europe/Paris
@@ -14,6 +14,6 @@ ntp_timezone: Europe/Paris
 ethernet_interface: eth0
 
 hotspot_interface: wlan0
-hotspot_ssid: "Photobooth"
-hotspot_dns_name: "photobooth.lan"
+hotspot_ssid: "PartyHall"
+hotspot_dns_name: "partyhall.lan"
 hotspot_wifi_channel: 11

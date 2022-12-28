@@ -7,18 +7,18 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/oxodao/photobooth/config"
-	"github.com/oxodao/photobooth/logs"
-	"github.com/oxodao/photobooth/models"
-	"github.com/oxodao/photobooth/orm"
+	"github.com/partyhall/partyhall/config"
+	"github.com/partyhall/partyhall/logs"
+	"github.com/partyhall/partyhall/models"
+	"github.com/partyhall/partyhall/orm"
 	"golang.org/x/exp/slices"
 )
 
-const SOCKET_TYPE_PHOTOBOOTH = "PHOTOBOOTH"
+const SOCKET_TYPE_BOOTH = "BOOTH"
 const SOCKET_TYPE_ADMIN = "ADMIN"
 
 var SOCKET_TYPES = []string{
-	SOCKET_TYPE_PHOTOBOOTH,
+	SOCKET_TYPE_BOOTH,
 	SOCKET_TYPE_ADMIN,
 }
 
@@ -34,13 +34,13 @@ func (s Sockets) broadcastTo(to string, msgType string, data interface{}) {
 	}
 }
 
-func (s Sockets) BroadcastPhotobooth(msgType string, data interface{}) {
-	s.broadcastTo(SOCKET_TYPE_PHOTOBOOTH, msgType, data)
+func (s Sockets) BroadcastPartyHall(msgType string, data interface{}) {
+	s.broadcastTo(SOCKET_TYPE_BOOTH, msgType, data)
 }
 
 func (s Sockets) BroadcastTakePicture() {
 	for _, socket := range s {
-		if socket.Type != SOCKET_TYPE_PHOTOBOOTH {
+		if socket.Type != SOCKET_TYPE_BOOTH {
 			continue
 		}
 
@@ -67,15 +67,15 @@ type Socket struct {
 }
 
 func (s *Socket) TakePicture() {
-	if GET.Photobooth.IsTakingPicture || s.Type != SOCKET_TYPE_PHOTOBOOTH {
+	if GET.PartyHall.IsTakingPicture || s.Type != SOCKET_TYPE_BOOTH {
 		return
 	}
 
-	GET.Photobooth.IsTakingPicture = true
+	GET.PartyHall.IsTakingPicture = true
 
 	logs.Info("Taking picture...")
 	go func() {
-		timeout := config.GET.Photobooth.DefaultTimer
+		timeout := config.GET.PartyHall.DefaultTimer
 
 		for timeout >= 0 {
 			s.Send("TIMER", timeout)
@@ -83,7 +83,7 @@ func (s *Socket) TakePicture() {
 			time.Sleep(1 * time.Second)
 		}
 
-		GET.Photobooth.IsTakingPicture = false
+		GET.PartyHall.IsTakingPicture = false
 	}()
 }
 
@@ -111,7 +111,7 @@ func (s *Socket) OnMessage(msg models.SocketMessage) {
 			break
 		}
 
-		GET.Photobooth.CurrentMode = mode
+		GET.PartyHall.CurrentMode = mode
 		GET.Sockets.BroadcastState()
 	case "SET_DATETIME":
 		dt, ok := msg.Payload.(string)
@@ -144,10 +144,10 @@ func (s *Socket) OnMessage(msg models.SocketMessage) {
 			break
 		}
 
-		GET.Photobooth.CurrentState.CurrentEvent = &evtId
-		GET.Photobooth.CurrentState.CurrentEventObj = evt
+		GET.PartyHall.CurrentState.CurrentEvent = &evtId
+		GET.PartyHall.CurrentState.CurrentEventObj = evt
 
-		err = orm.GET.AppState.SetState(GET.Photobooth.CurrentState)
+		err = orm.GET.AppState.SetState(GET.PartyHall.CurrentState)
 		if err != nil {
 			s.Send("ERR_MODAL", "Failed to save state: "+err.Error())
 			break
@@ -155,15 +155,15 @@ func (s *Socket) OnMessage(msg models.SocketMessage) {
 
 		GET.Sockets.BroadcastState()
 	case "SHOW_DEBUG":
-		(*GET.MqttClient).Publish("photobooth/button_press", 2, false, "DISPLAY_DEBUG")
+		(*GET.MqttClient).Publish("partyhall/button_press", 2, false, "DISPLAY_DEBUG")
 	case "EXPORT_ZIP":
-		token := (*GET.MqttClient).Publish("photobooth/export", 2, false, fmt.Sprintf("%v", msg.Payload))
+		token := (*GET.MqttClient).Publish("partyhall/export", 2, false, fmt.Sprintf("%v", msg.Payload))
 		token.Wait()
 		if token.Error() != nil {
 			logs.Error(token.Error())
 		}
 	case "SHUTDOWN":
-		(*GET.MqttClient).Publish("photobooth/button_press", 2, false, "SHUTDOWN")
+		(*GET.MqttClient).Publish("partyhall/button_press", 2, false, "SHUTDOWN")
 	case "":
 		// Probably should be handled in another way
 		return
@@ -231,10 +231,10 @@ func (p *Provider) Join(socketType string, socket *websocket.Conn) {
 		}
 	}()
 
-	if socketType == SOCKET_TYPE_PHOTOBOOTH && config.GET.Photobooth.UnattendedInterval > 1 {
+	if socketType == SOCKET_TYPE_BOOTH && config.GET.PartyHall.UnattendedInterval > 1 {
 		go func() {
 			for sock.Open {
-				time.Sleep(time.Duration(config.GET.Photobooth.UnattendedInterval) * time.Minute)
+				time.Sleep(time.Duration(config.GET.PartyHall.UnattendedInterval) * time.Minute)
 				logs.Info("Unattended picture")
 				sock.Send("UNATTENDED_PICTURE", nil)
 			}

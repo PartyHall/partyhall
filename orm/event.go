@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/oxodao/photobooth/models"
+	"github.com/partyhall/partyhall/models"
 )
 
 type Events struct {

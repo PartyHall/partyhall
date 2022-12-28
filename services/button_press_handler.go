@@ -5,17 +5,17 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/oxodao/photobooth/logs"
+	"github.com/partyhall/partyhall/logs"
 )
 
 var BPH *ButtonPressHandler = nil
 
 type ButtonPressHandler struct {
 	handlers map[string]func(client mqtt.Client)
-	pb       *Photobooth
+	pb       *PartyHall
 }
 
-func initButtonHandler(pb *Photobooth) {
+func initButtonHandler(pb *PartyHall) {
 	BPH = &ButtonPressHandler{}
 	BPH.pb = pb
 

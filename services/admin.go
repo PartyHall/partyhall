@@ -2,8 +2,8 @@ package services
 
 import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/oxodao/photobooth/config"
-	"github.com/oxodao/photobooth/logs"
+	"github.com/partyhall/partyhall/config"
+	"github.com/partyhall/partyhall/logs"
 	"golang.org/x/exp/slices"
 )
 
@@ -18,6 +18,6 @@ func (a *Admin) OnSetMode(c mqtt.Client, msg mqtt.Message) {
 		return
 	}
 
-	a.prv.Photobooth.CurrentMode = mode
+	a.prv.PartyHall.CurrentMode = mode
 	a.prv.Sockets.BroadcastState()
 }

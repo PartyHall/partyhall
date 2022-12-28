@@ -2,8 +2,8 @@ package orm
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/oxodao/photobooth/migrations"
-	"github.com/oxodao/photobooth/utils"
+	"github.com/partyhall/partyhall/migrations"
+	"github.com/partyhall/partyhall/utils"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -17,7 +17,7 @@ type ORM struct {
 }
 
 func Load() error {
-	db := sqlx.MustConnect("sqlite3", utils.GetPath("photobooth.db"))
+	db := sqlx.MustConnect("sqlite3", utils.GetPath("partyhall.db"))
 
 	GET = &ORM{
 		DB:       db,

@@ -33,6 +33,6 @@ export type AppState = {
     known_events: Event[];
     known_modes: string[];
 
-    photobooth_version: string;
-    photobooth_commit: string;
+    partyhall_version: string;
+    partyhall_commit: string;
 };

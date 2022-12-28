@@ -11,11 +11,11 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/mattn/go-sqlite3"
-	"github.com/oxodao/photobooth/logs"
-	"github.com/oxodao/photobooth/models"
-	"github.com/oxodao/photobooth/orm"
-	"github.com/oxodao/photobooth/services"
-	"github.com/oxodao/photobooth/utils"
+	"github.com/partyhall/partyhall/logs"
+	"github.com/partyhall/partyhall/models"
+	"github.com/partyhall/partyhall/orm"
+	"github.com/partyhall/partyhall/services"
+	"github.com/partyhall/partyhall/utils"
 )
 
 func registerAdminRoutes(r *mux.Router) {
@@ -45,7 +45,7 @@ func isPasswordValid(w http.ResponseWriter, r *http.Request) {
 
 func setMode(w http.ResponseWriter, r *http.Request) {
 	values := mux.Vars(r)
-	(*services.GET.MqttClient).Publish("photobooth/admin/set_mode", 2, false, values["mode"])
+	(*services.GET.MqttClient).Publish("partyhall/admin/set_mode", 2, false, values["mode"])
 }
 
 type UpdatedEvent struct {
@@ -84,10 +84,10 @@ func createEvent(w http.ResponseWriter, r *http.Request) {
 	events, err := orm.GET.Events.GetEvents()
 	if err == nil {
 		if len(events) == 1 {
-			services.GET.Photobooth.CurrentState.CurrentEvent = &events[0].Id
-			services.GET.Photobooth.CurrentState.CurrentEventObj = &events[0]
+			services.GET.PartyHall.CurrentState.CurrentEvent = &events[0].Id
+			services.GET.PartyHall.CurrentState.CurrentEventObj = &events[0]
 
-			orm.GET.AppState.SetState(services.GET.Photobooth.CurrentState)
+			orm.GET.AppState.SetState(services.GET.PartyHall.CurrentState)
 		}
 	}
 	//#endregion

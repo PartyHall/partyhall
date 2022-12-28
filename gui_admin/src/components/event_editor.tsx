@@ -4,7 +4,6 @@ import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import { DateTime } from "luxon";
 import { EditedEvent } from "../types/appstate";
-import { useWebsocket } from "../hooks/ws";
 import { useApi } from "../hooks/auth";
 
 import '../assets/css/event_editor.scss';

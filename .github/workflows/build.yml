@@ -1,4 +1,4 @@
-name: Build Photobooth
+name: Build PartyHall
 
 on:
   create:
@@ -8,14 +8,13 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    if: github.actor == github.event.repository.owner.login
     steps:
       - uses: actions/checkout@v2
       - run: docker run -v $PWD:/app oxodao/oxbuilder:n19g19 bash -c "cd /app/gui && npm i && npm run build"
       - run: docker run -v $PWD:/app oxodao/oxbuilder:n19g19 bash -c "cd /app/gui_admin && npm i && npm run build"
-      - run: docker run -e APP_VERSION="${GITHUB_REF##*/}" -e COMMIT_HASH="${GITHUB_SHA}" -v $PWD:/app oxodao/oxbuilder:n19g19 bash -c 'cd /app && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags="-X github.com/oxodao/photobooth/utils.CURRENT_VERSION=${APP_VERSION} -X github.com/oxodao/photobooth/utils.CURRENT_COMMIT=${COMMIT_HASH}" -o photobooth-${APP_VERSION}-linux-amd64 .'
-      - run: docker run -e APP_VERSION="${GITHUB_REF##*/}" -e COMMIT_HASH="${GITHUB_SHA}" -v $PWD:/app oxodao/oxbuilder:n19g19 bash -c 'cd /app && CGO_ENABLED=1 GOOS=linux GOARCH=arm64 CC=aarch64-linux-gnu-gcc go build -ldflags="-X github.com/oxodao/photobooth/utils.CURRENT_VERSION=${APP_VERSION} -X github.com/oxodao/photobooth/utils.CURRENT_COMMIT=${COMMIT_HASH}" -o photobooth-${APP_VERSION}-linux-arm64 .'
+      - run: docker run -e APP_VERSION="${GITHUB_REF##*/}" -e COMMIT_HASH="${GITHUB_SHA}" -v $PWD:/app oxodao/oxbuilder:n19g19 bash -c 'cd /app && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -ldflags="-X github.com/partyhall/partyhall/utils.CURRENT_VERSION=${APP_VERSION} -X github.com/partyhall/partyhall/utils.CURRENT_COMMIT=${COMMIT_HASH}" -o partyhall-${APP_VERSION}-linux-amd64 .'
+      - run: docker run -e APP_VERSION="${GITHUB_REF##*/}" -e COMMIT_HASH="${GITHUB_SHA}" -v $PWD:/app oxodao/oxbuilder:n19g19 bash -c 'cd /app && CGO_ENABLED=1 GOOS=linux GOARCH=arm64 CC=aarch64-linux-gnu-gcc go build -ldflags="-X github.com/partyhall/partyhall/utils.CURRENT_VERSION=${APP_VERSION} -X github.com/partyhall/partyhall/utils.CURRENT_COMMIT=${COMMIT_HASH}" -o partyhall-${APP_VERSION}-linux-arm64 .'
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "photobooth-*-*-*"
+          artifacts: "partyhall-*-*-*"
           token: ${{ secrets.GITHUB_TOKEN }}

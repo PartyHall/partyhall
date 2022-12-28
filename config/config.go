@@ -50,8 +50,8 @@ type Config struct {
 	RootPath    string `yaml:"root_path"`
 	DefaultMode string `yaml:"default_mode"`
 
-	Mosquitto  MosquittoConfig  `yaml:"mosquitto"`
-	Photobooth PhotoboothConfig `yaml:"photobooth"`
+	Mosquitto MosquittoConfig  `yaml:"mosquitto"`
+	PartyHall PhotoboothConfig `yaml:"partyhall"`
 }
 
 func (c *Config) GetImageFolder(eventId int64, unattended bool) (string, error) {
@@ -76,9 +76,9 @@ func (c *Config) GetImageFolder(eventId int64, unattended bool) (string, error) 
 func Load() error {
 	cfg := Config{}
 
-	configPath := os.Getenv("PHOTOBOOTH_CONFIG_PATH")
+	configPath := os.Getenv("PARTYHALL_CONFIG_PATH")
 	if len(configPath) == 0 {
-		configPath = "/etc/photobooth.yaml"
+		configPath = "/etc/partyhall.yaml"
 	}
 
 	data, err := ioutil.ReadFile(configPath)
@@ -91,12 +91,12 @@ func Load() error {
 		return err
 	}
 
-	if cfg.Photobooth.DefaultTimer == 0 {
-		cfg.Photobooth.DefaultTimer = 3
+	if cfg.PartyHall.DefaultTimer == 0 {
+		cfg.PartyHall.DefaultTimer = 3
 	}
 
 	if len(cfg.DefaultMode) == 0 {
-		cfg.DefaultMode = "PHOTOBOOTH"
+		cfg.DefaultMode = MODE_PHOTOBOOTH
 	}
 
 	GET = cfg

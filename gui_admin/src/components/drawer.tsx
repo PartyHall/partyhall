@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import SettingsIcon from '@mui/icons-material/Settings';
 import PhotoIcon from '@mui/icons-material/PhotoCamera';
 import QuizIcon from '@mui/icons-material/Quiz';
-import { useWebsocket } from '../hooks/ws';
 
 type DrawerProps = {
     open: boolean;

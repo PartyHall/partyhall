@@ -1,7 +1,0 @@
-roles:
-  - geerlingguy.ntp
-  - staticdev.firefox
-
-collections:
-  - ansible.posix
-  - community.general

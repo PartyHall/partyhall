@@ -1,0 +1,13 @@
+[Unit]
+Description=PartyHall HwHandler service
+Before=partyhall.service
+
+[Service]
+WorkingDirectory=/home/{{ansible_user}}
+ExecStart=/opt/partyhall/partyhall hwhandler
+Restart=always
+RestartSec=3s
+
+# @TODO: "is added as a dependency to a non-existent unit multi-user.target"
+[Install]
+WantedBy=default.target

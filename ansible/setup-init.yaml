@@ -1,0 +1,20 @@
+---
+- hosts: all
+  become: yes
+  tags: [init]
+
+  roles:
+    - geerlingguy.ntp
+
+  tasks:
+    - name: Updating the system setup
+      apt:
+        update_cache: yes
+        upgrade: yes
+        cache_valid_time: 86400
+      environment:
+        DEBIAN_FRONTEND: noninteractive
+
+    - name: Install some softwares
+      apt:
+        name: [ zip, unzip, sqlite3, vim ]

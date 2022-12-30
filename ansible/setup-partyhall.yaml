@@ -1,0 +1,60 @@
+---
+- hosts: all
+  tags: [partyhall]
+
+  tasks:
+    - name: Make partyhall dirs
+      become: yes
+      file:
+        path: /opt/partyhall
+        state: 'directory'
+        mode: '0777' # fck
+
+    - name: Fetch the partyhall release URL
+      get_release_url: 
+        repository: partyhall/partyhall
+      register: partyhall_url
+
+    - name: Downloading the latest release
+      become: yes
+      get_url:
+        url: "{{partyhall_url.meta}}"
+        dest: /opt/partyhall/partyhall
+        mode: '0777'
+
+    - name: Symlink the executable
+      become: yes
+      file:
+        src: /opt/partyhall/partyhall
+        dest: /usr/bin/partyhall
+        state: link
+
+    - name: Pushing the partyhall config
+      become: yes
+      template:
+        src: templates/partyhall.yaml.j2
+        dest: /etc/partyhall.yaml
+        mode: 0664
+
+    - name: Make data directory
+      file:
+        path: "/home/{{ansible_user}}/data"
+        state: directory
+        mode: '0770'
+
+    - name: Pushing the services
+      become: yes
+      template:
+        src: "templates/{{item}}.service.j2"
+        dest: "/usr/lib/systemd/user/{{item}}.service"
+        mode: '0644'
+      loop: [partyhall, pbhh]
+
+    - name: Enabling the services
+      systemd:
+        name: "{{item}}"
+        daemon_reload: yes
+        state: started
+        enabled: yes
+        scope: user
+      loop: [partyhall, pbhh]

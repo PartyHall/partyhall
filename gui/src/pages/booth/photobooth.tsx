@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import Webcam from "react-webcam";
 import LockedModal from "../../components/locked_modal";
-import { useWebsocket } from "../../hooks/boothSocket";
+import { useBoothSocket } from "../../hooks/boothSocket";
 
 import '../../assets/css/photobooth.scss';
 
 export default function Photobooth() {
     const webcamRef = useRef<Webcam>(null);
-    const { appState, lastMessage, sendMessage } = useWebsocket();
+    const { appState, lastMessage, sendMessage } = useBoothSocket();
     const [timer, setTimer] = useState(-1);
     const [flash, setFlash] = useState<boolean>(false);
     const [lastPicture, setLastPicture] = useState<string|null>(null);

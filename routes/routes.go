@@ -58,7 +58,11 @@ func startSocket(w http.ResponseWriter, r *http.Request) {
 			logs.Debug("Letting a remote connection")
 		}
 	} else {
-		// @TODO: Handle authentication
+		pwd := r.URL.Query().Get("password")
+		if pwd != config.GET.Web.AdminPassword {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
 	}
 
 	conn, err := upgrader.Upgrade(w, r, nil)

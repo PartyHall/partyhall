@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"net"
 	"net/http"
 )
@@ -11,8 +10,6 @@ func IsRemote(r *http.Request) bool {
 	if len(addr) == 0 {
 		ip, _, err := net.SplitHostPort(r.RemoteAddr)
 		if err != nil {
-			fmt.Println(err)
-
 			// Just to be on the safe side, we say that it's a remote connection when we can't parse the hostport (shouldn't happen)
 			return true
 		}

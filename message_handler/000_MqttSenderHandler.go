@@ -47,7 +47,6 @@ func getMqttHandler(hType string, topic string, getPayload func(interface{}) int
 }
 
 func getButtonPressHandler(hType string, button string) MqttSenderHandler {
-	fmt.Println(hType, button)
 	return getMqttHandler(
 		hType,
 		"button_press",

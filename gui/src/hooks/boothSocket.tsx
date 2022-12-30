@@ -1,5 +1,5 @@
 import { Alert, Snackbar } from "@mui/material";
-import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { TextLoader } from "../components/loader";
 import { AppState } from "../types/appstate";
@@ -34,10 +34,16 @@ const WebsocketContext = createContext<WebsocketContextProps>({
 });
 
 export default function BoothSocketProvider({ children }: { children: ReactNode }) {
-    const HOST = `ws://${window.location.host}/api/socket/booth`
-    const { sendMessage, lastMessage, readyState } = useWebSocket(HOST);
+    const { sendJsonMessage, lastMessage, readyState } = useWebSocket(
+        `ws://${window.location.host}/api/socket/booth`,
+        {
+            shouldReconnect: () => true,
+            reconnectAttempts: 10,
+            reconnectInterval: 3000,
+        }
+    );
     const [ctx, setContext] = useState<WebsocketProps>(defaultState);
-    const {showSnackbar} = useSnackbar();
+    const { showSnackbar } = useSnackbar();
 
     const connectionStatus = useRefresher(readyState, 5);
 
@@ -56,11 +62,11 @@ export default function BoothSocketProvider({ children }: { children: ReactNode 
         }
 
         const data = JSON.parse(lastMessage.data);
-        const newContext = {...ctx, lastMessage: data};
+        const newContext = { ...ctx, lastMessage: data };
 
         switch (data.type) {
             case "PING":
-                sendMessage('{"type": "PONG"}')
+                sendJsonMessage({ 'type': 'PONG' })
                 newContext.currentTime = data.payload;
                 break;
             case "APP_STATE":
@@ -79,7 +85,7 @@ export default function BoothSocketProvider({ children }: { children: ReactNode 
 
     return <WebsocketContext.Provider value={{
         ...ctx,
-        sendMessage: (msgType: string, data?: any) => sendMessage(JSON.stringify({ type: msgType, payload: data })),
+        sendMessage: (msgType: string, data?: any) => sendJsonMessage({ type: msgType, payload: data }),
         showDebug,
     }}>
         <TextLoader loading={readyState != ReadyState.OPEN || !ctx.appState} text={connectionStatus}>
@@ -88,6 +94,6 @@ export default function BoothSocketProvider({ children }: { children: ReactNode 
     </WebsocketContext.Provider>
 }
 
-export function useWebsocket(): WebsocketContextProps {
+export function useBoothSocket(): WebsocketContextProps {
     return useContext<WebsocketContextProps>(WebsocketContext);
 }

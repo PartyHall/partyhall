@@ -2,12 +2,12 @@ import { ReactNode } from "react";
 import { Navigate, useOutlet } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
 import useKeyPress from "../hooks/useKeyPress";
-import { useWebsocket } from "../hooks/boothSocket";
+import { useBoothSocket } from "../hooks/boothSocket";
 
 export default function BoothLayout() {
     const outlet = useOutlet();
     const {socketMode} = useApi();
-    const { appState, currentTime, showDebug } = useWebsocket();
+    const { appState, currentTime, showDebug } = useBoothSocket();
 
     useKeyPress(['d'], (event: any) => {
         if (event.key === 'd') {

@@ -1,6 +1,6 @@
 run:
-	mkdir -p gui/dist gui_admin/dist
-	touch gui/dist/random_data gui_admin/dist/random_data # Make go fckng happy
+	mkdir -p gui/dist
+	touch gui/dist/random_data # Make go fckng happy
 	docker compose up -d
 	go run .
 

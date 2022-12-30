@@ -1,9 +1,9 @@
-import { useWebsocket } from "../../hooks/boothSocket";
+import { useBoothSocket } from "../../hooks/boothSocket";
 import Photobooth from "./photobooth";
 import Quiz from "./quiz";
 
 export default function PartyHallUI() {
-    const { appState } = useWebsocket();
+    const { appState } = useBoothSocket();
 
     return <>
         { ['PHOTOBOOTH', 'DISABLED'].includes(appState.current_mode) && <Photobooth /> }

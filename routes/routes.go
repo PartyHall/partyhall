@@ -15,8 +15,11 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
+	"github.com/partyhall/partyhall/message_handler"
+	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/orm"
 	"github.com/partyhall/partyhall/services"
+	"github.com/partyhall/partyhall/socket"
 	"github.com/partyhall/partyhall/utils"
 	"golang.org/x/exp/slices"
 )
@@ -30,23 +33,23 @@ var upgrader = websocket.Upgrader{
 }
 
 func Register(r *mux.Router) {
-	r.HandleFunc("/socket/{type}", socket)
+	r.HandleFunc("/socket/{type}", startSocket)
 	r.HandleFunc("/settings", settings)
 	r.HandleFunc("/picture", picture).Methods(http.MethodPost)
 
 	registerAdminRoutes(r.PathPrefix("/admin").Subrouter())
 }
 
-func socket(w http.ResponseWriter, r *http.Request) {
+func startSocket(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	socketType := strings.ToUpper(vars["type"])
-	if !slices.Contains(services.SOCKET_TYPES, socketType) {
+	if !slices.Contains(socket.SOCKET_TYPES, socketType) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	// PartyHall should not be allowed from another computer
-	if socketType == services.SOCKET_TYPE_BOOTH {
+	if socketType == socket.SOCKET_TYPE_BOOTH {
 		if utils.IsRemote(r) {
 			if !config.GET.DebugMode && !config.IsInDev() {
 				w.WriteHeader(http.StatusForbidden)
@@ -64,7 +67,30 @@ func socket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	services.GET.Join(socketType, conn)
+	sock := socket.Join(socketType, conn)
+
+	go func() {
+		for {
+			data := models.SocketMessage{}
+			err := conn.ReadJSON(&data)
+			if err != nil {
+				if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+					logs.Error("Unexpected close error: ", err)
+					sock.Open = false
+					return
+				} else if websocket.IsCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+					logs.Error("Websocket disconnected: ", err)
+					sock.Open = false
+					return
+				}
+
+				logs.Error("Failed to connect websocket: ", err)
+				continue
+			}
+
+			message_handler.ProcessMessage(sock, data)
+		}
+	}()
 }
 
 func settings(w http.ResponseWriter, r *http.Request) {
@@ -171,7 +197,7 @@ func picture(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Broadcasting the state so that the current event is refreshed on the admin panel
-	services.GET.Sockets.BroadcastState()
+	socket.SOCKETS.BroadcastState()
 
 	if !isUnattended {
 		http.ServeFile(w, r, filepath)

@@ -11,6 +11,7 @@ import (
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/models"
+	"github.com/partyhall/partyhall/mqtt_handler"
 	"github.com/partyhall/partyhall/orm"
 	"github.com/partyhall/partyhall/routes"
 	"github.com/partyhall/partyhall/services"
@@ -27,7 +28,13 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		_, err := orm.GET.AppState.GetState()
+		err := mqtt_handler.ConnectAndListen()
+		if err != nil {
+			logs.Error(err)
+			os.Exit(1)
+		}
+
+		_, err = orm.GET.AppState.GetState()
 		if err != nil {
 			if err != sql.ErrNoRows {
 				logs.Error("Failed to load appstate: ", err)

@@ -6,9 +6,7 @@ import (
 	"io/fs"
 	"net"
 	"os"
-	"os/exec"
 	"strings"
-	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/partyhall/partyhall/config"
@@ -27,18 +25,18 @@ var (
 var GET *Provider
 
 type Provider struct {
-	Sockets    Sockets
 	MqttClient *mqtt.Client
 
-	Admin     Admin
-	PartyHall PartyHall
+	CurrentState    models.AppState
+	IsTakingPicture bool
+	CurrentMode     string
 }
 
 func (p *Provider) GetFrontendSettings() *models.FrontendSettings {
 	settings := models.FrontendSettings{
-		AppState:    p.PartyHall.CurrentState,
+		AppState:    p.CurrentState,
 		Photobooth:  config.GET.Photobooth,
-		CurrentMode: p.PartyHall.CurrentMode,
+		CurrentMode: p.CurrentMode,
 
 		IPAddress:  map[string][]string{},
 		KnownModes: config.MODES,
@@ -53,10 +51,10 @@ func (p *Provider) GetFrontendSettings() *models.FrontendSettings {
 		return nil
 	}
 
-	if GET.PartyHall.CurrentState.CurrentEvent != nil {
-		evt, err := orm.GET.Events.GetEvent(*GET.PartyHall.CurrentState.CurrentEvent)
+	if GET.CurrentState.CurrentEvent != nil {
+		evt, err := orm.GET.Events.GetEvent(*GET.CurrentState.CurrentEvent)
 		if err == nil {
-			GET.PartyHall.CurrentState.CurrentEventObj = evt
+			GET.CurrentState.CurrentEventObj = evt
 			settings.AppState.CurrentEventObj = evt
 		}
 	}
@@ -88,19 +86,6 @@ func (p *Provider) GetFrontendSettings() *models.FrontendSettings {
 	return &settings
 }
 
-func SetSystemDate(newTime time.Time) error {
-	_, lookErr := exec.LookPath("sudo")
-	if lookErr != nil {
-		logs.Errorf("Sudo binary not found, cannot set system date: %s\n", lookErr.Error())
-		return lookErr
-	} else {
-		dateString := newTime.Format("2 Jan 2006 15:04:05")
-		logs.Errorf("Setting system date to: %s\n", dateString)
-		args := []string{"date", "--set", dateString}
-		return exec.Command("sudo", args...).Run()
-	}
-}
-
 func (prv *Provider) loadState() error {
 	state, err := orm.GET.AppState.GetState()
 	if err != nil {
@@ -116,7 +101,7 @@ func (prv *Provider) loadState() error {
 		state.CurrentEventObj = evt
 	}
 
-	prv.PartyHall.CurrentState = state
+	prv.CurrentState = state
 
 	return nil
 }
@@ -143,22 +128,7 @@ func Load() error {
 		return err
 	}
 
-	opts := mqtt.NewClientOptions().AddBroker(config.GET.Mosquitto.Address).SetClientID("partyhall").SetPingTimeout(10 * time.Second).SetKeepAlive(10 * time.Second)
-	opts.SetAutoReconnect(true).SetMaxReconnectInterval(10 * time.Second)
-	opts.SetConnectionLostHandler(func(c mqtt.Client, err error) {
-		logs.Errorf("[MQTT] Connection lost: %s\n" + err.Error())
-	})
-	opts.SetReconnectingHandler(func(c mqtt.Client, options *mqtt.ClientOptions) {
-		logs.Info("[MQTT] Reconnecting...")
-	})
-
 	prv := &Provider{
-		Sockets: []*Socket{},
-	}
-
-	prv.Admin = Admin{prv: prv}
-	prv.PartyHall = PartyHall{
-		prv:         prv,
 		CurrentMode: config.GET.DefaultMode,
 	}
 
@@ -167,27 +137,6 @@ func Load() error {
 		return err
 	}
 
-	client := mqtt.NewClient(opts)
-	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		return token.Error()
-	}
-
-	initButtonHandler(&prv.PartyHall)
-
-	actions := map[string]mqtt.MessageHandler{
-		config.GetMqttTopic("button_press"):   BPH.OnButtonPress,
-		config.GetMqttTopic("sync"):           prv.PartyHall.OnSyncRequested,
-		config.GetMqttTopic("export"):         prv.PartyHall.OnExportEvent,
-		config.GetMqttTopic("admin/set_mode"): prv.Admin.OnSetMode,
-	}
-
-	for topic, action := range actions {
-		if token := client.Subscribe(topic, 2, action); token.Wait() && token.Error() != nil {
-			return token.Error()
-		}
-	}
-
-	prv.MqttClient = &client
 	GET = prv
 
 	return nil

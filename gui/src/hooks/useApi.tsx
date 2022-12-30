@@ -4,8 +4,10 @@ import { EditedEvent } from "../types/appstate";
 import AdminSocketProvider from "./adminSocket";
 import BoothSocketProvider from "./boothSocket";
 import { EventExport } from "../types/event_export";
+import getSocketMode from "../utils/socket_mode";
 
-const SOCKET_MODE_DEBUG = true;
+//@ts-ignore
+const SOCKET_MODE_DEBUG = import.meta.env.MODE === 'development';
 
 const KNOWN_SOCKET_MODE = ['booth', 'admin'];
 
@@ -24,7 +26,7 @@ type ApiContextProps = ApiProps & {
 };
 
 const defaultState: ApiProps = {
-    socketMode: 'booth',
+    socketMode: getSocketMode(),
     connecting: false,
     password: localStorage.getItem('password'),
 };

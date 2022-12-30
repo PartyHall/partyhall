@@ -14,6 +14,7 @@ web:
 mosquitto:
   address: 127.0.0.1:1883
 
+# This is the config for the command that controls the Arduino
 hardware_handler:
   baud_rate: 57600
   mappings:
@@ -25,9 +26,6 @@ photobooth:
   # If you have an hardware flash this should be set to true
   # Hardware flash are controlled by the arduino
   hardware_flash: false
-  webcam_resolution:
-    width: 1280
-    height: 720
 
   # Default timer before taking a picture
   default_timer: 3
@@ -36,3 +34,7 @@ photobooth:
   # After the event you will be able to compile it in a short animated video
   # Set to zero to disable
   unattended_interval: 2
+
+  webcam_resolution:
+    width: 1280
+    height: 720

@@ -15,6 +15,7 @@ import (
 	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/orm"
 	"github.com/partyhall/partyhall/services"
+	"github.com/partyhall/partyhall/socket"
 	"github.com/partyhall/partyhall/utils"
 )
 
@@ -84,15 +85,15 @@ func createEvent(w http.ResponseWriter, r *http.Request) {
 	events, err := orm.GET.Events.GetEvents()
 	if err == nil {
 		if len(events) == 1 {
-			services.GET.PartyHall.CurrentState.CurrentEvent = &events[0].Id
-			services.GET.PartyHall.CurrentState.CurrentEventObj = &events[0]
+			services.GET.CurrentState.CurrentEvent = &events[0].Id
+			services.GET.CurrentState.CurrentEventObj = &events[0]
 
-			orm.GET.AppState.SetState(services.GET.PartyHall.CurrentState)
+			orm.GET.AppState.SetState(services.GET.CurrentState)
 		}
 	}
 	//#endregion
 
-	services.GET.Sockets.BroadcastState()
+	socket.SOCKETS.BroadcastState()
 
 	data, _ := json.MarshalIndent(evt, "", "  ")
 	w.Header().Set("Content-Type", "application/json")
@@ -126,7 +127,7 @@ func updateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	services.GET.Sockets.BroadcastState()
+	socket.SOCKETS.BroadcastState()
 }
 
 func serveImage(w http.ResponseWriter, r *http.Request) {

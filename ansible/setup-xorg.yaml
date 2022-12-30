@@ -1,0 +1,63 @@
+---
+- hosts: all
+  tags: [xorg]
+
+  vars:
+    firefox_profiles:
+      default:
+        extensions: []
+        preferences:
+          privacy.webrtc.legacyGlobalIndicator: false  # Disable the small "webcam indicator" on top of the window
+          media.navigator.permission.disabled: true    # Let all wabsite access webcam without permissions
+
+  tasks:
+    - name: Setting up xorg
+      become: yes
+      apt:
+        name: [ unclutter, xorg, i3, firefox-esr, dmenu, suckless-tools, fonts-dejavu-core, fonts-dejavu-extra ]
+
+    - name: Setting up firefox
+      include_role:
+        name: staticdev.firefox
+
+    - name: Creating the xinitrc
+      template:
+        src: templates/xinitrc.j2
+        dest: /home/{{ansible_user}}/.xinitrc
+        mode: 0774
+
+    - name: Creating the i3 dir
+      file:
+        path: '/home/{{ansible_user}}/.config/i3'
+        state: directory
+        mode: 0774
+
+    - name: Adding the i3config
+      copy:
+        src: files/i3
+        dest: /home/{{ansible_user}}/.config/i3/config
+        mode: 0774
+
+    # @TODO: Make this service work and remove the hack in ~/.bash_profile
+    # - name: Pushing the service
+    #   become: yes
+    #   template:
+    #     src: templates/startx.service.j2
+    #     dest: '/etc/systemd/system/x11-autologin.service'
+    #     mode: '0644'
+
+    # - name: Enabling the service
+    #   become: yes
+    #   systemd:
+    #     name: x11-autologin
+    #     daemon_reload: yes
+    #     state: started
+    #     enabled: yes
+
+    - name: Pushing the bash_profile required
+      copy:
+        src: files/bash_profile
+        dest: "/home/{{ansible_user}}/.bash_profile"
+        owner: "{{ansible_user}}"
+        group: "{{ansible_user}}"
+        mode: '0774'

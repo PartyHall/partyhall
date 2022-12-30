@@ -1,0 +1,17 @@
+set $mod Mod4
+font pango:DejaVu Sans Mono 10 
+exec --no-startup-id dex --autostart --environment i3
+floating_modifier $mod
+bindsym $mod+q kill
+
+bindsym $mod+space exec --no-startup-id dmenu_run
+bindsym $mod+Shift+space floating toggle
+bindsym $mod+f fullscreen toggle
+
+set $ws1 "1"
+bindsym $mod+ampersand workspace number $ws1
+bindsym $mod+Shift+ampersand move container to workspace number $ws1
+
+bar {
+        status_command i3status
+}

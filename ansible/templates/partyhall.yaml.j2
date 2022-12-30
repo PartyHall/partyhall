@@ -1,0 +1,39 @@
+# Debug mode lets you connect to the partyhall from another device
+debug_mode: {{partyhall_debug_mode}}
+
+# Root path is where all the data related to the partyhall app are stored
+root_path: '/home/{{ansible_user}}/data'
+
+# Default mode can be either PHOTOBOOTH or QUIZ
+default_mode: 'PHOTOBOOTH'
+
+web:
+  listening_addr: 127.0.0.1:8039
+  admin_password: "{{partyhall_admin_password}}"
+
+mosquitto:
+  address: 127.0.0.1:1883
+
+hardware_handler:
+  baud_rate: 57600
+  mappings: # @TODO make those configurable with ansible vars
+    BTN_0: TAKE_PICTURE
+    BTN_1: DISPLAY_DEBUG
+    BTN_2: SHUTDOWN
+
+photobooth:
+  # If you have an hardware flash this should be set to true
+  # Hardware flash are controlled by the arduino
+  hardware_flash: {{partyhall_has_hardware_flash}}
+
+  # Default timer before taking a picture
+  default_timer: {{partyhall_default_timer}}
+
+  # When set, the partyhall will take (without flash) a picture every x minutes
+  # After the event you will be able to compile it in a short animated video
+  # Set to zero to disable
+  unattended_interval: {{partyhall_unattended_interval}}
+
+  webcam_resolution:
+    width: {{partyhall_webcam_width}}
+    height: {{partyhall_webcam_height}}

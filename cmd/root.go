@@ -10,6 +10,7 @@ import (
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/models"
+	"github.com/partyhall/partyhall/mqtt_handler"
 	"github.com/partyhall/partyhall/orm"
 	"github.com/partyhall/partyhall/routes"
 	"github.com/partyhall/partyhall/services"
@@ -26,7 +27,13 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		_, err := orm.GET.AppState.GetState()
+		err := mqtt_handler.ConnectAndListen()
+		if err != nil {
+			logs.Error(err)
+			os.Exit(1)
+		}
+
+		_, err = orm.GET.AppState.GetState()
 		if err != nil {
 			if err != sql.ErrNoRows {
 				logs.Error("Failed to load appstate: ", err)
@@ -58,13 +65,17 @@ var rootCmd = &cobra.Command{
 		r.PathPrefix("/media/partyhall").Handler(http.StripPrefix("/media/partyhall", http.FileServer(http.Dir(utils.GetPath("images")))))
 
 		routes.Register(r.PathPrefix("/api").Subrouter())
-		if services.ADMIN_FS != nil {
-			r.PathPrefix("/admin").Handler(http.StripPrefix("/admin", http.FileServer(http.FS(*services.ADMIN_FS))))
-		} else {
-			logs.Error("Failed to embed admin: not loaded")
-		}
 
 		if services.WEBAPP_FS != nil {
+			r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+				mode := "booth"
+				if utils.IsRemote(r) {
+					mode = "admin"
+				}
+
+				w.Write([]byte(services.InjectHtmlMode(mode)))
+			})
+
 			r.PathPrefix("/").Handler(http.FileServer(http.FS(*services.WEBAPP_FS)))
 		} else {
 			logs.Error("Failed to embed webapp: not loaded")

@@ -1,0 +1,4 @@
+if [[ -z $DISPLAY ]] && [[ $(tty) = /dev/tty1 ]]; then
+    sudo /usr/sbin/hostapd -B -P /run/hostapd.pid /etc/hostapd/hostapd.conf
+    startx
+fi

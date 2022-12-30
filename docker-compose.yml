@@ -19,14 +19,3 @@ services:
       - 5993:5173
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-  admin:
-    image: node:19-alpine
-    working_dir: /app
-    command: npm run dev
-    volumes:
-      - ./gui_admin:/app
-    ports:
-      - 5994:5173
-    extra_hosts:
-      - "host.docker.internal:host-gateway"

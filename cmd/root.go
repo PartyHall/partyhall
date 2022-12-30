@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 	"os"
 
@@ -74,28 +73,7 @@ var rootCmd = &cobra.Command{
 					mode = "admin"
 				}
 
-				// @TODO: Load the index.html in the embedfs + parse it + inject my script in the correct spot
-				// Currently this does not work as vite generates the filepath for the js/css files
-				script := fmt.Sprintf(`<script>window.SOCKET_TYPE = '%v';</script>`, mode)
-
-				w.Write([]byte(fmt.Sprintf(`
-<!DOCTYPE html>
-<html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<link rel="icon" type="image/svg+xml" href="/partyhall.svg" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>PartyHall</title>
-		%v
-		<script type="module" crossorigin src="/assets/index.10ad5d49.js"></script>
-		<link rel="stylesheet" href="/assets/index.6797710c.css">
-	</head>
-
-	<body>
-		<div id="root"></div>
-	</body>
-</html>
-				`, script)))
+				w.Write([]byte(services.InjectHtmlMode(mode)))
 			})
 
 			r.PathPrefix("/").Handler(http.FileServer(http.FS(*services.WEBAPP_FS)))

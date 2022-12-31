@@ -63,4 +63,4 @@
         state: started
         enabled: yes
         scope: user
-      loop: [partyhall, pbhh]
+      loop: [partyhall, hardware_handler]

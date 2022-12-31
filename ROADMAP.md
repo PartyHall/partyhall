@@ -10,3 +10,11 @@
 
 # Version 3
 - [] Remote sync to a server when connected to the internet so that the pictures are automatically shared as soon as internet is available
+
+# TO FIX
+- Weird appstate not sync-ing correctly (known issue)
+- Creating an event still uses the id preventing creation / Updating a wrong event
+- Failing to create an event spits out "[Object object]"
+- Failing to create / edit an event returns to the main screen instead of staying on the current screen, loosing progress
+- Shutting down with the buttons says "[MANUAL REBOOT REQUIRED] Failed to shutdown: exit status 1"
+

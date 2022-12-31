@@ -42,13 +42,19 @@
         state: directory
         mode: '0770'
 
-    - name: Pushing the services
+    - name: Pushing the services (Partyhall)
       become: yes
       template:
-        src: "templates/{{item}}.service.j2"
-        dest: "/usr/lib/systemd/user/{{item}}.service"
+        src: "templates/partyhall.service.j2"
+        dest: "/usr/lib/systemd/user/partyhall.service"
         mode: '0644'
-      loop: [partyhall, pbhh]
+
+    - name: Pushing the services (Hardware handler)
+      become: yes
+      template:
+        src: "templates/hardware_handler.service.j2"
+        dest: "/usr/lib/systemd/user/hardware_handler.service"
+        mode: '0644'
 
     - name: Enabling the services
       systemd:

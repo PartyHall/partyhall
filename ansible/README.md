@@ -22,7 +22,12 @@ $ cd partyhall/ansible
 Fill the inventory correctly:
 ```
 $ nvim inventories/hosts
-partyhall ansible_user=pi ansible_password=[[ YOUR RPI PASSWORD ]] ansible_host=[[ YOUR RPI ADDRESS ]] ansible_port=22
+partyhall ansible_user=pi ansible_host=[[ YOUR RPI ADDRESS ]] ansible_port=22
+```
+
+Copy your public key to the Raspberry pi:
+```
+$ ssh-copy-id pi@[[ YOUR RPI ADDRESS ]]
 ```
 
 You can add as many hosts as you have partyhall built. You then need to setup the config in the `inventories/host_vars/{HOST_NAME}.yml` file.

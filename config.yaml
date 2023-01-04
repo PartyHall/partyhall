@@ -18,23 +18,9 @@ mosquitto:
 hardware_handler:
   baud_rate: 57600
   mappings:
-    BTN_0: TAKE_PICTURE
+    BTN_0: photobooth/take_picture
     BTN_1: DISPLAY_DEBUG
     BTN_2: SHUTDOWN
 
-photobooth:
-  # If you have an hardware flash this should be set to true
-  # Hardware flash are controlled by the arduino
-  hardware_flash: false
-
-  # Default timer before taking a picture
-  default_timer: 3
-
-  # When set, the partyhall will take (without flash) a picture every x minutes
-  # After the event you will be able to compile it in a short animated video
-  # Set to zero to disable
-  unattended_interval: 2
-
-  webcam_resolution:
-    width: 1280
-    height: 720
+modules:
+  - photobooth

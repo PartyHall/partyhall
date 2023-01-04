@@ -1,9 +1,9 @@
-package message_handler
+package remote
 
 import (
+	"github.com/partyhall/easyws"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/services"
-	"github.com/partyhall/partyhall/socket"
 	"golang.org/x/exp/slices"
 )
 
@@ -13,7 +13,7 @@ func (h SetModeHandler) GetType() string {
 	return "SET_MODE"
 }
 
-func (h SetModeHandler) Do(s *socket.Socket, payload interface{}) {
+func (h SetModeHandler) Do(s *easyws.Socket, payload interface{}) {
 	mode, ok := payload.(string)
 	if !ok {
 		s.Send("ERR_MODAL", "Bad request")
@@ -26,5 +26,5 @@ func (h SetModeHandler) Do(s *socket.Socket, payload interface{}) {
 	}
 
 	services.GET.CurrentMode = mode
-	socket.SOCKETS.BroadcastState()
+	BroadcastState()
 }

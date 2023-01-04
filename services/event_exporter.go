@@ -18,6 +18,13 @@ import (
 	"github.com/partyhall/partyhall/utils"
 )
 
+/**
+ * @TODO: Each module should process its own export
+ * i.e. each module should receive the zip file and add its own file as it wants
+ * This would permit some more info to be exported
+ * And this will be easier once Prowty is released to integrate with it
+ */
+
 type EventExporter struct {
 	event *models.Event
 }

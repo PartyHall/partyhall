@@ -12,7 +12,7 @@ export type Event = {
 };
 
 export type EditedEvent = {
-    id?: number;
+    id?: number|'';
     name?: string|null;
     author?: string|null;
     date?: DateTime;
@@ -25,8 +25,12 @@ type appstate = {
     current_event: Event|null;
 };
 
-type Photobooth = {
+type PhotoboothModule = {
     hardware_flash: boolean;
+
+    default_timer: number;
+    unattended_interval: number;
+
     webcam_resolution: {
         width: number;
         height: number;
@@ -35,16 +39,14 @@ type Photobooth = {
 
 export type AppState = {
     app_state: appstate;
-    photobooth: Photobooth;
-    debug: boolean;
     current_mode: string;
-
-    ip_addresses: {
-        [key: string]: string[];
-    };
-
+    ip_addresses: { [key: string]: string[]; };
     known_events: Event[];
     known_modes: string[];
+
+    modules: {
+        photobooth: PhotoboothModule;
+    };
 
     partyhall_version: string;
     partyhall_commit: string;

@@ -1,9 +1,9 @@
-package message_handler
+package remote
 
 import (
+	"github.com/partyhall/easyws"
 	"github.com/partyhall/partyhall/orm"
 	"github.com/partyhall/partyhall/services"
-	"github.com/partyhall/partyhall/socket"
 )
 
 type SetEventHandler struct{}
@@ -12,7 +12,7 @@ func (h SetEventHandler) GetType() string {
 	return "SET_EVENT"
 }
 
-func (h SetEventHandler) Do(s *socket.Socket, payload interface{}) {
+func (h SetEventHandler) Do(s *easyws.Socket, payload interface{}) {
 	evtIdFloat, ok := payload.(float64)
 	if !ok {
 		s.Send("ERR_MODAL", "Failed to change event: Bad request")
@@ -36,5 +36,5 @@ func (h SetEventHandler) Do(s *socket.Socket, payload interface{}) {
 		return
 	}
 
-	socket.SOCKETS.BroadcastState()
+	BroadcastState()
 }

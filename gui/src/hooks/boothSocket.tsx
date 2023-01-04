@@ -5,12 +5,15 @@ import { TextLoader } from "../components/loader";
 import { AppState } from "../types/appstate";
 import { WsMessage } from "../types/ws_message";
 import { useSnackbar } from "./snackbar";
+import { SOCKET_MODE_DEBUG } from "./useApi";
 import useRefresher from "./useRefresher";
 
 type WebsocketProps = {
     lastMessage: WsMessage | null;
     appState: AppState;
     currentTime: string | null;
+
+    currentTimer: number;
 };
 
 type WebsocketContextProps = WebsocketProps & {
@@ -24,7 +27,8 @@ const defaultState: WebsocketProps = {
     // @ts-ignore
     appState: null,
     currentTime: null,
-    lastError: null,
+
+    currentTimer: -1,
 };
 
 const WebsocketContext = createContext<WebsocketContextProps>({
@@ -88,9 +92,17 @@ export default function BoothSocketProvider({ children }: { children: ReactNode 
         sendMessage: (msgType: string, data?: any) => sendJsonMessage({ type: msgType, payload: data }),
         showDebug,
     }}>
-        <TextLoader loading={readyState != ReadyState.OPEN || !ctx.appState} text={connectionStatus}>
-            {children}
-        </TextLoader>
+        <>
+            <TextLoader loading={readyState != ReadyState.OPEN || !ctx.appState} text={connectionStatus}>
+                {children}
+            </TextLoader>
+            {
+                SOCKET_MODE_DEBUG &&
+                <div className="debug absbl">
+                    <p>Last message: {ctx.lastMessage?.type}</p>
+                </div>
+            }
+        </>
     </WebsocketContext.Provider>
 }
 

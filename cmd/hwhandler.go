@@ -13,10 +13,6 @@ import (
 	"go.bug.st/serial"
 )
 
-func processSerialConn(port string) {
-
-}
-
 var hwhandlerCmd = &cobra.Command{
 	Use:   "hwhandler",
 	Short: "Hardware Handler",

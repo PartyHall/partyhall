@@ -7,7 +7,7 @@ import { EventExport } from "../types/event_export";
 import getSocketMode from "../utils/socket_mode";
 
 //@ts-ignore
-const SOCKET_MODE_DEBUG = import.meta.env.MODE === 'development';
+export const SOCKET_MODE_DEBUG = import.meta.env.MODE === 'development';
 
 const KNOWN_SOCKET_MODE = ['booth', 'admin'];
 
@@ -21,7 +21,7 @@ type ApiContextProps = ApiProps & {
     login: (password: string) => Promise<void>;
     logout: () => void;
 
-    saveEvent: (event: EditedEvent) => Promise<void>;
+    saveEvent: (event: EditedEvent) => Promise<boolean>;
     getLastExports: (eventId: number) => Promise<EventExport | null>;
 };
 
@@ -35,7 +35,7 @@ const ApiContext = createContext<ApiContextProps>({
     ...defaultState,
     login: async (password: string) => { },
     logout: () => { },
-    saveEvent: async (event: EditedEvent) => { },
+    saveEvent: async (event: EditedEvent) => false,
     getLastExports: async (eventId: number) => null,
 });
 
@@ -117,9 +117,12 @@ export default function ApiProvider({ children }: { children: ReactNode }) {
             }
 
             showSnackbar('Event saved !', 'success');
+            return true;
         } catch (e) {
             showSnackbar('Failed to save event: ' + e, 'error');
         }
+
+        return false;
     }
 
     const getLastExports = async (eventId: number) => {
@@ -171,7 +174,7 @@ export default function ApiProvider({ children }: { children: ReactNode }) {
             {
                 SOCKET_MODE_DEBUG &&
                 <div className="debug absbr" onClick={changeMode}>
-                    Socket mode: {context.socketMode}
+                    <p>Socket mode: {context.socketMode}</p>
                 </div>
             }
         </>

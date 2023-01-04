@@ -12,7 +12,7 @@ import { useAdminSocket } from "../../../hooks/adminSocket";
 import { useApi } from "../../../hooks/useApi";
 
 const getEmptyEvent = (): EditedEvent => ({
-    id: -1,
+    id: '',
     name: '',
     author: '',
     date: DateTime.now(),
@@ -63,8 +63,10 @@ export default function EditEvent() {
 
     const title = !eventId ? "Creating event" : ("Editing event " + (editedEvent?.name ?? ''));
     const save = async (data: EditedEvent) => {
-        await saveEvent(data);
-        navigate('/admin');
+        const saved = await saveEvent(data);
+        if (saved) {
+            navigate('/admin');
+        }
     };
 
     return <Grid container spacing={0} direction="column" alignItems="center" justifyContent="center" minHeight="100%">

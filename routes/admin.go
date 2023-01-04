@@ -14,8 +14,8 @@ import (
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/orm"
+	"github.com/partyhall/partyhall/remote"
 	"github.com/partyhall/partyhall/services"
-	"github.com/partyhall/partyhall/socket"
 	"github.com/partyhall/partyhall/utils"
 )
 
@@ -93,7 +93,7 @@ func createEvent(w http.ResponseWriter, r *http.Request) {
 	}
 	//#endregion
 
-	socket.SOCKETS.BroadcastState()
+	remote.BroadcastState()
 
 	data, _ := json.MarshalIndent(evt, "", "  ")
 	w.Header().Set("Content-Type", "application/json")
@@ -127,7 +127,7 @@ func updateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	socket.SOCKETS.BroadcastState()
+	remote.BroadcastState()
 }
 
 func serveImage(w http.ResponseWriter, r *http.Request) {

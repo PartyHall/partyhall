@@ -1,11 +1,11 @@
-package message_handler
+package remote
 
 import (
 	"os/exec"
 	"time"
 
+	"github.com/partyhall/easyws"
 	"github.com/partyhall/partyhall/logs"
-	"github.com/partyhall/partyhall/socket"
 )
 
 type SetDateTimeHandler struct{}
@@ -14,7 +14,7 @@ func (h SetDateTimeHandler) GetType() string {
 	return "SET_DATETIME"
 }
 
-func (h SetDateTimeHandler) Do(s *socket.Socket, payload interface{}) {
+func (h SetDateTimeHandler) Do(s *easyws.Socket, payload interface{}) {
 	dt, ok := payload.(string)
 	if !ok {
 		s.Send("ERR_MODAL", "Bad request")

@@ -4,7 +4,7 @@ import { TextLoader } from "../components/loader";
 import { AppState } from "../types/appstate";
 import { WsMessage } from "../types/ws_message";
 import { useSnackbar } from "./snackbar";
-import { useApi } from "./useApi";
+import { SOCKET_MODE_DEBUG, useApi } from "./useApi";
 import useRefresher from "./useRefresher";
 
 type WebsocketProps = {
@@ -86,6 +86,13 @@ export default function AdminSocketProvider({ children }: { children: ReactNode 
             <TextLoader loading={readyState != ReadyState.OPEN || !ctx.appState} text={connectionStatus}>
                 {children}
             </TextLoader>
+
+            {
+                SOCKET_MODE_DEBUG &&
+                <div className="debug absbl">
+                    <p>Last message: {ctx.lastMessage?.type}</p>
+                </div>
+            }
         </>
     </WebsocketContext.Provider>
 }

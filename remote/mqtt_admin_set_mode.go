@@ -1,11 +1,10 @@
-package mqtt_handler
+package remote
 
 import (
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/services"
-	"github.com/partyhall/partyhall/socket"
 	"golang.org/x/exp/slices"
 )
 
@@ -23,5 +22,5 @@ func (h AdminSetModeHandler) Do(client mqtt.Client, msg mqtt.Message) {
 	}
 
 	services.GET.CurrentMode = mode
-	socket.SOCKETS.BroadcastState()
+	BroadcastState()
 }

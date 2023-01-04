@@ -10,8 +10,9 @@ import (
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/models"
-	"github.com/partyhall/partyhall/mqtt_handler"
+	"github.com/partyhall/partyhall/modules"
 	"github.com/partyhall/partyhall/orm"
+	"github.com/partyhall/partyhall/remote"
 	"github.com/partyhall/partyhall/routes"
 	"github.com/partyhall/partyhall/services"
 	"github.com/partyhall/partyhall/utils"
@@ -27,10 +28,23 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		err := mqtt_handler.ConnectAndListen()
+		modules.UpdateFrontendModuleSettings()
+
+		err := remote.InitMqtt()
 		if err != nil {
 			logs.Error(err)
 			os.Exit(1)
+		}
+
+		for name, module := range modules.MODULES {
+			// Must be not be done on the same map
+			handlers := module.GetMqttHandlers()
+			for k, v := range module.GetMqttHandlers() {
+				handlers[name+"/"+k] = v
+				delete(handlers, k)
+			}
+
+			remote.EasyMqtt.RegisterHandlers(handlers)
 		}
 
 		_, err = orm.GET.AppState.GetState()

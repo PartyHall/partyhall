@@ -3,12 +3,12 @@ package utils
 import (
 	"os"
 	"path/filepath"
-
-	"github.com/partyhall/partyhall/config"
 )
 
+var ROOT_PATH string = ""
+
 func GetPath(path ...string) string {
-	path = append([]string{config.GET.RootPath}, path...)
+	path = append([]string{ROOT_PATH}, path...)
 
 	return filepath.Join(path...)
 }

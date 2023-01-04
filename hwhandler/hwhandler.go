@@ -1,6 +1,7 @@
 package hwhandler
 
 import (
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"strings"
@@ -12,6 +13,9 @@ import (
 )
 
 var client mqtt.Client
+
+var lastButtonPress string = ""
+var lastButtonPressTime time.Time = time.Now()
 
 type HardwareHandler struct {
 	PortName string
@@ -57,7 +61,8 @@ func (hh *HardwareHandler) ProcessSerialConn() {
 func (hh *HardwareHandler) readLine(port serial.Port) (string, error) {
 	str := ""
 
-	buff := make([]byte, 100)
+	// We read char by char
+	buff := make([]byte, 1)
 	for {
 		n, err := port.Read(buff)
 		if err != nil {
@@ -81,29 +86,56 @@ func (hh *HardwareHandler) readLine(port serial.Port) (string, error) {
 	return str, nil
 }
 
+func (hh *HardwareHandler) DebugMsg(msg string, hx string) {
+	fmt.Printf("Unknown message: %v\n\t=> 0x%v\n", msg, hx)
+}
+
 func (hh *HardwareHandler) processSerialMessage(msg string) {
+	if len(msg) == 0 {
+		return
+	}
+
+	hx := hex.EncodeToString([]byte(msg))
+
 	if strings.HasPrefix(msg, "BTN_") {
 		msg = strings.Trim(msg, " \t")
 		val, ok := config.GET.HardwareHandler.Mappings[msg]
 		if !ok {
-			fmt.Println("Unknown button: " + msg)
+			hh.DebugMsg(msg, hx)
 			return
 		}
 
-		client.Publish(config.GetMqttTopic("button_press"), 2, false, val)
+		currTime := time.Now()
+		diff := currTime.Sub(lastButtonPressTime).Seconds()
 
+		// Debounce
+		if lastButtonPress != val || diff > 1 {
+			topic := config.GetMqttTopic("", strings.ToLower(val))
+			fmt.Println("Button pressed: ", msg, " sending ", topic)
+			client.Publish(topic, 2, false, "press")
+
+			lastButtonPress = val
+			lastButtonPressTime = currTime
+		}
+
+		return
+	}
+
+	if len(msg) == 0 {
+		fmt.Print("Bad message: ")
+		hh.DebugMsg(msg, hx)
 		return
 	}
 
 	data := strings.Split(msg, " ")
-	if len(data) == 0 {
-		fmt.Println("Bad message received")
-		return
-	}
 
 	switch data[0] {
+	case "STARTING_UP":
+		fmt.Println("Arduino's starting up...")
+	case "OK_RF24":
+		fmt.Println("Wireless device detected & ready to be used")
 	default:
-		fmt.Println("Unhandled arduino message: ", data[0])
+		hh.DebugMsg(msg, hx)
 		fmt.Println(strings.Join(append([]string{"\targs: "}, data[1:]...), " "))
 	}
 }

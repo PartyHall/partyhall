@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/partyhall/partyhall/utils"
 	"go.bug.st/serial"
 	"gopkg.in/yaml.v2"
 )
@@ -22,18 +23,6 @@ var MODES = []string{
 	MODE_PHOTOBOOTH,
 	MODE_QUIZ,
 	MODE_DISABLED,
-}
-
-type WebcamResolution struct {
-	Width  int `json:"width" yaml:"width"`
-	Height int `json:"height" yaml:"height"`
-}
-
-type PhotoboothConfig struct {
-	HardwareFlash      bool             `yaml:"hardware_flash" json:"hardware_flash"`
-	DefaultTimer       int              `yaml:"default_timer" json:"-"`
-	UnattendedInterval int              `yaml:"unattended_interval" json:"-"`
-	WebcamResolution   WebcamResolution `yaml:"webcam_resolution" json:"webcam_resolution"`
 }
 
 type MosquittoConfig struct {
@@ -57,10 +46,11 @@ type Config struct {
 	RootPath    string `yaml:"root_path"`
 	DefaultMode string `yaml:"default_mode"`
 
-	Mosquitto  MosquittoConfig  `yaml:"mosquitto"`
-	Photobooth PhotoboothConfig `yaml:"photobooth"`
+	Mosquitto MosquittoConfig `yaml:"mosquitto"`
 
 	HardwareHandler HardwareHandlerConfig `yaml:"hardware_handler"`
+
+	Modules []string
 }
 
 func (c *Config) GetImageFolder(eventId int64, unattended bool) (string, error) {
@@ -100,10 +90,6 @@ func Load() error {
 		return err
 	}
 
-	if cfg.Photobooth.DefaultTimer == 0 {
-		cfg.Photobooth.DefaultTimer = 3
-	}
-
 	if len(cfg.DefaultMode) == 0 {
 		cfg.DefaultMode = MODE_PHOTOBOOTH
 	}
@@ -117,11 +103,36 @@ func Load() error {
 
 	GET = cfg
 
+	utils.ROOT_PATH = cfg.RootPath
+
+	return initializeFolders()
+}
+
+func initializeFolders() error {
+	err := utils.MakeOrCreateFolder("")
+	if err != nil {
+		fmt.Println("Failed to create root folder")
+		os.Exit(1)
+	}
+
+	for _, folder := range []string{"images", "config"} {
+		if err := utils.MakeOrCreateFolder(folder); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
-func GetMqttTopic(topic string) string {
-	return fmt.Sprintf("partyhall/%v", topic)
+func GetMqttTopic(module string, topic string) string {
+	module = strings.ToLower(module)
+	topic = strings.ToLower(topic)
+
+	if len(module) == 0 {
+		return fmt.Sprintf("partyhall/%v", topic)
+	}
+
+	return fmt.Sprintf("partyhall/%v/%v", module, topic)
 }
 
 func IsInDev() bool {

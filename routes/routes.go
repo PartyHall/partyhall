@@ -8,97 +8,26 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
-	"github.com/partyhall/partyhall/message_handler"
-	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/orm"
+	"github.com/partyhall/partyhall/remote"
 	"github.com/partyhall/partyhall/services"
-	"github.com/partyhall/partyhall/socket"
-	"github.com/partyhall/partyhall/utils"
-	"golang.org/x/exp/slices"
 )
 
-var upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
-
 func Register(r *mux.Router) {
-	r.HandleFunc("/socket/{type}", startSocket)
+	r.HandleFunc("/socket/{type}", remote.EasyWS.Route)
 	r.HandleFunc("/settings", settings)
 	r.HandleFunc("/picture", picture).Methods(http.MethodPost)
 
 	registerAdminRoutes(r.PathPrefix("/admin").Subrouter())
 }
 
-func startSocket(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	socketType := strings.ToUpper(vars["type"])
-	if !slices.Contains(socket.SOCKET_TYPES, socketType) {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	// PartyHall should not be allowed from another computer
-	if socketType == socket.SOCKET_TYPE_BOOTH {
-		if utils.IsRemote(r) {
-			if !config.GET.DebugMode && !config.IsInDev() {
-				w.WriteHeader(http.StatusForbidden)
-				return
-			}
-			logs.Debug("Letting a remote connection")
-		}
-	} else {
-		pwd := r.URL.Query().Get("password")
-		if pwd != config.GET.Web.AdminPassword {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-	}
-
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		logs.Error("Failed to upgrade connection: ", err)
-		return
-	}
-
-	sock := socket.Join(socketType, conn)
-
-	go func() {
-		for {
-			data := models.SocketMessage{}
-			err := conn.ReadJSON(&data)
-			if err != nil {
-				if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-					logs.Error("Unexpected close error: ", err)
-					sock.Open = false
-					return
-				} else if websocket.IsCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-					logs.Error("Websocket disconnected: ", err)
-					sock.Open = false
-					return
-				}
-
-				logs.Error("Failed to connect websocket: ", err)
-				continue
-			}
-
-			message_handler.ProcessMessage(sock, data)
-		}
-	}()
-}
-
 func settings(w http.ResponseWriter, r *http.Request) {
-	settings := services.GET.GetFrontendSettings()
+	settings := services.BuildFrontendSettings()
 
 	w.Header().Set("Content-Type", "application/json")
 	data, _ := json.Marshal(settings)
@@ -201,7 +130,7 @@ func picture(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Broadcasting the state so that the current event is refreshed on the admin panel
-	socket.SOCKETS.BroadcastState()
+	remote.BroadcastState()
 
 	if !isUnattended {
 		http.ServeFile(w, r, filepath)

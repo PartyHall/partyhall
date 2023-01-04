@@ -5,14 +5,20 @@ import { useBoothSocket } from "../../hooks/boothSocket";
 
 import '../../assets/css/photobooth.scss';
 
+type LastPicture = {
+    url: string;
+    loaded: boolean;
+};
+
 export default function Photobooth() {
     const webcamRef = useRef<Webcam>(null);
     const { appState, lastMessage, sendMessage } = useBoothSocket();
     const [timer, setTimer] = useState(-1);
     const [flash, setFlash] = useState<boolean>(false);
-    const [lastPicture, setLastPicture] = useState<string|null>(null);
+    const [lastPicture, setLastPicture] = useState<LastPicture|null>(null);
 
-    const resolution = appState.photobooth.webcam_resolution;
+    const module = appState.modules.photobooth;
+    const resolution = module.webcam_resolution;
 
     const takePicture = async (unattended: boolean) => {
         if (!webcamRef || !webcamRef.current) {
@@ -39,8 +45,7 @@ export default function Photobooth() {
                     const image = await resp.blob();
                     const url = URL.createObjectURL(image);
 
-                    setLastPicture(url);
-
+                    setLastPicture({ url, loaded: false});
                     setTimeout(() => setLastPicture(null), 3500);
                 }
             } catch {
@@ -54,16 +59,12 @@ export default function Photobooth() {
             return;
         }
 
-        if (lastMessage.type == 'TIMER') {
-            setTimer(lastMessage.payload)
-            if (lastMessage.payload === 0) {
-                setFlash(true);
-                setTimeout(() => {
-                    takePicture(false);
-                    setFlash(false);
-                }, 150);
+        if (lastMessage.type == 'TAKE_PICTURE' && timer === -1) {
+            if (appState.current_mode === 'DISABLED') {
+                return;
             }
 
+            setTimer(module.default_timer)
             return
         }
 
@@ -71,6 +72,23 @@ export default function Photobooth() {
             takePicture(true);
         }
     }, [lastMessage]);
+
+    useEffect(() => {
+        if (timer > 0) {
+            setTimeout(() => {
+                setTimer(timer-1);
+            }, 1000);
+        }
+
+        if (timer == 0) {
+            setFlash(true);
+            setTimeout(() => {
+                takePicture(false);
+                setFlash(false);
+                setTimer(-1);
+            }, 500);
+        }
+    }, [timer]);
 
     return <div className="photobooth">
         <Webcam
@@ -88,8 +106,8 @@ export default function Photobooth() {
         { appState.current_mode === 'DISABLED' && <LockedModal /> }
 
         {
-            lastPicture && <div className="picture_frame">
-                <img src={lastPicture} alt="Last picture" />
+            lastPicture && <div className="picture_frame" style={lastPicture.loaded ? {} : {display: 'none'}}>
+                <img src={lastPicture.url} onLoad={() => setLastPicture({...lastPicture, loaded: true})} alt="Last picture" />
             </div>
         }
     </div>

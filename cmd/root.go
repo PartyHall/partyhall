@@ -45,6 +45,7 @@ var rootCmd = &cobra.Command{
 			}
 
 			remote.EasyMqtt.RegisterHandlers(handlers)
+			remote.EasyWS.RegisterMessageHandlers(module.GetWebsocketHandlers()...)
 		}
 
 		_, err = orm.GET.AppState.GetState()

@@ -29,7 +29,7 @@ export default function AdminPhotobooth() {
         </Card>
         <Card>
             <CardActions>
-                <Button style={{ width: '100%' }} onClick={() => sendMessage('REMOTE_TAKE_PICTURE', null)}>Remote take a picture</Button>
+                <Button style={{ width: '100%' }} onClick={() => sendMessage('photobooth/REMOTE_TAKE_PICTURE', null)}>Remote take a picture</Button>
             </CardActions>
         </Card>
 

@@ -2,7 +2,6 @@ run:
 	mkdir -p gui/dist
 	touch gui/dist/random_data # Make go fckng happy
 	docker compose up -d
-	go run .
 
 create-db:
 	rm -rf 0_DATA/partyhall.db

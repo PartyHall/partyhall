@@ -4,6 +4,7 @@ import (
 	"os"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/partyhall/easyws"
 	"gopkg.in/yaml.v2"
 )
 
@@ -50,9 +51,12 @@ func (m ModulePhotobooth) GetMqttHandlers() map[string]mqtt.MessageHandler {
 	}
 }
 
-// func (m ModulePhotobooth) GetWebsocketHandlers() map[string] {
-// 	return []message_handler.MessageHandler{}
-// }
+func (m ModulePhotobooth) GetWebsocketHandlers() []easyws.MessageHandler {
+	return []easyws.MessageHandler{
+		TakePictureHandler{},
+		RemoteTakePictureHandler{},
+	}
+}
 
 func (m ModulePhotobooth) GetFrontendSettings() map[string]interface{} {
 	return map[string]interface{}{

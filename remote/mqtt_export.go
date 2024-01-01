@@ -1,6 +1,7 @@
 package remote
 
 import (
+	"fmt"
 	"strconv"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
@@ -11,6 +12,7 @@ import (
 )
 
 func OnExportZip(client mqtt.Client, msg mqtt.Message) {
+	fmt.Println("Export started")
 	eventIdStr := string(msg.Payload())
 	eventId, err := strconv.ParseInt(eventIdStr, 10, 64)
 	if err != nil {

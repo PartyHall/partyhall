@@ -24,7 +24,7 @@ func asMqtt(message string) MqttSenderHandler {
 		Type:  message,
 		Topic: config.GetMqttTopic("", message),
 		GetPayload: func(i interface{}) interface{} {
-			return message
+			return i
 		},
 	}
 }

@@ -8,7 +8,7 @@ import (
 type TakePictureHandler struct{}
 
 func (h TakePictureHandler) GetType() string {
-	return "TAKE_PICTURE"
+	return "photobooth/TAKE_PICTURE"
 }
 
 func (h TakePictureHandler) Do(s *easyws.Socket, payload interface{}) {
@@ -18,7 +18,7 @@ func (h TakePictureHandler) Do(s *easyws.Socket, payload interface{}) {
 type RemoteTakePictureHandler struct{}
 
 func (h RemoteTakePictureHandler) GetType() string {
-	return "REMOTE_TAKE_PICTURE"
+	return "photobooth/REMOTE_TAKE_PICTURE"
 }
 
 func (h RemoteTakePictureHandler) Do(s *easyws.Socket, payload interface{}) {

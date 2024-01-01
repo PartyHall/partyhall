@@ -34,7 +34,7 @@ export default function BoothLayout() {
             {
                 appState.debug && <>
                     {D('Mode', <span>{appState.current_mode}</span>)}
-                    {D('Hardware flash', <span>{appState.photobooth.hardware_flash ? 'true' : 'false'}</span>)}
+                    {D('Hardware flash', <span>{appState.modules.photobooth.hardware_flash ? 'true' : 'false'}</span>)}
                     {D('IPs', <ul>
                         {
                             appState.ip_addresses && Object.entries(appState.ip_addresses).filter(([_, x]) => x.length > 0).map(([key, inter]) => <li key={key}>

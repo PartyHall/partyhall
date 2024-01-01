@@ -52,10 +52,8 @@ export default function BoothSocketProvider({ children }: { children: ReactNode 
     const connectionStatus = useRefresher(readyState, 5);
 
     const showDebug = () => {
-        // @ts-ignore
         setContext({ ...ctx, appState: { ...ctx.appState, debug: true } });
         setTimeout(() => {
-            // @ts-ignore
             setContext({ ...ctx, appState: { ...ctx.appState, debug: false } });
         }, 20000);
     };

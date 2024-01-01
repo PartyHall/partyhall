@@ -1,4 +1,4 @@
-import { Button, Card, CardActions, CardContent, IconButton, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
+import { Box, Button, Card, CardActions, CardContent, IconButton, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
 import { DateTime } from 'luxon';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -94,8 +94,11 @@ export default function AdminIndex() {
         }
         <Card>
             <CardContent>
-                <Typography variant="h2" fontSize={18}>System time</Typography>
-                <Typography variant="body1" style={{ textAlign: "center", marginTop: '2em' }}>{currentTime}</Typography>
+                <Typography variant="h2" fontSize={18}>System info</Typography>
+                <Box mt={2}>
+                    <Typography variant="body1" color="GrayText">PartyHall {appState.partyhall_version} ({appState.partyhall_commit})</Typography>
+                    <Typography variant="body1" color="GrayText">Current time: {currentTime}</Typography>
+                </Box>
             </CardContent>
             <CardActions>
                 <Button style={{ width: '100%' }} onClick={() => sendMessage('SET_DATETIME', DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'))}>Set to my device's time</Button>

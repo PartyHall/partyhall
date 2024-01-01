@@ -96,7 +96,7 @@ export default function Photobooth() {
             ref={webcamRef}
             width={resolution.width}
             height={resolution.height}
-            onClick={() => appState.current_mode !== 'DISABLED' && sendMessage('TAKE_PICTURE')}
+            onClick={() => appState.current_mode !== 'DISABLED' && sendMessage('photobooth/TAKE_PICTURE')}
             screenshotFormat="image/jpeg"
             videoConstraints={{ facingMode: 'user', ...resolution }}
         />

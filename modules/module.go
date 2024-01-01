@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/partyhall/easyws"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/modules/module_photobooth"
 	"github.com/partyhall/partyhall/services"
@@ -20,7 +21,7 @@ type Module interface {
 	LoadConfig(filename string) error
 
 	GetMqttHandlers() map[string]mqtt.MessageHandler
-	// GetWebsocketHandlers() []message_handler.MessageHandler
+	GetWebsocketHandlers() []easyws.MessageHandler
 	GetState() map[string]interface{}
 	GetFrontendSettings() map[string]interface{}
 }

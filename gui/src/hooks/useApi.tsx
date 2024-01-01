@@ -22,7 +22,7 @@ type ApiContextProps = ApiProps & {
     logout: () => void;
 
     saveEvent: (event: EditedEvent) => Promise<boolean>;
-    getLastExports: (eventId: number) => Promise<EventExport | null>;
+    getLastExports: (eventId: number) => Promise<EventExport[]>;
 };
 
 const defaultState: ApiProps = {
@@ -36,7 +36,7 @@ const ApiContext = createContext<ApiContextProps>({
     login: async (password: string) => { },
     logout: () => { },
     saveEvent: async (event: EditedEvent) => false,
-    getLastExports: async (eventId: number) => null,
+    getLastExports: async (eventId: number) => [],
 });
 
 export default function ApiProvider({ children }: { children: ReactNode }) {
@@ -87,14 +87,13 @@ export default function ApiProvider({ children }: { children: ReactNode }) {
     };
 
     const saveEvent = async (event: EditedEvent) => {
-        const query = {
+        const query: any = {
             name: event.name,
             author: event.author,
             location: event.location,
         };
 
         if (!!event.date) {
-            //@ts-ignore
             query.date = Math.floor(event.date.toSeconds());
         }
 
@@ -107,7 +106,6 @@ export default function ApiProvider({ children }: { children: ReactNode }) {
                         'Authorization': context.password ?? '',
                         'Content-Type': 'application/json',
                     },
-                    //@ts-ignore
                     body: JSON.stringify(query),
                 }
             );

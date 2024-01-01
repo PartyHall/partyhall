@@ -38,6 +38,7 @@ type PhotoboothModule = {
 };
 
 export type AppState = {
+    debug: boolean;
     app_state: appstate;
     current_mode: string;
     ip_addresses: { [key: string]: string[]; };

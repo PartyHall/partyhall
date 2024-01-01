@@ -27,9 +27,6 @@ export default function ExportListing() {
         }
 
         const exports = await getLastExports(appState.app_state.current_event.id);
-
-        //@TODO: fix this
-        //@ts-ignore
         setLastExports(exports);
     };
 

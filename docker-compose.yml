@@ -9,13 +9,21 @@ services:
       - ./0_DATA/mosquitto/data:/mosquitto/data
       - ./0_DATA/mosquitto/logs:/mosquitto/log
 
-  front:
-    image: node:19-alpine
+  backend:
+    image: cosmtrek/air
     working_dir: /app
-    command: npm run dev
     volumes:
-      - ./gui:/app
+      - ./:/app
+      - ./config.yaml:/etc/partyhall.yaml
     ports:
-      - 5993:5173
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - 8039:8039
+
+  frontend:
+    image: node:lts
+    init: true
+    volumes: ['./gui:/app']
+    working_dir: '/app'
+    user: "${UID:-1000}:${GID:-1000}"
+    ports:
+      - '127.0.0.1:5993:5173'
+    command: ['bash', '-c', '[ ! -d node_modules ] && npm install; npm run dev -- --host']

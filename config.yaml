@@ -12,7 +12,7 @@ web:
   admin_password: "admin"
 
 mosquitto:
-  address: 127.0.0.1:1883
+  address: mosquitto:1883
 
 # This is the config for the command that controls the Arduino
 hardware_handler:

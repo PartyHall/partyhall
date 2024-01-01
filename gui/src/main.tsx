@@ -35,10 +35,6 @@ const darkTheme = createTheme({
 
 const router = createHashRouter(createRoutesFromElements(
   <>
-    <Route element={<BoothLayout />}>
-      <Route path="/" element={<PartyHallUI />} />
-    </Route>
-
     <Route element={<UnauthedLayout />}>
       <Route path="/admin/login" element={<Login />} />
     </Route>
@@ -48,6 +44,10 @@ const router = createHashRouter(createRoutesFromElements(
       <Route path="/admin/event/edit/:id?" element={<EditEvent />} />
       <Route path="/admin/photobooth" element={<AdminPhotobooth />} />
       <Route path="/admin/quiz" element={<AdminQuiz />} />
+    </Route>
+
+    <Route element={<BoothLayout />}>
+      <Route path="/" element={<PartyHallUI />} />
     </Route>
   </>
 ));

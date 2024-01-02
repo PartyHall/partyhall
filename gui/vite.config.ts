@@ -12,6 +12,12 @@ export default defineConfig({
         secure: false,
         changeOrigin: true,
       },
+      '^/media': {
+        target: 'http://backend:8039',
+        ws: true,
+        secure: false,
+        changeOrigin: true,
+      },
     }
   }
 })

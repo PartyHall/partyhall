@@ -59,9 +59,10 @@ func init() {
 
 func InitMqtt() error {
 	handlers := map[string]mqtt.MessageHandler{
-		"display_debug": OnDisplayDebug,
-		"export_zip":    OnExportZip,
-		"shutdown":      OnShutdown,
+		"display_debug":  OnDisplayDebug,
+		"export_zip":     OnExportZip,
+		"shutdown":       OnShutdown,
+		"admin/set_mode": OnSetMode,
 	}
 
 	EasyMqtt = easymqtt.New(

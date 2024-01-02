@@ -24,3 +24,4 @@ hardware_handler:
 
 modules:
   - photobooth
+  - karaoke

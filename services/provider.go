@@ -15,8 +15,9 @@ import (
 )
 
 var (
-	WEBAPP_FS     *fs.FS
-	DB_SCRIPTS_FS embed.FS
+	WEBAPP_FS              *fs.FS
+	DB_SCRIPTS_FS          embed.FS
+	KARAOKE_FALLBACK_IMAGE []byte
 )
 
 var GET *Provider
@@ -63,7 +64,8 @@ func Load() error {
 	}
 
 	prv := &Provider{
-		CurrentMode: config.GET.DefaultMode,
+		CurrentMode:    config.GET.DefaultMode,
+		ModuleSettings: map[string]interface{}{},
 	}
 
 	err = prv.loadState()

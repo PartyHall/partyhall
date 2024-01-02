@@ -15,6 +15,9 @@ var webapp embed.FS
 //go:embed sql
 var dbScripts embed.FS
 
+//go:embed karaokefallback.jpg
+var karaokeFallbackImage []byte
+
 const DEBUG = true
 
 func init() {
@@ -28,4 +31,5 @@ func init() {
 	}
 
 	services.DB_SCRIPTS_FS = dbScripts
+	services.KARAOKE_FALLBACK_IMAGE = karaokeFallbackImage
 }

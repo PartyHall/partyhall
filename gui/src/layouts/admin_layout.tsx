@@ -5,7 +5,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
 import SettingsIcon from '@mui/icons-material/Settings';
 import PhotoIcon from '@mui/icons-material/PhotoCamera';
-import QuizIcon from '@mui/icons-material/Quiz';
+import KaraokeIcon from '@mui/icons-material/Mic';
 
 import { useApi } from "../hooks/useApi";
 import { useState } from "react";
@@ -66,11 +66,11 @@ export default function AdminLayout() {
                             </ListItemButton>
                         </ListItem>
                     </Link>
-                    <Link to="/admin/quiz" style={linkStyle}>
+                    <Link to="/admin/karaoke" style={linkStyle}>
                         <ListItem disablePadding>
                             <ListItemButton>
-                                <ListItemIcon><QuizIcon /></ListItemIcon>
-                                <ListItemText primary="Quiz" />
+                                <ListItemIcon><KaraokeIcon /></ListItemIcon>
+                                <ListItemText primary="Karaoke" />
                             </ListItemButton>
                         </ListItem>
                     </Link>
@@ -79,7 +79,7 @@ export default function AdminLayout() {
         </Drawer>
 
         <div style={{height: '100%', overflowY: 'scroll', paddingBottom: '5em'}}>
-            <Stack maxWidth="sm" spacing={2} margin="auto" marginTop={2}>
+            <Stack maxWidth="sm" spacing={2} margin="auto" paddingTop={2} style={{height: "100%", overflowY: "scroll"}}>
                 {outlet}
             </Stack>
         </div>

@@ -6,6 +6,7 @@
 DROP TABLE IF EXISTS exported_event;
 DROP TABLE IF EXISTS image;
 DROP TABLE IF EXISTS event;
+DROP TABLE IF EXISTS song;
 
 DROP TABLE IF EXISTS app_state;
 
@@ -31,6 +32,15 @@ CREATE TABLE exported_event (
     event_id INTEGER REFERENCES event(id),
     filename VARCHAR(512) NOT NULL,
     date datetime NOT NULL
+);
+
+CREATE TABLE song (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    filename VARCHAR(512) NOT NULL UNIQUE,
+    artist VARCHAR(512) NULL,
+    title VARCHAR(512) NULL,
+    format VARCHAR(32) NOT NULL DEFAULT 'cdg',
+    play_count INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE TABLE app_state (

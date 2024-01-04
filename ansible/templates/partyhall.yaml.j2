@@ -21,19 +21,6 @@ hardware_handler:
     BTN_1: DISPLAY_DEBUG
     BTN_2: SHUTDOWN
 
-photobooth:
-  # If you have an hardware flash this should be set to true
-  # Hardware flash are controlled by the arduino
-  hardware_flash: {{partyhall_has_hardware_flash}}
-
-  # Default timer before taking a picture
-  default_timer: {{partyhall_default_timer}}
-
-  # When set, the partyhall will take (without flash) a picture every x minutes
-  # After the event you will be able to compile it in a short animated video
-  # Set to zero to disable
-  unattended_interval: {{partyhall_unattended_interval}}
-
-  webcam_resolution:
-    width: {{partyhall_webcam_width}}
-    height: {{partyhall_webcam_height}}
+modules:
+  - photobooth
+  - karaoke

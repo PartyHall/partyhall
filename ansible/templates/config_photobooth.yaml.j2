@@ -1,0 +1,15 @@
+# If you have an hardware flash this should be set to true
+# Hardware flash are controlled by the arduino
+hardware_flash: {{partyhall_photobooth_has_hardware_flash}}
+
+# Default timer before taking a picture
+default_timer: {{partyhall_photobooth_default_timer}}
+
+# When set, the partyhall will take (without flash) a picture every x minutes
+# After the event you will be able to compile it in a short animated video
+# Set to zero to disable
+unattended_interval: {{partyhall_photobooth_unattended_interval}}
+
+webcam_resolution:
+  width: {{partyhall_photobooth_webcam_width}}
+  height: {{partyhall_photobooth_webcam_height}}

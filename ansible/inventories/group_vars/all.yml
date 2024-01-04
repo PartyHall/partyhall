@@ -1,18 +1,24 @@
 ---
 partyhall_debug_mode: false
-partyhall_has_hardware_flash: false
-partyhall_default_timer: 3
-partyhall_unattended_interval: 5
 
-partyhall_webcam_width: 1280
-partyhall_webcam_height: 720
+# Photobooth module
+partyhall_photobooth_has_hardware_flash: false
+partyhall_photobooth_default_timer: 3
+partyhall_photobooth_unattended_interval: 5
+
+partyhall_photobooth_webcam_width: 1280
+partyhall_photobooth_webcam_height: 720
+
+# Karaoke module
+partyhall_karaoke_amt_songs_per_page: 20
+partyhall_karaoke_pre_play_timer: 20
 
 ntp_enabled: true
 ntp_timezone: Europe/Paris
 
 ethernet_interface: eth0
 
-hotspot_interface: wlan0
+hotspot_interface: wlan1
 hotspot_ssid: "PartyHall"
 hotspot_dns_name: "partyhall.lan"
 hotspot_wifi_channel: 11

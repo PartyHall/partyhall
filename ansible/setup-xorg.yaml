@@ -8,7 +8,7 @@
         extensions: []
         preferences:
           privacy.webrtc.legacyGlobalIndicator: false  # Disable the small "webcam indicator" on top of the window
-          media.navigator.permission.disabled: true    # Let all wabsite access webcam without permissions
+          media.navigator.permission.disabled: true    # Let all website access webcam without permissions
 
   tasks:
     - name: Setting up xorg

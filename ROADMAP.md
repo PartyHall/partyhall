@@ -1,7 +1,7 @@
 # Version 1
 - [x] Simple photobooth
 - [x] Applicance makes a Wifi hotspot to access the UI
-- [ ] Karaoke system (Admin only)
+- [x] Karaoke system (Admin only)
 - [x] Admin UI
 - [ ] User ui (Select song for the karaoke)
 

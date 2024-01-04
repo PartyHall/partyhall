@@ -78,6 +78,10 @@ func (m ModuleKaraoke) LoadConfig(filename string) error {
 	return nil
 }
 
+func (m ModuleKaraoke) PreInitialize() error {
+	return nil
+}
+
 func (m ModuleKaraoke) Initialize() error {
 	go func() {
 		for {

@@ -22,6 +22,7 @@ type Module interface {
 	GetModuleName() string
 	LoadConfig(filename string) error
 
+	PreInitialize() error
 	Initialize() error
 	GetMqttHandlers() map[string]mqtt.MessageHandler
 	GetWebsocketHandlers() []easyws.MessageHandler
@@ -60,6 +61,16 @@ func LoadModules() error {
 	}
 
 	return nil
+}
+
+func PreInitializeModules() {
+	for name, module := range MODULES {
+		logs.Info("Pre-initializing module " + name)
+		err := module.PreInitialize()
+		if err != nil {
+			panic(err)
+		}
+	}
 }
 
 func InitializeModules() {

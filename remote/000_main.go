@@ -17,7 +17,17 @@ import (
 var EasyWS easyws.EasyWS
 var EasyMqtt *easymqtt.EasyMqtt
 
-func init() {
+var onJoins map[string]func(socketType string, s *easyws.Socket)
+
+func RegisterOnJoin(module string, function func(socketType string, s *easyws.Socket)) {
+	if onJoins == nil {
+		onJoins = make(map[string]func(socketType string, s *easyws.Socket))
+	}
+
+	onJoins[module] = function
+}
+
+func Initialize() {
 	EasyWS = easyws.NewWithTypes(
 		utils.SOCKET_TYPES,
 		func(socketType string, r *http.Request) bool {
@@ -54,6 +64,9 @@ func init() {
 
 	EasyWS.OnJoin = func(socketType string, s *easyws.Socket) {
 		SendState(s)
+		for _, function := range onJoins {
+			function(socketType, s)
+		}
 	}
 }
 

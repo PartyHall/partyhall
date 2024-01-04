@@ -36,6 +36,9 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
+		modules.PreInitializeModules()
+		remote.Initialize()
+
 		for name, module := range modules.MODULES {
 			// Must be not be done on the same map
 			handlers := module.GetMqttHandlers()

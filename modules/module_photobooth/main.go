@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/partyhall/easyws"
 	"github.com/partyhall/partyhall/logs"
+	"github.com/partyhall/partyhall/remote"
 	"github.com/partyhall/partyhall/services"
 	"github.com/partyhall/partyhall/utils"
 	"gopkg.in/yaml.v2"
@@ -53,6 +54,16 @@ func (m ModulePhotobooth) LoadConfig(filename string) error {
 	}
 
 	CONFIG = cfg
+
+	return nil
+}
+
+func (m ModulePhotobooth) PreInitialize() error {
+	remote.RegisterOnJoin("photobooth", func(socketType string, s *easyws.Socket) {
+		if socketType == utils.SOCKET_TYPE_BOOTH {
+			m.Actions.StartUnattended(s)
+		}
+	})
 
 	return nil
 }

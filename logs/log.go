@@ -22,7 +22,7 @@ func Init() {
 	// Because the RPi does not have hwclock we need to do this stupid thing
 	// If it had we could just use the current date & symlink latest
 	logpath := utils.GetPath("latest.json")
-	if _, err := os.Stat(logpath); !os.IsNotExist(err) {
+	if utils.FileExists(logpath) {
 		date := time.Now().Format("2006-01-02_14-04-05")
 		err := os.Rename(logpath, utils.GetPath(fmt.Sprintf("logs_before_%v.log", date)))
 		if err != nil {

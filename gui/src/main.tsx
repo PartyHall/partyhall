@@ -17,7 +17,7 @@ import UnauthedLayout from './layouts/unauthed_layout'
 import AdminLayout from './layouts/admin_layout'
 import AdminIndex from './pages/admin'
 import AdminPhotobooth from './pages/admin/photobooth'
-import AdminQuiz from './pages/admin/quiz'
+import AdminKaraoke from './pages/admin/karaoke'
 import PartyHallUI from './pages/booth'
 import Login from './pages/admin/login'
 import ApiProvider from './hooks/useApi'
@@ -43,7 +43,7 @@ const router = createHashRouter(createRoutesFromElements(
       <Route path="/admin/" element={<AdminIndex />} />
       <Route path="/admin/event/edit/:id?" element={<EditEvent />} />
       <Route path="/admin/photobooth" element={<AdminPhotobooth />} />
-      <Route path="/admin/quiz" element={<AdminQuiz />} />
+      <Route path="/admin/karaoke" element={<AdminKaraoke />} />
     </Route>
 
     <Route element={<BoothLayout />}>

@@ -28,13 +28,16 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		modules.UpdateFrontendModuleSettings()
+		modules.BroadcastFrontendSettings()
 
 		err := remote.InitMqtt()
 		if err != nil {
 			logs.Error(err)
 			os.Exit(1)
 		}
+
+		modules.PreInitializeModules()
+		remote.Initialize()
 
 		for name, module := range modules.MODULES {
 			// Must be not be done on the same map
@@ -47,6 +50,8 @@ var rootCmd = &cobra.Command{
 			remote.EasyMqtt.RegisterHandlers(handlers)
 			remote.EasyWS.RegisterMessageHandlers(module.GetWebsocketHandlers()...)
 		}
+
+		modules.InitializeModules()
 
 		_, err = orm.GET.AppState.GetState()
 		if err != nil {
@@ -78,6 +83,7 @@ var rootCmd = &cobra.Command{
 		r := mux.NewRouter()
 
 		r.PathPrefix("/media/partyhall").Handler(http.StripPrefix("/media/partyhall", http.FileServer(http.Dir(utils.GetPath("images")))))
+		r.PathPrefix("/media/karaoke").Handler(http.StripPrefix("/media/karaoke", http.FileServer(http.Dir(utils.GetPath("karaoke")))))
 
 		routes.Register(r.PathPrefix("/api").Subrouter())
 

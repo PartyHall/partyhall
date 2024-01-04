@@ -37,6 +37,21 @@ type PhotoboothModule = {
     };
 };
 
+export type KaraokeSong = {
+    id: number;
+    filename: string;
+    artist: string;
+    title: string;
+    format: string;
+};
+
+type KaraokeModule = {
+    currentSong: KaraokeSong;
+    queue: KaraokeSong[];
+    started: boolean;
+    preplayTimer: number;
+};
+
 export type AppState = {
     debug: boolean;
     app_state: appstate;
@@ -47,6 +62,7 @@ export type AppState = {
 
     modules: {
         photobooth: PhotoboothModule;
+        karaoke: KaraokeModule;
     };
 
     partyhall_version: string;

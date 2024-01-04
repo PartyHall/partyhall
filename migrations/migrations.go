@@ -20,9 +20,10 @@ type migration interface {
 
 func CheckDbExists(scripts embed.FS) error {
 	path := utils.GetPath("partyhall.db")
-	if _, err := os.Stat(path); !os.IsNotExist(err) {
+	if utils.FileExists(path) {
 		return nil
 	}
+
 	file, err := os.Create(path)
 	if err != nil {
 		return err

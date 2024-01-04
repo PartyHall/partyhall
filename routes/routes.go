@@ -13,6 +13,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
+	"github.com/partyhall/partyhall/modules"
 	"github.com/partyhall/partyhall/orm"
 	"github.com/partyhall/partyhall/remote"
 	"github.com/partyhall/partyhall/services"
@@ -24,6 +25,8 @@ func Register(r *mux.Router) {
 	r.HandleFunc("/picture", picture).Methods(http.MethodPost)
 
 	registerAdminRoutes(r.PathPrefix("/admin").Subrouter())
+
+	modules.RegisterRoutes(r.PathPrefix("/modules").Subrouter())
 }
 
 func settings(w http.ResponseWriter, r *http.Request) {

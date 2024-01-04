@@ -3,14 +3,16 @@ package modules
 import (
 	"errors"
 	"fmt"
-	"os"
 	"strings"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/gorilla/mux"
 	"github.com/partyhall/easyws"
 	"github.com/partyhall/partyhall/config"
+	"github.com/partyhall/partyhall/logs"
+	"github.com/partyhall/partyhall/modules/module_karaoke"
 	"github.com/partyhall/partyhall/modules/module_photobooth"
-	"github.com/partyhall/partyhall/services"
+	"github.com/partyhall/partyhall/remote"
 	"github.com/partyhall/partyhall/utils"
 )
 
@@ -20,15 +22,18 @@ type Module interface {
 	GetModuleName() string
 	LoadConfig(filename string) error
 
+	PreInitialize() error
+	Initialize() error
 	GetMqttHandlers() map[string]mqtt.MessageHandler
 	GetWebsocketHandlers() []easyws.MessageHandler
-	GetState() map[string]interface{}
-	GetFrontendSettings() map[string]interface{}
+	UpdateFrontendSettings()
+	RegisterApiRoutes(router *mux.Router)
 }
 
 func LoadModules() error {
 	MODULES = map[string]Module{
 		"photobooth": module_photobooth.ModulePhotobooth{},
+		"karaoke":    module_karaoke.ModuleKaraoke{},
 	}
 
 	var loadedModules = 0
@@ -40,11 +45,9 @@ func LoadModules() error {
 			return fmt.Errorf("failed to load module %v: does not exists", name)
 		}
 
+		logs.Info("Loading module " + module.GetModuleName())
+
 		configFile := utils.GetPath("config", name+".yaml")
-		fmt.Println(configFile)
-		if _, err := os.Stat(configFile); os.IsNotExist(err) {
-			return fmt.Errorf("failed to load module %v: config file does not exists at path %v", name, configFile)
-		}
 
 		if err := module.LoadConfig(configFile); err != nil {
 			return fmt.Errorf("failed to load module %v: %v", name, err)
@@ -60,12 +63,43 @@ func LoadModules() error {
 	return nil
 }
 
-func UpdateFrontendModuleSettings() {
-	moduleSettings := map[string]interface{}{}
-
+func PreInitializeModules() {
 	for name, module := range MODULES {
-		moduleSettings[name] = module.GetFrontendSettings()
+		logs.Info("Pre-initializing module " + name)
+		err := module.PreInitialize()
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func InitializeModules() {
+	for name, module := range MODULES {
+		logs.Info("Initializing module " + name)
+		err := module.Initialize()
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+// @TODO do this better so that module updates their settings themselves
+func BroadcastFrontendSettings() {
+	for _, module := range MODULES {
+		module.UpdateFrontendSettings()
 	}
 
-	services.GET.ModuleSettings = moduleSettings
+	remote.BroadcastState()
+}
+
+// @TODO remove spaces & not url valid characters
+func NormalizeModuleName(m Module) string {
+	return strings.ToLower(m.GetModuleName())
+}
+
+func RegisterRoutes(r *mux.Router) {
+	for _, module := range MODULES {
+		sr := r.PathPrefix("/" + NormalizeModuleName(module) + "/").Subrouter()
+		module.RegisterApiRoutes(sr)
+	}
 }

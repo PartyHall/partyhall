@@ -8,13 +8,7 @@ import (
 	"golang.org/x/exp/slices"
 )
 
-type AdminSetModeHandler struct{}
-
-func (h AdminSetModeHandler) GetTopic() string {
-	return "admin/set_mode"
-}
-
-func (h AdminSetModeHandler) Do(client mqtt.Client, msg mqtt.Message) {
+func OnSetMode(client mqtt.Client, msg mqtt.Message) {
 	mode := string(msg.Payload())
 	if !slices.Contains(config.MODES, mode) {
 		logs.Error("given mode is not allowed")

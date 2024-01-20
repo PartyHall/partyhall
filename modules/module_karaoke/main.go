@@ -27,6 +27,11 @@ var (
 	}
 
 	CONFIG = Config{}
+
+	ALLOWED_EXT_LIST = []string{
+		"mp4",
+		"webm",
+	}
 )
 
 /**
@@ -117,6 +122,8 @@ func (m ModuleKaraoke) ScanSongs() {
 	}
 
 	//#region Purge invalid songs
+	// @TODO: In case of video
+	// Check whether the DB song has the correct extension to consider it valid
 	for _, entry := range entries {
 		songName := entry.Name()
 		basePath := filepath.Join(baseDir, songName)
@@ -129,9 +136,9 @@ func (m ModuleKaraoke) ScanSongs() {
 
 		hasCdg := utils.FileExists(filepath.Join(basePath, "song.cdg"))
 		hasMp3 := utils.FileExists(filepath.Join(basePath, "song.mp3"))
-		hasMp4 := utils.FileExists(filepath.Join(basePath, "song.mp4"))
+		foundExt := utils.FileExistsForAnyExt(filepath.Join(basePath, "song"), ALLOWED_EXT_LIST)
 
-		if hasMp4 || (hasMp3 && hasCdg) {
+		if len(foundExt) > 0 || (hasMp3 && hasCdg) {
 			isSongValid = true
 		}
 
@@ -188,11 +195,12 @@ func (m ModuleKaraoke) ScanSongs() {
 		}
 
 		if len(format) == 0 {
+			// Wtf ?
 			foundCdg := false
-			foundMp4 := false
+			foundVideo := false
 
-			if !foundCdg && !foundMp4 {
-				logs.Error("Failed to create song " + songName + ", the folder should contain either a cdg or a mp4")
+			if !foundCdg && !foundVideo {
+				logs.Error("Failed to create song " + songName + ", the folder should contain either a cdg or a video")
 				continue
 			}
 		}

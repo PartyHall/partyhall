@@ -31,3 +31,13 @@ func FileExists(filename string) bool {
 
 	return true
 }
+
+func FileExistsForAnyExt(basename string, allowedExtensions []string) string {
+	for _, v := range allowedExtensions {
+		if FileExists(basename + "." + v) {
+			return v
+		}
+	}
+
+	return ""
+}

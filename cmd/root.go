@@ -117,5 +117,6 @@ func Execute() {
 
 func init() {
 	rootCmd.AddCommand(hwhandlerCmd)
+	rootCmd.AddCommand(convertVideoCmd)
 	rootCmd.AddCommand(versionCmd)
 }

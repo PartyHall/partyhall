@@ -7,6 +7,7 @@ import Webcam from "react-webcam";
 import { Stack, Typography } from "@mui/material";
 import { songTitle } from "../../../utils/songs";
 import OsdSong from "./osd_song";
+import VideoPlayer from "./videoplayer";
 
 export default function Karaoke() {
     const { appState, lastMessage, sendMessage } = useBoothSocket();
@@ -41,6 +42,14 @@ export default function Karaoke() {
                         onPlay={() => {}}
                         onStatus={(x: any) => sendMessage('karaoke/PLAYING_STATUS', {'current': x.position, 'total': x.total})}
                     /> 
+                }
+                {
+                    module.currentSong.format !== 'cdg' && <VideoPlayer
+                        isPlaying={module.started}
+                        song={module.currentSong}
+                        onEnd={() => sendMessage('karaoke/PLAYING_ENDED')}
+                        onStatus={(x: any) => sendMessage('karaoke/PLAYING_STATUS', {'current': x.position, 'total': x.total})}
+                    />
                 }
             </>
         }

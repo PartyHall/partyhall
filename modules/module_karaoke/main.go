@@ -1,12 +1,10 @@
 package module_karaoke
 
 import (
-	"encoding/json"
 	"net/http"
 	"os"
 	"path/filepath"
 	"slices"
-	"strconv"
 	"strings"
 	"time"
 
@@ -98,6 +96,7 @@ func (m ModuleKaraoke) Initialize() error {
 	return nil
 }
 
+// #region ScanSongs
 // ScanSongs checks the song directory to add new cdg files to the database
 // It also removes from the DB songs that do no longer have cdg+mp3 files
 func (m ModuleKaraoke) ScanSongs() {
@@ -212,8 +211,10 @@ func (m ModuleKaraoke) ScanSongs() {
 			logs.Info("Song " + songName + " created.")
 		}
 	}
-	//#region
+	//#endregion
 }
+
+//#endregion
 
 func (m ModuleKaraoke) GetMqttHandlers() map[string]mqtt.MessageHandler {
 	return map[string]mqtt.MessageHandler{}
@@ -247,60 +248,8 @@ func (m ModuleKaraoke) UpdateFrontendSettings() {
 }
 
 func (m ModuleKaraoke) RegisterApiRoutes(router *mux.Router) {
-	router.HandleFunc("/search_song", func(w http.ResponseWriter, r *http.Request) {
-		query := r.URL.Query().Get("q")
-		if len(query) == 0 {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		songs, err := ormSearchSong(query)
-		if err != nil {
-			jsonErr, _ := json.Marshal(map[string]interface{}{
-				"err":     "Failed to search song",
-				"details": err,
-			})
-
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Header().Set("Content-Type", "application/json")
-			w.Write(jsonErr)
-			return
-		}
-
-		data, _ := json.Marshal(songs)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(data)
-	})
-
-	router.HandleFunc("/list_song", func(w http.ResponseWriter, r *http.Request) {
-		pageStr := r.URL.Query().Get("page")
-		var page int64 = 1
-
-		if len(pageStr) > 0 {
-			var err error = nil
-			page, err = strconv.ParseInt(pageStr, 10, 64)
-			if err != nil {
-				page = 1
-			}
-		}
-
-		songs, err := ormListSongs((page-1)*int64(CONFIG.AmtSongsPerPage), int64(CONFIG.AmtSongsPerPage))
-		if err != nil {
-			jsonErr, _ := json.Marshal(map[string]interface{}{
-				"err":     "Failed to list songs",
-				"details": err.Error(),
-			})
-
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Header().Set("Content-Type", "application/json")
-			w.Write(jsonErr)
-			return
-		}
-
-		data, _ := json.Marshal(songs)
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(data)
-	})
+	router.HandleFunc("/search_song", searchSong)
+	router.HandleFunc("/list_song", listSong)
 
 	router.HandleFunc("/fallback-image", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/jpeg")

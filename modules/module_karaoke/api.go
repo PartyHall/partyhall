@@ -2,6 +2,7 @@ package module_karaoke
 
 import (
 	"encoding/json"
+	"math"
 	"net/http"
 	"strconv"
 
@@ -67,7 +68,18 @@ func listSong(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data, _ := json.Marshal(songs)
+	count, err := ormCountSongs()
+	if err != nil {
+		count = len(songs)
+	}
+
+	data, _ := json.Marshal(models.ContextualizedResponse{
+		Results: songs,
+		Meta: models.ResponseMetadata{
+			LastPage: int(math.Ceil(float64(count) / float64(CONFIG.AmtSongsPerPage))),
+			Total:    count,
+		},
+	})
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(data)
 }

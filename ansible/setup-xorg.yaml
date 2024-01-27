@@ -11,53 +11,46 @@
           media.navigator.permission.disabled: true    # Let all website access webcam without permissions
 
   tasks:
-    - name: Setting up xorg
+    - name: 'Setting up xorg'
       become: yes
       apt:
-        name: [ unclutter, xorg, i3, firefox-esr, dmenu, suckless-tools, fonts-dejavu-core, fonts-dejavu-extra ]
+        name: [ 'lightdm', 'unclutter', 'xorg', 'i3', 'dmenu', 'suckless-tools', 'lxterminal', 'fonts-dejavu-core', 'fonts-dejavu-extra' ]
+    
+    - name: 'Enable lightdm autologin'
+      become: yes
+      lineinfile:
+        path: '/etc/lightdm/lightdm.conf'
+        regexp: ".*autologin-user\\s*=\\s*($|{{ansible_user}})"
+        line: 'autologin-user = {{ansible_user}}'
 
-    - name: Setting up firefox
+    - name: 'Use i3 as WM'
+      copy:
+          dest: '/home/{{ansible_user}}/.xsession'
+          owner: '{{ansible_user}}'
+          group: '{{ansible_user }}'
+          mode: '0644'
+          content: |
+              exec i3
+
+    - name: 'Setting up firefox'
       include_role:
-        name: staticdev.firefox
+        name: 'staticdev.firefox'
 
-    - name: Creating the xinitrc
-      template:
-        src: templates/xinitrc.j2
-        dest: /home/{{ansible_user}}/.xinitrc
-        mode: 0774
-
-    - name: Creating the i3 dir
+    - name: 'Creating the i3 dir'
       file:
         path: '/home/{{ansible_user}}/.config/i3'
-        state: directory
-        mode: 0774
-
-    - name: Adding the i3config
-      copy:
-        src: files/i3
-        dest: /home/{{ansible_user}}/.config/i3/config
-        mode: 0774
-
-    # @TODO: Make this service work and remove the hack in ~/.bash_profile
-    # - name: Pushing the service
-    #   become: yes
-    #   template:
-    #     src: templates/startx.service.j2
-    #     dest: '/etc/systemd/system/x11-autologin.service'
-    #     mode: '0644'
-
-    # - name: Enabling the service
-    #   become: yes
-    #   systemd:
-    #     name: x11-autologin
-    #     daemon_reload: yes
-    #     state: started
-    #     enabled: yes
-
-    - name: Pushing the bash_profile required
-      copy:
-        src: files/bash_profile
-        dest: "/home/{{ansible_user}}/.bash_profile"
-        owner: "{{ansible_user}}"
-        group: "{{ansible_user}}"
+        state: 'directory'
         mode: '0774'
+
+    - name: 'Adding the i3config'
+      copy:
+        src: 'files/i3'
+        dest: '/home/{{ansible_user}}/.config/i3/config'
+        mode: '0774'
+
+    - name: 'Enabling the DM service'
+      systemd:
+        name: 'lightdm'
+        daemon_reload: yes
+        enabled: yes
+        state: 'started'

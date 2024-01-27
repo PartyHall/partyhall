@@ -16,7 +16,7 @@ partyhall_karaoke_pre_play_timer: 5
 ntp_enabled: true
 ntp_timezone: Europe/Paris
 
-ethernet_interface: eth0
+ethernet_interface: ens33
 
 hotspot_interface: wlan0
 hotspot_ssid: "PartyHall"

@@ -26,7 +26,7 @@ export default function KaraokeQueue() {
         }
     }, [lastMessage]);
 
-    return <Stack direction="column" gap={1} mt={1}>
+    return <Stack direction="column" gap={1} mt={1} flex="1 1 0">
         {
             module.currentSong && <Card elevation={2}>
                 <CardContent>
@@ -45,15 +45,17 @@ export default function KaraokeQueue() {
 
         <Typography variant="h4">Queue:</Typography>
         {module.queue.length == 0 && <Typography variant="body1">Empty queue</Typography>}
-        <List>
-            { module.queue.map((x, idx) => <Song 
-                key={x.id}
-                song={x}
-                type="QUEUE" 
-                first={idx === 0}
-                last={idx === module.queue.length - 1}
-            />)
-            }
-        </List>
+        <Stack flex="1 1 0" style={{overflowY: 'scroll'}}>
+            <List>
+                { module.queue.map((x, idx) => <Song 
+                    key={x.id}
+                    song={x}
+                    type="QUEUE" 
+                    first={idx === 0}
+                    last={idx === module.queue.length - 1}
+                />)
+                }
+            </List>
+        </Stack>
     </Stack>
 }

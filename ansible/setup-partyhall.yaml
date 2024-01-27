@@ -1,92 +1,92 @@
 ---
-- hosts: all
-  tags: [partyhall]
+- hosts: 'all'
+  tags: ['partyhall']
 
   tasks:
-    - name: Make partyhall dirs
+    - name: 'Make partyhall dirs'
       become: yes
       file:
-        path: /opt/partyhall
+        path: '/opt/partyhall'
         state: 'directory'
         mode: '0777' # fck
 
-    - name: Fetch the partyhall release URL
+    - name: 'Fetch the partyhall release URL'
       get_release_url: 
-        repository: partyhall/partyhall
-      register: partyhall_url
+        repository: 'partyhall/partyhall'
+      register: 'partyhall_url'
 
-    - name: Downloading the latest release
+    - name: 'Downloading the latest release'
       become: yes
       get_url:
-        url: "{{partyhall_url.meta}}"
-        dest: /opt/partyhall/partyhall
+        url: '{{partyhall_url.meta}}'
+        dest: '/opt/partyhall/partyhall'
         mode: '0777'
 
-    - name: Symlink the executable
+    - name: 'Symlink the executable'
       become: yes
       file:
-        src: /opt/partyhall/partyhall
-        dest: /usr/bin/partyhall
-        state: link
+        src: '/opt/partyhall/partyhall'
+        dest: '/usr/bin/partyhall'
+        state: 'link'
 
-    - name: Pushing the partyhall config
+    - name: 'Pushing the partyhall config'
       become: yes
       template:
-        src: templates/partyhall.yaml.j2
-        dest: /etc/partyhall.yaml
+        src: 'templates/partyhall.yaml.j2'
+        dest: '/etc/partyhall.yaml'
         mode: 0664
 
-    - name: Make data directory
+    - name: 'Make data directory'
       file:
-        path: "/home/{{ansible_user}}/data"
-        state: directory
+        path: '/home/{{ansible_user}}/data'
+        state: 'directory'
         mode: '0770'
 
-    - name: Make config directory
+    - name: 'Make config directory'
       file:
-        path: "/home/{{ansible_user}}/data/config"
-        state: directory
+        path: '/home/{{ansible_user}}/data/config'
+        state: 'directory'
         mode: '0770'
 
-    - name: Pushing the photobooth module config
+    - name: 'Pushing the photobooth module config'
       become: yes
       template:
-        src: "templates/config_photobooth.yaml.j2"
-        dest: "/home/{{ansible_user}}//data/config/photobooth.yaml"
+        src: 'templates/config_photobooth.yaml.j2'
+        dest: '/home/{{ansible_user}}/data/config/photobooth.yaml'
         mode: '0644'
 
-    - name: Pushing the karaoke module config
+    - name: 'Pushing the karaoke module config'
       become: yes
       template:
-        src: "templates/config_karaoke.yaml.j2"
-        dest: "/home/{{ansible_user}}//data/config/karaoke.yaml"
+        src: 'templates/config_karaoke.yaml.j2'
+        dest: '/home/{{ansible_user}}/data/config/karaoke.yaml'
         mode: '0644'
 
-    - name: Create the karaoke songs folder
+    - name: 'Create the karaoke songs folder'
       file:
-        path: "/home/{{ansible_user}}/data/karaoke"
-        state: directory
+        path: '/home/{{ansible_user}}/data/karaoke'
+        state: 'directory'
         mode: '0770'
 
-    - name: Pushing the services (Partyhall)
+    - name: 'Pushing the services (Partyhall)'
       become: yes
       template:
-        src: "templates/partyhall.service.j2"
-        dest: "/usr/lib/systemd/user/partyhall.service"
+        src: 'templates/partyhall.service.j2'
+        dest: '/usr/lib/systemd/user/partyhall.service'
         mode: '0644'
 
-    - name: Pushing the services (Hardware handler)
+    - name: 'Pushing the services (Hardware handler)'
       become: yes
       template:
-        src: "templates/hardware_handler.service.j2"
-        dest: "/usr/lib/systemd/user/hardware_handler.service"
+        src: 'templates/hardware_handler.service.j2'
+        dest: '/usr/lib/systemd/user/hardware_handler.service'
         mode: '0644'
 
-    - name: Enabling the services
+    - name: 'Enabling the services'
       systemd:
-        name: "{{item}}"
+        name: '{{item}}'
         daemon_reload: yes
-        state: started
+        state: 'started'
         enabled: yes
-        scope: user
-      loop: [partyhall, hardware_handler]
+        scope: 'user'
+      loop: ['partyhall', 'hardware_handler']

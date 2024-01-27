@@ -1,25 +1,25 @@
 ---
-- hosts: all
+- hosts: 'all'
   become: yes
-  tags: [mosquitto]
+  tags: ['mosquitto']
 
   tasks:
-    - name: Install mosquitto
+    - name: 'Install mosquitto'
       apt:
-        name: [ mosquitto ]
+        name: [ 'mosquitto' ]
 
-    - name: Make mosquitto listen on localhost
+    - name: 'Make mosquitto listen on localhost'
       lineinfile:
-        path: /etc/mosquitto/mosquitto.conf
-        line: listener 1883 127.0.0.1
+        path: '/etc/mosquitto/mosquitto.conf'
+        line: 'listener 1883 127.0.0.1'
 
-    - name: Allow anonymous user on mosquitto
+    - name: 'Allow anonymous user on mosquitto'
       lineinfile:
-        path: /etc/mosquitto/mosquitto.conf
-        line: allow_anonymous true
+        path: '/etc/mosquitto/mosquitto.conf'
+        line: 'allow_anonymous true'
 
-    - name: Enable & start mosquitto
+    - name: 'Enable & start mosquitto'
       systemd:
-        name: mosquitto
+        name: 'mosquitto'
         enabled: yes
-        state: restarted
+        state: 'restarted'

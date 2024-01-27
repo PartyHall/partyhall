@@ -78,8 +78,8 @@ export default function AdminLayout() {
             </Box>
         </Drawer>
 
-        <div style={{height: '100%', overflowY: 'scroll', paddingBottom: '5em'}}>
-            <Stack maxWidth="sm" spacing={2} margin="auto" paddingTop={2} style={{height: "100%", overflowY: "scroll"}}>
+        <div style={{height: '100%', paddingBottom: '5em'}}>
+            <Stack maxWidth="sm" spacing={2} margin="auto" paddingTop={2} style={{height: "100%"}}>
                 {outlet}
             </Stack>
         </div>

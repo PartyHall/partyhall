@@ -1,20 +1,57 @@
 ---
-- hosts: all
+- hosts: 'all'
   become: yes
-  tags: [init]
+  tags: ['init']
 
   roles:
-    - geerlingguy.ntp
+    - 'geerlingguy.ntp'
 
   tasks:
-    - name: Updating the system setup
+    - name: 'Updating the system setup'
       apt:
         update_cache: yes
         upgrade: yes
         cache_valid_time: 86400
       environment:
-        DEBIAN_FRONTEND: noninteractive
+        DEBIAN_FRONTEND: 'noninteractive'
 
-    - name: Install some softwares
+    - name: 'Install some softwares'
       apt:
-        name: [ zip, unzip, sqlite3, vim ]
+        name: ['zip', 'unzip', 'sqlite3', 'vim', 'sudo', 'ffmpeg']
+
+    - name: 'Make users passwordless for sudo in group wheel'
+      lineinfile:
+        path: '/etc/sudoers'
+        state: 'present'
+        regexp: '^%wheel'
+        line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+        validate: '/usr/sbin/visudo -cf %s'
+
+    - name: 'Ensure group wheel exists'
+      group:
+        name: 'wheel'
+        state: 'present'
+
+    - name: 'Add the user to the sudo group'
+      user:
+        name: '{{ ansible_user }}'
+        groups: 'wheel'
+        append: yes
+
+    # @TODO those three probably won't work on a Raspberry Pi
+    # Check first if grub is installed and do these only in this case
+    - name: 'Disabling grub boot menu'
+      copy:
+        content: |
+          set timeout_style=hidden
+          set timeout=0
+        dest: '/boot/grub/custom.cfg'
+
+    # @TODO: Add splashscreen
+    # Probably related: https://stackoverflow.com/questions/55844981/ansible-insert-word-in-grub-cmdline
+
+    - name: 'Updating the grub config'
+      command: 'update-grub'
+      environment:
+        PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/sbin:/bin'
+

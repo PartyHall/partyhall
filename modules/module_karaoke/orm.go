@@ -119,3 +119,15 @@ func ormFetchSongFilenames() ([]string, error) {
 func ormCountSongPlayed(filename string) {
 	orm.GET.DB.Exec(`UPDATE song SET play_count = play_count + 1 WHERE filename = $1`, filename)
 }
+
+func ormCountSongs() (int, error) {
+	row := orm.GET.DB.QueryRow(`SELECT COUNT(*) FROM song`)
+	if row.Err() != nil {
+		return -1, row.Err()
+	}
+
+	var count int = -1
+	err := row.Scan(&count)
+
+	return count, err
+}

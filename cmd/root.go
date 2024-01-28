@@ -118,5 +118,6 @@ func Execute() {
 func init() {
 	rootCmd.AddCommand(hwhandlerCmd)
 	rootCmd.AddCommand(convertVideoCmd)
+	rootCmd.AddCommand(spotifySearchCmd)
 	rootCmd.AddCommand(versionCmd)
 }

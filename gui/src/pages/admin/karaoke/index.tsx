@@ -2,7 +2,7 @@ import { Box, Stack, Tab, Tabs } from "@mui/material";
 import { useState } from "react";
 import KaraokeSearch from "./search";
 import KaraokeQueue from "./queue";
-import KaraokeAddSong from "./add_song";
+import KaraokeAddSong from "./new_song/index";
 
 export default function AdminKaraoke() {
     const [currentTab, setCurrentTab] = useState<number>(0);

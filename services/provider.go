@@ -28,6 +28,7 @@ type Provider struct {
 
 	CurrentState   models.AppState
 	CurrentMode    string
+	Spotify        Spotify
 	ModuleSettings map[string]interface{}
 }
 
@@ -65,6 +66,7 @@ func Load() error {
 
 	prv := &Provider{
 		CurrentMode:    config.GET.DefaultMode,
+		Spotify:        Spotify{},
 		ModuleSettings: map[string]interface{}{},
 	}
 

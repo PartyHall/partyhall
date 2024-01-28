@@ -247,9 +247,12 @@ func (m ModuleKaraoke) UpdateFrontendSettings() {
 	}
 }
 
+// @TODO Secure routes
 func (m ModuleKaraoke) RegisterApiRoutes(router *mux.Router) {
 	router.HandleFunc("/search_song", searchSong)
 	router.HandleFunc("/list_song", listSong)
+	router.HandleFunc("/create_song", createSong)
+	router.HandleFunc("/search/spotify", spotifySearch)
 
 	router.HandleFunc("/fallback-image", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/jpeg")

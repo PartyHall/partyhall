@@ -28,7 +28,7 @@ export default function Karaoke() {
             module.currentSong && module.preplayTimer == 0 &&
             <>
                 {
-                    module.currentSong.format === 'cdg' &&
+                    module.currentSong.format.toLowerCase() === 'cdg' &&
                     <CDGPlayer
                         cdgAlpha={.8}
                         cdgSize={window.innerHeight / 2}
@@ -44,7 +44,7 @@ export default function Karaoke() {
                     /> 
                 }
                 {
-                    module.currentSong.format !== 'cdg' && <VideoPlayer
+                    module.currentSong.format.toLowerCase() !== 'cdg' && <VideoPlayer
                         isPlaying={module.started}
                         song={module.currentSong}
                         onEnd={() => sendMessage('karaoke/PLAYING_ENDED')}

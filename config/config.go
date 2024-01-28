@@ -52,6 +52,9 @@ type Config struct {
 
 	HardwareHandler HardwareHandlerConfig `yaml:"hardware_handler"`
 
+	SpotifyClientID     string `yaml:"spotify_client_id"`
+	SpotifyClientSecret string `yaml:"spotify_client_secret"`
+
 	Modules []string
 }
 

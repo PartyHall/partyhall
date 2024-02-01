@@ -64,6 +64,7 @@ export default function CreateSong() {
                 reset();
             }
         } catch (e) {
+            console.log(e);
             //@ts-ignore
             showSnackbar('Failed to create song: ' + (await e.response.text()), 'error');
         }

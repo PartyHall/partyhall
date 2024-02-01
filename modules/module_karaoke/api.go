@@ -15,6 +15,7 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/h2non/bimg"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/services"
@@ -194,7 +195,8 @@ func createSong(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if coverType != "NO_COVER" {
-		outputCover, err := os.Create(filepath.Join(tempDir, "cover.jpg"))
+		coverPath := filepath.Join(tempDir, "cover.jpg")
+		outputCover, err := os.Create(coverPath)
 		if err != nil {
 			fmt.Println(err)
 
@@ -243,8 +245,49 @@ func createSong(w http.ResponseWriter, r *http.Request) {
 
 		outputCover.Close()
 
-		// Be sure its 300x300 as jpg
-		// Save it back on top of it
+		buf, err := bimg.Read(coverPath)
+		if err != nil {
+			fmt.Println("Failed to open image: ", err)
+			w.WriteHeader(500)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte("{\"non_fields\": \"Failed to open cover image\"}"))
+
+			return
+		}
+
+		newImage, err := bimg.NewImage(buf).Resize(300, 300)
+		if err != nil {
+			fmt.Println("Failed to resize image: ", err)
+			w.WriteHeader(500)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte("{\"non_fields\": \"Failed to resize cover image\"}"))
+
+			return
+		}
+
+		format := bimg.NewImage(newImage).Type()
+		if format != "jpeg" {
+			fmt.Printf("Wrong format: %v, expected %v. Converting...\n", format, "jpeg")
+			newImage, err = bimg.NewImage(newImage).Convert(bimg.JPEG)
+			if err != nil {
+				fmt.Println("Failed to resize image: ", err)
+				w.WriteHeader(500)
+				w.Header().Set("Content-Type", "application/json")
+				w.Write([]byte("{\"non_fields\": \"Failed to resize cover image\"}"))
+
+				return
+			}
+		}
+
+		err = bimg.Write(coverPath, newImage)
+		if err != nil {
+			fmt.Println("Failed to resize image: ", err)
+			w.WriteHeader(500)
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte("{\"non_fields\": \"Failed to resize cover image\"}"))
+
+			return
+		}
 	}
 
 	infoFile, err := os.Create(filepath.Join(tempDir, "info.txt"))
@@ -281,6 +324,8 @@ func createSong(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
+
+	w.WriteHeader(http.StatusCreated)
 }
 
 func spotifySearch(w http.ResponseWriter, r *http.Request) {

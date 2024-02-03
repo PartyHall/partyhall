@@ -99,25 +99,25 @@ func (m ModuleKaraoke) Initialize() error {
 // #region ScanSongs
 // ScanSongs checks the song directory to add new cdg files to the database
 // It also removes from the DB songs that do no longer have cdg+mp3 files
-func (m ModuleKaraoke) ScanSongs() {
+func (m ModuleKaraoke) ScanSongs() error {
 	logs.Info("[Karaoke] Scanning the songs")
 	baseDir := filepath.Join(config.GET.RootPath, "karaoke")
 	entries, err := os.ReadDir(baseDir)
 	if err != nil {
 		logs.Error("Failed to read songs directory!", err)
-		return
+		return err
 	}
 
 	dbSongs, err := ormFetchSongFilenames()
 	if err != nil {
 		logs.Error("Failed to fetch songs from DB: ", err)
-		return
+		return err
 	}
 	folderSongs := []string{}
 
 	if err != nil {
 		logs.Error("Failed to fetch songs in DB, skipping the scanning process")
-		return
+		return err
 	}
 
 	//#region Purge invalid songs
@@ -212,6 +212,8 @@ func (m ModuleKaraoke) ScanSongs() {
 		}
 	}
 	//#endregion
+
+	return nil
 }
 
 //#endregion
@@ -247,12 +249,13 @@ func (m ModuleKaraoke) UpdateFrontendSettings() {
 	}
 }
 
-// @TODO Secure routes
+// @TODO Secure routes correctly by user
 func (m ModuleKaraoke) RegisterApiRoutes(router *mux.Router) {
 	router.HandleFunc("/search_song", searchSong)
 	router.HandleFunc("/list_song", listSong)
 	router.HandleFunc("/create_song", createSong)
 	router.HandleFunc("/search/spotify", spotifySearch)
+	router.HandleFunc("/rescan_songs", rescanSongs)
 
 	router.HandleFunc("/fallback-image", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "image/jpeg")

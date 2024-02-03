@@ -2,7 +2,7 @@ import { Box, Stack, Tab, Tabs } from "@mui/material";
 import { useState } from "react";
 import KaraokeSearch from "./search";
 import KaraokeQueue from "./queue";
-import KaraokeAddSong from "./new_song/index";
+import KaraokeSettings from "./new_song/index";
 
 export default function AdminKaraoke() {
     const [currentTab, setCurrentTab] = useState<number>(0);
@@ -27,7 +27,7 @@ export default function AdminKaraoke() {
             }
             {
                 currentTab == 2 &&
-                <KaraokeAddSong />
+                <KaraokeSettings />
             }
         </Stack>
     </Stack>

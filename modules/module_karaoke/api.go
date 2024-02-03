@@ -431,3 +431,9 @@ func listSong(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(data)
 }
+
+func rescanSongs(w http.ResponseWriter, r *http.Request) {
+	if err := INSTANCE.ScanSongs(); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+}

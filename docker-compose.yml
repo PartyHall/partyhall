@@ -8,15 +8,31 @@ services:
       - ./.docker/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ./0_DATA/mosquitto/data:/mosquitto/data
       - ./0_DATA/mosquitto/logs:/mosquitto/log
+    # healthcheck:
+      # test: ["CMD", "curl", "-f", "http://localhost:1883 || exit 1" ]
+      # test: ["CMD-SHELL", "timeout -t 5 mosquitto_sub -t '$$SYS/#' -C 1 | grep -v Error || exit 1"]
+      # interval: 10s
+      # timeout: 10s
+      # retries: 6
 
   backend:
-    image: cosmtrek/air
+    build:
+      context: .docker/backend
     working_dir: /app
+    user: 1000:1000
     volumes:
       - ./:/app
       - ./config.yaml:/etc/partyhall.yaml
     ports:
       - 8039:8039
+    # depends_on:
+      # mosquitto:
+        # condition: service_healthy
+    # healthcheck:
+      # test: ["CMD", "curl -f http://localhost:8039 || exit 1"]
+      # timeout: 15s
+      # interval: 30s
+      # retries: 3
 
   frontend:
     image: node:lts
@@ -27,3 +43,6 @@ services:
     ports:
       - '127.0.0.1:5993:5173'
     command: ['bash', '-c', '[ ! -d node_modules ] && npm install; npm run dev -- --host']
+    # depends_on:
+      # backend:
+        # condition: service_healthy

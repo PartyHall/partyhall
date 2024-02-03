@@ -17,6 +17,9 @@ var client mqtt.Client
 var lastButtonPress string = ""
 var lastButtonPressTime time.Time = time.Now()
 
+// @TODO:
+// PINGPONG with the arduino & autorestart when its not working
+
 type HardwareHandler struct {
 	PortName string
 }

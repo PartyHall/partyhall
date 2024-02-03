@@ -86,7 +86,7 @@ func (vc *VideoConverter) CheckFormat(path string) (bool, error) {
 
 func getCommandForFormat(format string) (string, string) {
 	if format == "vp9" {
-		return `ffmpeg -i "%v" -c:v libvpx-vp9 -vf "scale=min(720\,iw):-2" -c:a libopus -b:a 192k "%v.webm"`, "webm"
+		return `ffmpeg -i "%v" -c:v libvpx-vp9 -vf "scale=-2:min(720\,ih)" -c:a libopus -b:a 192k "%v.webm"`, "webm"
 	}
 
 	if format == "h264" {

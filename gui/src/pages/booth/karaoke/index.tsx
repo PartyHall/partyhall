@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useBoothSocket } from "../../../hooks/boothSocket";
 
 import '../../../assets/css/karaoke.scss';
@@ -13,6 +13,39 @@ export default function Karaoke() {
     const { appState, lastMessage, sendMessage } = useBoothSocket();
     const webcamRef = useRef<Webcam>(null);
     const module = appState.modules.karaoke;
+
+    const takePicture = async () => {
+        if (!webcamRef || !webcamRef.current) {
+            return;
+        }
+
+        const imageSrc = webcamRef.current.getScreenshot();
+        if (imageSrc) {
+            let form = new FormData();
+
+            form.append('image', imageSrc);
+            form.append('unattended', 'true')
+            form.append('event', ''+appState?.app_state?.current_event?.id)
+
+            try {
+                await fetch('/api/picture', {
+                    method: 'POST',
+                    body: form,
+                });
+            } catch {
+            }
+        }
+    };
+
+    useEffect(() => {
+        if (!lastMessage) {
+            return;
+        }
+
+        if (lastMessage.type == 'UNATTENDED_PICTURE') {
+            takePicture();
+        }
+    }, [lastMessage]);
 
     return <div className="karaoke">
         <Webcam

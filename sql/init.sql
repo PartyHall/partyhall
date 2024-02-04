@@ -55,6 +55,7 @@ CREATE TABLE app_state (
 
 CREATE TABLE ph_user (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(512),
     username VARCHAR(512) NOT NULL UNIQUE,
     password VARCHAR(512) NOT NULL,
     roles JSON NOT NULL DEFAULT '["USER"]'

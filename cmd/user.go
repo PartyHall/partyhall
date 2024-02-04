@@ -18,8 +18,8 @@ var userCmd = &cobra.Command{
 
 var createUserCmd = &cobra.Command{
 	Use:   "create",
-	Short: "Creates a user, user-create [username] [password]",
-	Args:  cobra.MinimumNArgs(2),
+	Short: "Creates a user, user-create [username] [password] [name]",
+	Args:  cobra.MinimumNArgs(3),
 	Run: func(cmd *cobra.Command, args []string) {
 		if err := services.Load(); err != nil {
 			logs.Error(err)
@@ -52,6 +52,7 @@ var createUserCmd = &cobra.Command{
 		}
 
 		user := models.User{
+			Name:     args[2],
 			Username: username,
 			Password: password,
 			Roles:    models.Roles(roles),

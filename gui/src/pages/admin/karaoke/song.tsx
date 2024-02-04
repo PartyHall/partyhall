@@ -18,8 +18,8 @@ import { songTitle } from "../../../utils/songs";
 // interface SongProps extends React.HTMLAttributes<HTMLDivElement>{
 interface SongProps extends StackProps {
     song: KaraokeSong;
-    first?: boolean;
-    last?: boolean;
+    isFirst?: boolean;
+    isLast?: boolean;
     type: 'SEARCH' | 'QUEUE';
 }
 
@@ -46,12 +46,12 @@ export default function Song(props: SongProps) {
         {
             (props.type === 'QUEUE' && (!module.currentSong || module.currentSong.filename !== props.song.filename)) &&
             <Stack direction="column" alignItems="center" justifyContent="center" gap={1}>
-                <IconButton style={{padding: ".25em"}} disabled={props.first} onClick={() => {
+                <IconButton style={{padding: ".25em"}} disabled={props.isFirst} onClick={() => {
                     sendMessage('karaoke/QUEUE_MOVE_UP', props.song.filename)
                 }}>
                     <UpIcon />
                 </IconButton>
-                <IconButton style={{padding: ".25em"}} disabled={props.last} onClick={() => {
+                <IconButton style={{padding: ".25em"}} disabled={props.isLast} onClick={() => {
                     sendMessage('karaoke/QUEUE_MOVE_DOWN', props.song.filename)
                 }}>
                     <DownIcon />
@@ -63,10 +63,14 @@ export default function Song(props: SongProps) {
             <Typography variant="body1">{props.song.title.length > 0 ? props.song.title : props.song.filename}</Typography>
             <Typography variant="body1" fontSize=".9em" color="GrayText">{props.song.artist}</Typography>
             <Typography variant="body1" fontSize=".6em" color="GrayText">{props.song.format}</Typography>
+            {
+                props.song.sung_by && props.song.sung_by.length > 0 &&
+                <Typography variant="body1" fontSize="1em" color="GrayText">Sung by {props.song.sung_by}</Typography>
+            }
         </Stack>
         <Stack direction="column" alignItems="center">
             {
-                (props.type === 'SEARCH' || !isCurrentSong) &&
+                (appState.current_mode === 'KARAOKE' && (props.type === 'SEARCH' || !isCurrentSong)) &&
                 <IconButton onClick={() => {
                     if (module.currentSong != null) {
                         showDialog(
@@ -83,7 +87,7 @@ export default function Song(props: SongProps) {
                 </IconButton>
             }
             {
-                (props.type === 'QUEUE' && isCurrentSong) &&
+                (appState.current_mode === 'KARAOKE' && props.type === 'QUEUE' && isCurrentSong) &&
                 <IconButton onClick={() => {
                     sendMessage('karaoke/PAUSE', props.song.filename);
                 }}>
@@ -96,7 +100,7 @@ export default function Song(props: SongProps) {
                 <IconButton onClick={() => {
                     sendMessage('karaoke/ADD_TO_QUEUE', props.song.filename);
                     showSnackbar('Adding song to the queue', 'success');
-                }}>
+                }} disabled={module.queue.map(x => x.id).includes(props.song.id) || (module.currentSong && props.song.id == module.currentSong.id)}>
                     <AddToQueueIcon />
                 </IconButton>
             }

@@ -15,6 +15,7 @@ import (
 
 func GetClaimsFromUser(dbUser *models.User) models.JwtCustomClaims {
 	return models.JwtCustomClaims{
+		Name:     dbUser.Name,
 		Username: dbUser.Username,
 		Roles:    dbUser.Roles,
 		RegisteredClaims: jwt.RegisteredClaims{

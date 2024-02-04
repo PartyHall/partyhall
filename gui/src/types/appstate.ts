@@ -43,6 +43,7 @@ export type KaraokeSong = {
     artist: string;
     title: string;
     format: string;
+    sung_by: string;
 };
 
 type KaraokeModule = {

@@ -34,6 +34,7 @@ func (roles Roles) Value() (driver.Value, error) {
 
 type User struct {
 	Id       int    `json:"id" db:"id"`
+	Name     string `json:"name" db:"name"`
 	Username string `json:"username" db:"username"`
 	Password string `json:"-" db:"password"`
 	Roles    Roles  `json:"roles" db:"roles"`
@@ -47,6 +48,7 @@ type RefreshToken struct {
 }
 
 type JwtCustomClaims struct {
+	Name     string `json:"name"`
 	Username string `json:"username"`
 	Roles    Roles  `json:"roles"`
 	jwt.RegisteredClaims

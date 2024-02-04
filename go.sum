@@ -108,6 +108,8 @@ github.com/partyhall/easyws v0.0.0-20240203170130-37fedf28da60 h1:PwRUiWDlYgtBov
 github.com/partyhall/easyws v0.0.0-20240203170130-37fedf28da60/go.mod h1:QFUB00knI1dpE+LEq2aupTQaodhtr2UJ675ej/NoziY=
 github.com/partyhall/easyws v0.0.0-20240203170519-8b0fe2d6ffc8 h1:9SpIXaprpT5w3BPJAbxIZe17yCYka+FYq+6zC6Vizg0=
 github.com/partyhall/easyws v0.0.0-20240203170519-8b0fe2d6ffc8/go.mod h1:1otUD6hZt1/IOvYnHZcRuXXvXx8DOPqczbRgZdF5oHk=
+github.com/partyhall/easyws v0.0.0-20240204220639-bde455f5e677 h1:nquVIZKNUaOvcfNQ+DlHJDTTZpgrDVpYBg3FJqpVwRM=
+github.com/partyhall/easyws v0.0.0-20240204220639-bde455f5e677/go.mod h1:1otUD6hZt1/IOvYnHZcRuXXvXx8DOPqczbRgZdF5oHk=
 github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e/go.mod h1:pJLUxLENpZxwdsKMEsNbx1VGcRFpLqf3715MtcvvzbA=
 github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

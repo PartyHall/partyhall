@@ -1,12 +1,10 @@
 import { createContext, ReactNode, useCallback, useContext, useState } from "react";
 import { useSnackbar } from "./snackbar";
-import { EditedEvent, KaraokeSong } from "../types/appstate";
 import AdminSocketProvider from "./adminSocket";
 import BoothSocketProvider from "./boothSocket";
-import { EventExport } from "../types/event_export";
 import getSocketMode from "../utils/socket_mode";
-import { Meta } from "../types/contextualized_response";
 import { SDK } from "../sdk/sdk";
+import { ROLES, hasRole as sdkHasRole } from "../sdk/utils";
 
 //@ts-ignore
 export const SOCKET_MODE_DEBUG = import.meta.env.MODE === 'development';
@@ -37,6 +35,7 @@ type ApiContextProps = ApiProps & {
     login: (username: string, password: string) => Promise<void>;
     logout: () => void;
     isLoggedIn: () => boolean;
+    hasRole: (role: ROLES) => boolean;
 };
 
 const defaultState: ApiProps = {
@@ -49,6 +48,7 @@ const ApiContext = createContext<ApiContextProps>({
     login: async (username: string, password: string) => { },
     logout: () => { },
     isLoggedIn: () => false,
+    hasRole: () => false,
 });
 
 export default function ApiProvider({ children }: { children: ReactNode }) {
@@ -97,11 +97,14 @@ export default function ApiProvider({ children }: { children: ReactNode }) {
         setToken();
     };
 
+    const hasRole = (role: ROLES) => sdkHasRole(context.api.tokenUser, role);
+
     return <ApiContext.Provider value={{
         ...context,
         login,
         logout,
         isLoggedIn,
+        hasRole,
     }}>
         <>
             {

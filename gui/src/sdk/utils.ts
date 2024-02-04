@@ -1,6 +1,11 @@
 import { DateTime } from "luxon";
 import { TokenUser } from "./responses/user";
 
+const ROLE_ADMIN = "ADMIN";
+const ROLE_USER = "USER";
+
+export type ROLES = 'ADMIN'|'USER'|'ADMIN_KARAOKE'|'ADMIN_PHOTOBOOTH';
+
 export const parseUser = (token: string|null): TokenUser|null => {
     if (!token) {
         return null;
@@ -20,4 +25,12 @@ export const parseUser = (token: string|null): TokenUser|null => {
     }
     
     return data;
+};
+
+export const hasRole = (user: TokenUser|null, role: ROLES) => {
+    if (!user) {
+        return false;
+    }
+
+    return user.roles.includes('ADMIN') || user.roles.includes(role);
 };

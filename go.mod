@@ -15,7 +15,7 @@ require (
 	github.com/labstack/gommon v0.4.2
 	github.com/mattn/go-sqlite3 v1.14.19
 	github.com/partyhall/easymqtt v0.0.0-20230104153035-96887f9e9a21
-	github.com/partyhall/easyws v0.0.0-20240203170519-8b0fe2d6ffc8
+	github.com/partyhall/easyws v0.0.0-20240204220639-bde455f5e677
 	github.com/spf13/cobra v1.8.0
 	go.bug.st/serial v1.6.1
 	go.uber.org/zap v1.26.0

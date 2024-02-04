@@ -71,7 +71,7 @@ func songPost(c echo.Context) error {
 	// Need to test if validation is working correctly
 	songField, err := c.FormFile("song")
 	if err != nil || songField == nil {
-		fmt.Println("err")
+		fmt.Println("Err: ", err)
 		// Should not happen but meh
 		return echo.NewHTTPError(http.StatusBadRequest, "Song missing!")
 	}

@@ -16,7 +16,7 @@ export default function VideoPlayer({isPlaying, song, onEnd, onStatus}: Props) {
         if (isNaN(e.target.duration)){
             onStatus({
                 position: 0,
-                duration: 360,
+                total: -1,
             });
 
             return;
@@ -24,7 +24,7 @@ export default function VideoPlayer({isPlaying, song, onEnd, onStatus}: Props) {
 
         onStatus({
             position: e.target.currentTime,
-            duration: e.target.duration,
+            total: Math.floor(e.target.duration),
         });
     };
 

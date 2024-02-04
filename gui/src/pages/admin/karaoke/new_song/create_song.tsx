@@ -40,7 +40,7 @@ export default function CreateSong() {
         fd.append('cover_type', data.cover_type)
 
         if (data.cover_type === 'LINK') {
-            fd.append('cover', data.cover_data);
+            fd.append('cover_url', data.cover_data);
         } else if (data.cover_type === 'UPLOADED') {
 
         }
@@ -52,7 +52,7 @@ export default function CreateSong() {
         }
 
         try {
-            const resp = await fetch('/api/modules/karaoke/create_song', {
+            const resp = await fetch('/api/modules/karaoke/song', {
                 method: 'POST',
                 body: fd,
             });

@@ -9,7 +9,7 @@ import (
 	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/gorilla/mux"
+	"github.com/labstack/echo/v4"
 	"github.com/partyhall/easyws"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
@@ -204,7 +204,7 @@ func (m ModuleKaraoke) ScanSongs() error {
 			}
 		}
 
-		err = ormCreateSong(songName, artist, title, format)
+		_, err = ormCreateSong(songName, artist, title, format)
 		if err != nil {
 			logs.Error("Failed to create song "+songName+": ", err)
 		} else {
@@ -250,15 +250,16 @@ func (m ModuleKaraoke) UpdateFrontendSettings() {
 }
 
 // @TODO Secure routes correctly by user
-func (m ModuleKaraoke) RegisterApiRoutes(router *mux.Router) {
-	router.HandleFunc("/search_song", searchSong)
-	router.HandleFunc("/list_song", listSong)
-	router.HandleFunc("/create_song", createSong)
-	router.HandleFunc("/search/spotify", spotifySearch)
-	router.HandleFunc("/rescan_songs", rescanSongs)
+func (m ModuleKaraoke) RegisterApiRoutes(g *echo.Group) {
+	g.GET("/song", searchSongs)
+	g.POST("/song", songPost)
+	g.POST("/rescan", rescanSongs)
+	g.POST("/spotify-search", spotifySearch)
 
-	router.HandleFunc("/fallback-image", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "image/jpeg")
-		w.Write(services.KARAOKE_FALLBACK_IMAGE)
+	g.GET("/fallback-image", func(c echo.Context) error {
+		c.Response().Header().Set("Content-Type", "image/jpeg")
+		return c.Blob(http.StatusOK, "", services.KARAOKE_FALLBACK_IMAGE)
 	})
+
+	g.Static("/medias", utils.GetPath("karaoke"))
 }

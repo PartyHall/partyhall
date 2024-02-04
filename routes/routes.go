@@ -1,16 +1,15 @@
 package routes
 
 import (
-	"encoding/base64"
-	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strconv"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/labstack/echo/v4"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/modules"
@@ -19,30 +18,25 @@ import (
 	"github.com/partyhall/partyhall/services"
 )
 
-func Register(r *mux.Router) {
-	r.HandleFunc("/socket/{type}", remote.EasyWS.Route)
-	r.HandleFunc("/settings", settings)
-	r.HandleFunc("/picture", picture).Methods(http.MethodPost)
+func Register(g *echo.Group) {
+	g.GET("/settings", settings)
+	g.GET("/socket/:type", remote.EasyWS.Route)
+	g.POST("/picture", picture)
 
-	registerAdminRoutes(r.PathPrefix("/admin").Subrouter())
-
-	modules.RegisterRoutes(r.PathPrefix("/modules").Subrouter())
+	registerAdminRoutes(g.Group("/admin"))
+	modules.RegisterRoutes(g.Group("/modules"))
 }
 
-func settings(w http.ResponseWriter, r *http.Request) {
-	settings := services.BuildFrontendSettings()
-
-	w.Header().Set("Content-Type", "application/json")
-	data, _ := json.Marshal(settings)
-	w.Write(data)
+func settings(c echo.Context) error {
+	return c.JSON(http.StatusOK, services.BuildFrontendSettings())
 }
 
-func getEventAndFilename(event string, isUnattended bool) (int64, string) {
+func getEventAndFilename(event string, isUnattended bool) (int, string) {
 	var err error
-	var eventId int64 = -1
+	var eventId int = -1
 	var imageName string = fmt.Sprintf("%v.jpg", time.Now().Format("20060102-150405"))
 
-	eventId, err = strconv.ParseInt(event, 10, 64)
+	eventId, err = strconv.Atoi(event)
 	if err != nil {
 		logs.Error("Failed to get event id: ", err)
 		logs.Error("Fallingback to id -1")
@@ -70,72 +64,60 @@ func getEventAndFilename(event string, isUnattended bool) (int64, string) {
 	return evt.Id, imageName
 }
 
-func picture(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseMultipartForm(256 * 1024) // Max picture size = 256mo, we should be good.
+func picture(c echo.Context) error {
+	event := c.FormValue("event")
+	unattended := c.FormValue("unattended")
+	image, err := c.FormFile("image")
 	if err != nil {
-		logs.Error("Unable to save picture: Parse form error => ", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		return echo.NewHTTPError(http.StatusInternalServerError, "Unable to save picture: Getting picture => "+err.Error())
 	}
 
-	event := r.FormValue("event")
-	unattended := r.FormValue("unattended")
-	image := r.FormValue("image")
-
-	if len(event) == 0 || len(unattended) == 0 || len(image) == 0 {
-		logs.Error("Failed to save picture: bad request")
-		w.WriteHeader(http.StatusBadRequest)
-		return
+	if len(event) == 0 || len(unattended) == 0 {
+		return echo.NewHTTPError(http.StatusBadRequest, "Failed to save picture: bad request")
 	}
 
 	isUnattended, err := strconv.ParseBool(unattended)
 	if err != nil {
-		logs.Error("Failed to parse unattended var: ", err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		return echo.NewHTTPError(http.StatusBadRequest, "Failed to parse unattended var: "+err.Error())
 	}
+
+	src, err := image.Open()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to open image: "+err.Error())
+	}
+	defer src.Close()
 
 	eventId, filename := getEventAndFilename(event, isUnattended)
 
 	path, err := config.GET.GetImageFolder(eventId, isUnattended)
 	if err != nil {
-		logs.Error("Failed to create path: ", err)
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create path: "+err.Error())
 	}
 
 	filepath := filepath.Join(path, filename)
 	f, err := os.Create(filepath)
 	if err != nil {
-		logs.Error("Failed to create image file...")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to create image file: "+err.Error())
 	}
-	defer f.Close()
 
-	image = image[len("data:image/jpeg;base64,"):]
-	data, err := base64.StdEncoding.DecodeString(image)
-	if err != nil {
-		logs.Error("Failed to decode image, writing it to file as-is")
-		_, err = f.Write([]byte(image))
-		if err != nil {
-			logs.Error("Even failed to write the b64... sad")
-		}
-	} else {
-		_, err = f.Write(data)
-		if err != nil {
-			logs.Error("Failed to write the image to disk")
-		}
+	if _, err := io.Copy(f, src); err != nil {
+		// @TODO: Remove the picture from the DB
+		f.Close()
+		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to save image file: "+err.Error())
 	}
 
 	if err = f.Sync(); err != nil {
 		logs.Error("Failed to sync the data ! be careful")
 	}
 
+	f.Close()
+
 	// Broadcasting the state so that the current event is refreshed on the admin panel
 	remote.BroadcastState()
 
 	if !isUnattended {
-		http.ServeFile(w, r, filepath)
+		return c.File(filepath)
 	}
+
+	return c.NoContent(http.StatusCreated)
 }

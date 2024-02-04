@@ -19,7 +19,7 @@ func (h SetEventHandler) Do(s *easyws.Socket, payload interface{}) {
 		return
 	}
 
-	var evtId int64 = int64(evtIdFloat)
+	var evtId int = int(evtIdFloat)
 
 	evt, err := orm.GET.Events.GetEvent(evtId)
 	if err != nil {

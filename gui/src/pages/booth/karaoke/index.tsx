@@ -8,6 +8,7 @@ import { Stack, Typography } from "@mui/material";
 import { songTitle } from "../../../utils/songs";
 import OsdSong from "./osd_song";
 import VideoPlayer from "./videoplayer";
+import { b64ImageToBlob } from "../../../utils/files";
 
 export default function Karaoke() {
     const { appState, lastMessage, sendMessage } = useBoothSocket();
@@ -23,7 +24,7 @@ export default function Karaoke() {
         if (imageSrc) {
             let form = new FormData();
 
-            form.append('image', imageSrc);
+            form.append('image', b64ImageToBlob(imageSrc));
             form.append('unattended', 'true')
             form.append('event', ''+appState?.app_state?.current_event?.id)
 

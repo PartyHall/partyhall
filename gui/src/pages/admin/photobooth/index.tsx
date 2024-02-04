@@ -33,8 +33,6 @@ export default function AdminPhotobooth() {
             </CardActions>
         </Card>
 
-        {
-            hasEvent && <ExportListing />
-        }
+        { hasEvent && <ExportListing /> }
     </>
 }

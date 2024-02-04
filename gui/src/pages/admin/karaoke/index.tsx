@@ -12,7 +12,7 @@ export default function AdminKaraoke() {
             <Tabs value={currentTab} onChange={(_, x) => setCurrentTab(x)}>
                 <Tab label="Search"/>
                 <Tab label="Queue"/>
-                <Tab label="New"/>
+                <Tab label="Admin"/>
             </Tabs>
         </Box>
 

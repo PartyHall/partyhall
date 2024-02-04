@@ -1,11 +1,11 @@
 package models
 
 type Event struct {
-	Id       int64      `json:"id" db:"id"`
-	Name     string     `json:"name" db:"name"`
-	Date     *Timestamp `json:"date" db:"date"`
-	Author   *string    `json:"author" db:"author"`
-	Location *string    `json:"location" db:"location"`
+	Id       int       `json:"id" db:"id"`
+	Name     string    `json:"name" db:"name"`
+	Date     Timestamp `json:"date" db:"date"`
+	Author   string    `json:"author" db:"author"`
+	Location *string   `json:"location" db:"location"`
 
 	Exporting  bool       `json:"exporting" db:"exporting"`
 	LastExport *Timestamp `json:"last_export" db:"last_export"`

@@ -2,9 +2,10 @@ package remote
 
 import (
 	"errors"
-	"net/http"
+	"fmt"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/labstack/echo/v4"
 	"github.com/partyhall/easymqtt"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
@@ -30,10 +31,14 @@ func RegisterOnJoin(module string, function func(socketType string, s *easyws.So
 func Initialize() {
 	EasyWS = easyws.NewWithTypes(
 		utils.SOCKET_TYPES,
-		func(socketType string, r *http.Request) bool {
+		func(socketType string, c *echo.Context) bool {
+			fmt.Println("Validating auth")
 			if socketType == utils.SOCKET_TYPE_BOOTH {
-				if utils.IsRemote(r) {
+				fmt.Println("Is booth")
+				if utils.IsRemote(c) {
+					fmt.Println("Is remote")
 					if !config.GET.DebugMode && !config.IsInDev() {
+						fmt.Println("No debg no dev")
 						return false
 					}
 
@@ -41,8 +46,10 @@ func Initialize() {
 					return true
 				}
 			} else {
-				pwd := r.URL.Query().Get("password")
+				pwd := (*c).QueryParam("password")
+				fmt.Println("chk pwd")
 				if pwd != config.GET.Web.AdminPassword {
+					fmt.Println("pwd invalid: ", pwd, config.GET.Web.AdminPassword)
 					return false
 				}
 			}

@@ -1,4 +1,4 @@
-import { Button, Card, CardActions, CardContent, CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
+import { Button, Card, CardActions, CardContent, CircularProgress, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
 import { DateTime } from "luxon";
 import { useState } from "react";
 import DownloadIcon from '@mui/icons-material/Download'
@@ -48,7 +48,7 @@ export default function ExportListing() {
         setDownloadInProgress(true);
         try {
             const resp = await fetch(
-                `/api/admin/exports/${id}/download`,
+                `/api/admin/event/${id}/export/download`,
                 { 'headers': { 'Authorization': password ?? '' } }
             );
             if (resp.status != 200) {

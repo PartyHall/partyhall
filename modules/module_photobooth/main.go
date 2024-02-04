@@ -5,7 +5,7 @@ import (
 	"os"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/gorilla/mux"
+	"github.com/labstack/echo/v4"
 	"github.com/partyhall/easyws"
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/remote"
@@ -94,6 +94,6 @@ func (m ModulePhotobooth) UpdateFrontendSettings() {
 	}
 }
 
-func (m ModulePhotobooth) RegisterApiRoutes(router *mux.Router) {
+func (m ModulePhotobooth) RegisterApiRoutes(g *echo.Group) {
 
 }

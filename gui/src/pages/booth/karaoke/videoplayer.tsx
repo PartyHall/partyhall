@@ -41,7 +41,7 @@ export default function VideoPlayer({isPlaying, song, onEnd, onStatus}: Props) {
     }, [isPlaying]);
 
     return <video 
-        src={'/media/karaoke/' + song.filename + '/song.' + song.format}
+        src={'/api/modules/karaoke/medias/' + song.filename + '/song.' + song.format}
         autoPlay
         onEnded={onEnd}
         controls

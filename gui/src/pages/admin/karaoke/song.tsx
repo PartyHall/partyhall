@@ -58,7 +58,7 @@ export default function Song(props: SongProps) {
                 </IconButton>
             </Stack>
         }
-        <img ref={imgRef} onError={onImgError} src={`/media/karaoke/${props.song.filename}/cover.jpg`} alt={props.song.filename} style={{ maxHeight: '6em', objectFit: 'contain' }} />
+        <img ref={imgRef} onError={onImgError} src={`/api/modules/karaoke/medias/${props.song.filename}/cover.jpg`} alt={props.song.filename} style={{ maxHeight: '6em', objectFit: 'contain' }} />
         <Stack direction="column" flex={1} ml={2}>
             <Typography variant="body1">{props.song.title.length > 0 ? props.song.title : props.song.filename}</Typography>
             <Typography variant="body1" fontSize=".9em" color="GrayText">{props.song.artist}</Typography>

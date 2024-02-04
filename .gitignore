@@ -4,3 +4,4 @@
 tmp/
 /partyhall
 config.yaml
+.cache

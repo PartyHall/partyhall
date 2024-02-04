@@ -8,6 +8,8 @@ import { Meta } from "../../../types/contextualized_response";
 
 // @TODO: debounce
 export default function KaraokeSearch() {
+    const [wasSearch, setWasSearch] = useState<boolean>(false);
+
     const [loading, setLoading] = useState<boolean>(true);
     const [page, setPage] = useState<number>(1);
     const [search, setSearch] = useState<string>("");
@@ -15,25 +17,19 @@ export default function KaraokeSearch() {
     const [results, setResults] = useState<KaraokeSong[]>([]);
 
     const loadSongs = async () => {
-        setLoading(true);
-        let resp;
-        if (search.length > 0) {
-            resp = await fetch(`/api/modules/karaoke/search_song?q=${encodeURI(search)}`);
-        } else {
-            resp = await fetch(`/api/modules/karaoke/list_song?page=${page}`)
+        let currPage = page;
+        if ((wasSearch && search.length == 0) || (!wasSearch && search.length > 0)) {
+            currPage = 1;
+            setWasSearch(!wasSearch);
+            setPage(currPage);
         }
 
+        setLoading(true);
+        let resp: any = await fetch(`/api/modules/karaoke/song?page=${currPage}` + (search.length > 0 ? `&q=${encodeURI(search)}` : ''))
+
         resp = await resp.json();
-        if (search.length > 0) {
-            setResults(resp);
-            setMeta({
-                last_page: 1,
-                total: resp.length,
-            })
-        } else {
-            setResults(resp['results']);
-            setMeta(resp['meta']);
-        }
+        setResults(resp['results']);
+        setMeta(resp['meta']);
 
         setLoading(false);
     };

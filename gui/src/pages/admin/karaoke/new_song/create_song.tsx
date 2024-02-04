@@ -6,23 +6,10 @@ import { MusicNote as MusicNoteIcon, Lyrics as LyricsIcon } from '@mui/icons-mat
 import SearchSpotify from "./search_spotify";
 import { useSnackbar } from "../../../../hooks/snackbar";
 import { useApi } from "../../../../hooks/useApi";
-
-type COVER_SOURCE = 'NO_COVER'|'LINK'|'UPLOADED';
-type FORMAT = 'CDG'|'WEBM'|'MP4';
-
-type NewSong = {
-    title: string;
-    artist: string;
-    format: string;
-    cover_type: COVER_SOURCE;
-    cover_data: string;
-
-    song: FileList;
-    cdg: FileList;
-};
+import { COVER_SOURCE, FORMAT, SongPost } from "../../../../sdk/requests/song";
 
 export default function CreateSong() {
-    const {token} = useApi();
+    const {api} = useApi();
     const {showSnackbar} = useSnackbar();
     const [coverSource, setCoverSource] = useState<COVER_SOURCE>('LINK');
     const [format, setFormat] = useState<FORMAT>('CDG');
@@ -32,48 +19,19 @@ export default function CreateSong() {
     const [songFilename, setSongFilename] = useState<string>("");
     const [cdgFilename, setCdgFilename] = useState<string>("");
 
-    const { register, handleSubmit, resetField, setValue, reset } = useForm<NewSong>();
+    const { register, handleSubmit, resetField, setValue, reset } = useForm<SongPost>();
 
-    const submit = async (data: NewSong) => {
-        const fd = new FormData();
-        fd.append('title', data.title);
-        fd.append('artist', data.artist);
-        fd.append('format', data.format);
-        fd.append('cover_type', data.cover_type)
-
-        if (data.cover_type === 'LINK') {
-            fd.append('cover_url', data.cover_data);
-        } else if (data.cover_type === 'UPLOADED') {
-
-        }
-
-        fd.append('song', data.song[0]);
-
-        if (data.format === 'CDG') {
-            fd.append('cdg', data.cdg[0]);
-        }
-
+    const submit = async (data: SongPost) => {
         try {
-            const resp = await fetch('/api/modules/karaoke/song', {
-                method: 'POST',
-                headers: {
-                    'Authorization': token ? ('Bearer ' + token) : '',
-                },
-                body: fd,
-            });
-    
-            if (resp.status != 201) {
-                showSnackbar('Failed to create song: ' + (await resp.text()), 'error');
-            } else {
-                showSnackbar('Music created', 'success');
-                reset();
-                setSongFilename('');
-                setCdgFilename('');
-            }
+            await api.karaoke.post(data);
+            reset();
+            setSongFilename('');
+            setCdgFilename('');
+
+            showSnackbar('Music created', 'success');
         } catch (e) {
             console.log(e);
-            //@ts-ignore
-            showSnackbar('Failed to create song: ' + (await e.response.text()), 'error');
+            showSnackbar('Failed to create song: ' + e, 'error');
         }
     };
 

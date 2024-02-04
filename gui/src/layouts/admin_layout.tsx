@@ -22,7 +22,7 @@ const linkStyle = {
 
 export default function AdminLayout() {
     const outlet = useOutlet();
-    const { socketMode, token, logout } = useApi();
+    const { socketMode, isLoggedIn, logout } = useApi();
     const {appState} = useAdminSocket();
     const [state, setState] = useState<State>({
         menuOpen: false,
@@ -32,7 +32,7 @@ export default function AdminLayout() {
         return <Navigate to={"/"} />
     }
 
-    if (!token) {
+    if (!isLoggedIn()) {
         return <Navigate to={"/admin/login"} />
     }
 

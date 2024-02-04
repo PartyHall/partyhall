@@ -2,6 +2,7 @@ package orm
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/partyhall/partyhall/models"
@@ -71,4 +72,45 @@ func (u *Users) FindByUsername(username string) (*models.User, error) {
 	err := row.StructScan(&dbUser)
 
 	return &dbUser, err
+}
+
+func (u *Users) FindByRefreshToken(token string) (*models.User, error) {
+	row := u.db.QueryRowx(`
+		SELECT u.id as id, u.username as username, u.password as password, u.roles as roles
+		FROM ph_user u
+		INNER JOIN refresh_token rt ON rt.user_id = u.id
+		WHERE rt.token = ? AND strftime('%s', rt.expires_at) > strftime('%s', 'now')
+	`, token)
+
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+
+	dbUser := models.User{}
+	err := row.StructScan(&dbUser)
+
+	return &dbUser, err
+}
+
+func (u *Users) DeleteRefreshToken(token string) error {
+	_, err := u.db.Exec("DELETE FROM refresh_token WHERE token = ?", token)
+	return err
+}
+
+func (u *Users) CreateRefreshToken(userId int, token string) (int, error) {
+	fmt.Println("Ajout token ", userId, token)
+	row := u.db.QueryRow(`
+		INSERT INTO refresh_token(token, expires_at, user_id)
+		VALUES (?, datetime('now', '+7 days'), ?)
+		RETURNING id
+	`, token, userId)
+
+	if row.Err() != nil {
+		return 0, row.Err()
+	}
+
+	var rtId int
+	err := row.Scan(&rtId)
+
+	return rtId, err
 }

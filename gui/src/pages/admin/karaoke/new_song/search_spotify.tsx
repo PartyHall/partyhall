@@ -1,9 +1,10 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, Card, Grid, List, ListItem, Stack, Typography } from "@mui/material";
+import { Button, Card, Stack, Typography } from "@mui/material";
 
 import {faSpotify as SpotifyIcon} from '@fortawesome/free-brands-svg-icons';
 import { useState } from "react";
 import { useApi } from "../../../../hooks/useApi";
+import { ApiSong } from "../../../../sdk/responses/karaoke";
 
 type Props = {
     artist: string;
@@ -12,14 +13,8 @@ type Props = {
     onChange?: (url: string) => void;
 };
 
-type ApiSong = {
-    artist: string;
-    song: string;
-    cover: string;
-}
-
 export default function SearchSpotify({ artist, title, onChange }: Props) {
-    const {token} = useApi();
+    const {api} = useApi();
     const [loading, setLoading] = useState<boolean>(false);
     const [results, setResults] = useState<ApiSong[]|null>(null);
 
@@ -27,15 +22,7 @@ export default function SearchSpotify({ artist, title, onChange }: Props) {
 
     const searchSpotify = async () => {
         setLoading(true);
-
-        let resp = await fetch(
-            `/api/modules/karaoke/spotify-search?q=${encodeURI(artist + ' ' + title)}`,
-            { method: 'POST', headers: { 'Authorization': token ? ('Bearer ' + token) : ''} },
-        );
-        resp = await resp.json();
-        //@ts-ignore
-        setResults(resp as ApiSong[]);
-
+        setResults(await api.karaoke.searchSpotify(artist, title));
         setLoading(false);
     };
 

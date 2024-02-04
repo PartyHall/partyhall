@@ -28,7 +28,7 @@ export default function AdminIndex() {
             return;
         }
 
-        const events = appState.known_events.filter(x => x.id === newId); // wow such typescript
+        const events = appState.known_events.filter(x => x.id === newId);
         if (events.length === 0) {
             return;
         }

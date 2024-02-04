@@ -20,12 +20,12 @@ import AdminPhotobooth from './pages/admin/photobooth'
 import AdminKaraoke from './pages/admin/karaoke'
 import PartyHallUI from './pages/booth'
 import Login from './pages/admin/login'
-import ApiProvider from './hooks/useApi'
 import SnackbarProvider from './hooks/snackbar'
 import ConfirmDialogProvider from './hooks/dialog'
 import EditEvent from './pages/admin/event/edit'
 
 import './assets/css/index.scss';
+import ApiProvider from './hooks/useApi'
 
 const darkTheme = createTheme({
   palette: {

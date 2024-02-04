@@ -48,7 +48,7 @@ func GetArgon() *Argon {
 	return argon
 }
 
-func (arg Argon) generateRandomBytes(n uint32) ([]byte, error) {
+func (arg Argon) GenerateRandomBytes(n uint32) ([]byte, error) {
 	b := make([]byte, n)
 	_, err := rand.Read(b)
 	if err != nil {
@@ -59,7 +59,7 @@ func (arg Argon) generateRandomBytes(n uint32) ([]byte, error) {
 }
 
 func (arg Argon) Hash(password string) (string, error) {
-	salt, err := arg.generateRandomBytes(arg.params.SaltLength)
+	salt, err := arg.GenerateRandomBytes(arg.params.SaltLength)
 	if err != nil {
 		return "", err
 	}

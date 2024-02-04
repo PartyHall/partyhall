@@ -39,6 +39,13 @@ type User struct {
 	Roles    Roles  `json:"roles" db:"roles"`
 }
 
+type RefreshToken struct {
+	Id        int        `db:"id"`
+	User      *User      `db:"user"`
+	Token     string     `db:"token"`
+	ExpiresAt *Timestamp `db:"expires_at"`
+}
+
 type JwtCustomClaims struct {
 	Username string `json:"username"`
 	Roles    Roles  `json:"roles"`

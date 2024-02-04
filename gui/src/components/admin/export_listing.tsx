@@ -14,7 +14,7 @@ import { useConfirmDialog } from "../../hooks/dialog";
 export default function ExportListing() {
     const { showSnackbar } = useSnackbar();
     const { showDialog } = useConfirmDialog();
-    const { token, getLastExports } = useApi();
+    const { api } = useApi();
     const { appState, sendMessage, lastMessage } = useAdminSocket();
 
     const [downloadInProgress, setDownloadInProgress] = useState<boolean>(false);
@@ -26,8 +26,7 @@ export default function ExportListing() {
             return
         }
 
-        const exports = await getLastExports(appState.app_state.current_event.id);
-        setLastExports(exports);
+        setLastExports(await api.events.getLastExports(appState.app_state.current_event.id));
     };
 
     useAsyncEffect(async () => {
@@ -47,10 +46,7 @@ export default function ExportListing() {
     const download = async (id: number) => {
         setDownloadInProgress(true);
         try {
-            const resp = await fetch(
-                `/api/admin/event/${id}/export/download`,
-                { 'headers': { 'Authorization': token ? ('Bearer ' + token) : '' } }
-            );
+            const resp = await api.events.downloadExport(id);
             if (resp.status != 200) {
                 throw 'Failed to download file';
             }

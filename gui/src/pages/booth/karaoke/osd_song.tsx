@@ -19,7 +19,7 @@ export default function OsdSong({song}: {song: KaraokeSong}) {
     };
 
     return <Stack direction="row" gap={2}>
-        <img ref={imgRef} onError={onImgError} src={`/media/karaoke/${song.filename}/cover.jpg`} alt={song.filename} style={{maxHeight: '6em', objectFit: 'contain'}} />
+        <img ref={imgRef} onError={onImgError} src={`/api/modules/karaoke/medias/${song.filename}/cover.jpg`} alt={song.filename} style={{maxHeight: '6em', objectFit: 'contain'}} />
         <Stack direction="column" flex={1}>
             <Typography variant="body1">{song.title.length > 0 ? song.title : song.filename}</Typography>
             <Typography variant="body1" fontSize=".9em" color="GrayText">{song.artist}</Typography>

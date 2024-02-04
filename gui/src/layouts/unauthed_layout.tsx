@@ -3,13 +3,13 @@ import { useApi } from "../hooks/useApi";
 
 export default function UnauthedLayout() {
     const outlet = useOutlet();
-    const { socketMode, token } = useApi();
+    const { socketMode, isLoggedIn } = useApi();
 
     if (socketMode != 'admin') {
         return <Navigate to={"/"} />
     }
 
-    if (!!token) {
+    if (!!isLoggedIn()) {
         return <Navigate to={"/admin"} />
     }
 

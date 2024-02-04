@@ -25,11 +25,8 @@ func Register(g *echo.Group) {
 	g.GET("/settings", settings)
 	g.POST("/login", login)
 
-	// @TODO secure
-	g.GET("/socket/:type", remote.EasyWS.Route, services.GET.EchoWsJwtMiddleware)
-
-	// @TODO secure
-	g.POST("/picture", picture)
+	g.GET("/socket/:type", remote.EasyWS.Route)
+	g.POST("/picture", picture, middlewares.BoothOnlyMiddleware)
 
 	registerAdminRoutes(g.Group("/admin", services.GET.EchoJwtMiddleware, middlewares.RequireAdmin))
 	modules.RegisterRoutes(g.Group("/modules"))

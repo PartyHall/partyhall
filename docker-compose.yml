@@ -20,6 +20,8 @@ services:
       context: .docker/backend
     working_dir: /app
     user: 1000:1000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./:/app
       - ./config.yaml:/etc/partyhall.yaml

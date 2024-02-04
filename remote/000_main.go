@@ -31,8 +31,7 @@ func Initialize() {
 	EasyWS = easyws.NewWithTypes(
 		utils.SOCKET_TYPES,
 		func(socketType string, c *echo.Context) bool {
-			// @TODO:
-			// Deprecated, use middleware
+			// @deprecated: use middleware
 			return true
 		},
 	)

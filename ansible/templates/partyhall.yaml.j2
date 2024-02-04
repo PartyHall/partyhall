@@ -4,7 +4,7 @@ debug_mode: {{partyhall_debug_mode}}
 # Root path is where all the data related to the partyhall app are stored
 root_path: '/home/{{ansible_user}}/data'
 
-# Default mode can be either PHOTOBOOTH or QUIZ
+# Default mode can be either PHOTOBOOTH or KARAOKE
 default_mode: 'PHOTOBOOTH'
 
 web:
@@ -16,7 +16,7 @@ mosquitto:
 
 hardware_handler:
   baud_rate: 57600
-  mappings: # @TODO make those configurable with ansible vars
+  mappings:
     BTN_0: TAKE_PICTURE
     BTN_1: DISPLAY_DEBUG
     BTN_2: SHUTDOWN

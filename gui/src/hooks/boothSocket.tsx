@@ -1,5 +1,4 @@
-import { Alert, Snackbar } from "@mui/material";
-import { createContext, ReactNode, useContext, useEffect, useRef, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { TextLoader } from "../components/loader";
 import { AppState } from "../types/appstate";

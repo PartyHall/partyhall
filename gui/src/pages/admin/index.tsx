@@ -6,8 +6,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useConfirmDialog } from "../../hooks/dialog";
 import { useAdminSocket } from "../../hooks/adminSocket";
 import { useNavigate } from "react-router-dom";
+import { useApi } from "../../hooks/useApi";
 
 export default function AdminIndex() {
+    const { hasRole } = useApi();
     const { sendMessage, appState, currentTime } = useAdminSocket();
     const { showDialog } = useConfirmDialog();
     const navigate = useNavigate();
@@ -28,7 +30,7 @@ export default function AdminIndex() {
             return;
         }
 
-        const events = appState.known_events.filter(x => x.id === newId); // wow such typescript
+        const events = appState.known_events.filter(x => x.id === newId);
         if (events.length === 0) {
             return;
         }
@@ -56,7 +58,7 @@ export default function AdminIndex() {
                 {
                     appState.known_events.length > 0
                     &&
-                    <Select value={currentEvent} label="Event" onChange={setNewEvent} style={{ marginTop: '1em' }}>
+                    <Select value={currentEvent} label="Event" onChange={setNewEvent} style={{ marginTop: '1em' }} disabled={!hasRole('ADMIN')}>
                         {
                             appState.known_events.map(x => <MenuItem key={x.id} value={x.id}>{x.name}</MenuItem>)
                         }
@@ -64,15 +66,19 @@ export default function AdminIndex() {
                 }
             </CardContent>
             <CardActions style={{ justifyContent: 'center' }}>
-                <IconButton color="primary" onClick={() => navigate('/admin/event/edit')}>
-                    <AddIcon />
-                </IconButton>
-
                 {
-                    currentEvent != ''
-                    && <IconButton color="warning" onClick={() => navigate(`/admin/event/edit/${currentEvent}`)}>
-                        <EditIcon />
-                    </IconButton>
+                    hasRole('ADMIN') && <>
+                        <IconButton color="primary" onClick={() => navigate('/admin/event/edit')}>
+                            <AddIcon />
+                        </IconButton>
+
+                        {
+                            currentEvent != ''
+                            && <IconButton color="warning" onClick={() => navigate(`/admin/event/edit/${currentEvent}`)}>
+                                <EditIcon />
+                            </IconButton>
+                        }
+                    </>
                 }
             </CardActions>
         </Card>
@@ -83,7 +89,7 @@ export default function AdminIndex() {
                     <Typography variant="h2" fontSize={18}>Mode</Typography>
                     {
                         appState?.current_mode &&
-                        <Select value={appState.current_mode} label="Mode" onChange={(evt: SelectChangeEvent) => sendMessage('SET_MODE', evt.target.value)} style={{ marginTop: '1em' }}>
+                        <Select value={appState.current_mode} label="Mode" onChange={(evt: SelectChangeEvent) => sendMessage('SET_MODE', evt.target.value)} style={{ marginTop: '1em' }} disabled={!hasRole('ADMIN')}>
                             {
                                 appState.known_modes.map(x => <MenuItem key={x} value={x}>{x}</MenuItem>)
                             }
@@ -101,20 +107,29 @@ export default function AdminIndex() {
                 </Box>
             </CardContent>
             <CardActions>
-                <Button style={{ width: '100%' }} onClick={() => sendMessage('SET_DATETIME', DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'))}>Set to my device's time</Button>
+                {
+                    hasRole('ADMIN') &&
+                    <Button style={{ width: '100%' }} onClick={() => sendMessage('SET_DATETIME', DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'))}>Set to my device's time</Button>
+                }
             </CardActions>
         </Card>
 
-        <Card>
-            <CardActions>
-                <Button style={{ width: '100%' }} onClick={() => sendMessage('DISPLAY_DEBUG', null)}>Show debug info (30 sec)</Button>
-            </CardActions>
-        </Card>
+        {
+            hasRole('ADMIN') &&
+            <Card>
+                <CardActions>
+                    <Button style={{ width: '100%' }} onClick={() => sendMessage('DISPLAY_DEBUG', null)}>Show debug info (30 sec)</Button>
+                </CardActions>
+            </Card>
+        }
 
-        <Card>
-            <CardActions>
-                <Button style={{ width: '100%' }} color="error" onClick={shutdown}>Shutdown</Button>
-            </CardActions>
-        </Card>
+        {
+            hasRole('ADMIN') &&
+            <Card>
+                <CardActions>
+                    <Button style={{ width: '100%' }} color="error" onClick={shutdown}>Shutdown</Button>
+                </CardActions>
+            </Card>
+        }
     </>
 }

@@ -8,6 +8,8 @@ DROP TABLE IF EXISTS image;
 DROP TABLE IF EXISTS event;
 DROP TABLE IF EXISTS song;
 
+DROP TABLE IF EXISTS refresh_token;
+DROP TABLE IF EXISTS ph_user;
 DROP TABLE IF EXISTS app_state;
 
 CREATE TABLE event (
@@ -49,6 +51,21 @@ CREATE TABLE app_state (
     token VARCHAR(255) NULL DEFAULT NULL,
     current_event INTEGER NULL REFERENCES event(id),
     last_applied_migration INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE TABLE ph_user (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name VARCHAR(512),
+    username VARCHAR(512) NOT NULL UNIQUE,
+    password VARCHAR(512) NOT NULL,
+    roles JSON NOT NULL DEFAULT '["USER"]'
+);
+
+CREATE TABLE refresh_token (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    token VARCHAR(128) NOT NULL UNIQUE,
+    expires_at datetime NOT NULL,
+    user_id INTEGER NOT NULL REFERENCES ph_user(id)
 );
 
 --

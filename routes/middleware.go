@@ -4,10 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
-
-	"github.com/partyhall/partyhall/config"
 )
 
+// @TODO deprecate or rework for echo
 func WriteError(w http.ResponseWriter, err error, errCode int, customTxt string) bool {
 	if err != nil {
 		metadata := map[string]string{
@@ -24,17 +23,4 @@ func WriteError(w http.ResponseWriter, err error, errCode int, customTxt string)
 	}
 
 	return false
-}
-
-func AuthenticatedMiddleware(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		password := r.Header.Get("Authorization")
-
-		if len(password) == 0 || config.GET.Web.AdminPassword != password {
-			w.WriteHeader(http.StatusUnauthorized)
-			return
-		}
-
-		h.ServeHTTP(w, r)
-	})
 }

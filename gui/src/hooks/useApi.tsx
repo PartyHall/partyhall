@@ -1,42 +1,54 @@
-import { createContext, ReactNode, useContext, useState } from "react";
+import { createContext, ReactNode, useCallback, useContext, useState } from "react";
 import { useSnackbar } from "./snackbar";
-import { EditedEvent } from "../types/appstate";
 import AdminSocketProvider from "./adminSocket";
 import BoothSocketProvider from "./boothSocket";
-import { EventExport } from "../types/event_export";
 import getSocketMode from "../utils/socket_mode";
+import { SDK } from "../sdk/sdk";
+import { ROLES, hasRole as sdkHasRole } from "../sdk/utils";
 
 //@ts-ignore
 export const SOCKET_MODE_DEBUG = import.meta.env.MODE === 'development';
 
 const KNOWN_SOCKET_MODE = ['booth', 'admin'];
 
+const TOKEN = localStorage.getItem('token');
+const REFRESH_TOKEN = localStorage.getItem('refresh_token');
+
+const storeToken = (token: string|null, refresh: string|null) => {
+    if (!token || !refresh) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('refresh_token');
+
+        return;
+    }
+
+    localStorage.setItem('token', token);
+    localStorage.setItem('refresh_token', refresh);
+}
+
 type ApiProps = {
+    api: SDK;
     socketMode: string;
-    connecting: boolean;
-    password: string | null;
 };
 
 type ApiContextProps = ApiProps & {
-    login: (password: string) => Promise<void>;
+    login: (username: string, password: string) => Promise<void>;
     logout: () => void;
-
-    saveEvent: (event: EditedEvent) => Promise<boolean>;
-    getLastExports: (eventId: number) => Promise<EventExport[]>;
+    isLoggedIn: () => boolean;
+    hasRole: (role: ROLES) => boolean;
 };
 
 const defaultState: ApiProps = {
+    api: new SDK(TOKEN, REFRESH_TOKEN, storeToken),
     socketMode: getSocketMode(),
-    connecting: false,
-    password: localStorage.getItem('password'),
 };
 
 const ApiContext = createContext<ApiContextProps>({
     ...defaultState,
-    login: async (password: string) => { },
+    login: async (username: string, password: string) => { },
     logout: () => { },
-    saveEvent: async (event: EditedEvent) => false,
-    getLastExports: async (eventId: number) => [],
+    isLoggedIn: () => false,
+    hasRole: () => false,
 });
 
 export default function ApiProvider({ children }: { children: ReactNode }) {
@@ -56,99 +68,43 @@ export default function ApiProvider({ children }: { children: ReactNode }) {
         setContext({ ...context, socketMode: KNOWN_SOCKET_MODE[idx] })
     };
 
-    const login = async (password: string) => {
-        setContext({ ...context, connecting: true });
+    const setToken = useCallback((token?: string, refresh?: string) => {
+        if (!token || !refresh) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('refresh_token');
 
-        const resp = await fetch(`/api/admin/login`, {
-            'method': 'POST',
-            'headers': {
-                'Authorization': password,
-            }
-        });
+            setContext({...context, api: new SDK(null, null, storeToken)});
 
-        let message = '';
-
-        if (resp.status === 401) {
-            message = 'Invalid password'
-        } else {
-            const data = await resp.text();
-
-            if (data === 'yes') {
-                localStorage.setItem('password', password);
-                setContext({ ...context, connecting: false, password });
-                return;
-            }
-
-            message = 'Wrong response from API';
+            return;
         }
 
-        showSnackbar(message, 'error');
-        setContext({ ...context, connecting: false });
+        setContext({...context, api: new SDK(token, refresh, storeToken)});
+
+        localStorage.setItem('token', token);
+        localStorage.setItem('refresh_token', refresh);
+    }, [context]);
+
+    const login = async (username: string, password: string) => {
+        const data = await context.api.auth.login(username, password);
+        setToken(data.token, data.refresh_token);
     };
 
-    const saveEvent = async (event: EditedEvent) => {
-        const query: any = {
-            name: event.name,
-            author: event.author,
-            location: event.location,
-        };
-
-        if (!!event.date) {
-            query.date = Math.floor(event.date.toSeconds());
-        }
-
-        try {
-            const resp = await fetch(
-                '/api/admin/event' + (!!event.id ? `/${event.id}` : ''),
-                {
-                    method: !!event.id ? 'PUT' : 'POST',
-                    headers: {
-                        'Authorization': context.password ?? '',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(query),
-                }
-            );
-
-            if (resp.status !== 200) {
-                throw await resp.json();
-            }
-
-            showSnackbar('Event saved !', 'success');
-            return true;
-        } catch (e) {
-            showSnackbar('Failed to save event: ' + e, 'error');
-        }
-
-        return false;
-    }
-
-    const getLastExports = async (eventId: number) => {
-        const resp = await fetch(`/api/admin/event/${eventId}/export`, {
-            'method': 'GET',
-            'headers': { 'Authorization': context.password ?? '' }
-        });
-
-        if (resp.status === 401) {
-            showSnackbar('Session expired', 'error');
-        } else {
-            return await resp.json();
-        }
-
-        return [];
+    const isLoggedIn = () => {
+        return !!context.api && !!context.api.tokenUser;
     };
 
     const logout = () => {
-        localStorage.removeItem('password');
-        setContext({ ...context, password: null });
-    }
+        setToken();
+    };
+
+    const hasRole = (role: ROLES) => sdkHasRole(context.api.tokenUser, role);
 
     return <ApiContext.Provider value={{
         ...context,
         login,
         logout,
-        saveEvent,
-        getLastExports,
+        isLoggedIn,
+        hasRole,
     }}>
         <>
             {
@@ -159,13 +115,13 @@ export default function ApiProvider({ children }: { children: ReactNode }) {
 
             {
                 // When in admin mode not logged in, don't use any socketprovider
-                (context.socketMode === 'admin' && context.password === null) &&
+                (context.socketMode === 'admin' && !isLoggedIn()) &&
                 <>{children}</>
             }
 
             {
                 // When in admin mode logged in, we use the AdminSocketProvider
-                (context.socketMode === 'admin' && context.password !== null) &&
+                (context.socketMode === 'admin' && isLoggedIn()) &&
                 <AdminSocketProvider><>{children}</></AdminSocketProvider>
             }
 

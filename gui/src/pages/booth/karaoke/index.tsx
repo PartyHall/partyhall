@@ -93,6 +93,10 @@ export default function Karaoke() {
                 <Typography variant="h1">Now playing:</Typography>
                 <Typography variant="h2">{songTitle(module.currentSong)}</Typography>
                 <Typography variant="h3">{module.preplayTimer}</Typography>
+                {
+                    module.currentSong.sung_by && module.currentSong.sung_by.length > 0 &&
+                    <Typography variant="h2">Sung by {module.currentSong.sung_by}</Typography>
+                }
             </Stack>
         }
         {

@@ -4,7 +4,7 @@ debug_mode: true
 # Root path is where all the data related to the partyhall app are stored
 root_path: './0_DATA/'
 
-# Default mode can be either PARTYHALL or QUIZ
+# Default mode can be either PARTYHALL or KARAOKE
 default_mode: 'PHOTOBOOTH'
 
 web:

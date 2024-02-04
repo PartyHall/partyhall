@@ -3,25 +3,20 @@ import { useState } from "react";
 
 import ScanIcon from '@mui/icons-material/Radar'
 import { useSnackbar } from "../../../../hooks/snackbar";
+import { useApi } from "../../../../hooks/useApi";
 
 export default function SettingsKaraoke() {
+    const {api} = useApi();
     const [scanning, setScanning] = useState<boolean>(false);
     const {showSnackbar} = useSnackbar();
 
     const rescanSongs = async (e: any) => {
         setScanning(true);
         try {
-            const resp = await fetch('/api/modules/karaoke/rescan', {
-                method: 'POST',
-            });
-    
-            if (resp.status != 200) {
-                showSnackbar('Failed to re-scan songs: ' + (await resp.text()), 'error');
-            } else {
-                showSnackbar('Songs re-scanned', 'success');
-            }
-        } catch {
-            showSnackbar('Failed to re-scan songs', 'error');
+            await api.karaoke.rescanSongs();
+            showSnackbar('Songs re-scanned', 'success');
+        } catch (e) {
+            showSnackbar('Failed to re-scan songs: ' + e, 'error');
         }
         setScanning(false);
     };

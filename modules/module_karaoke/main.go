@@ -12,8 +12,9 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/partyhall/easyws"
 	"github.com/partyhall/partyhall/config"
+	"github.com/partyhall/partyhall/dto"
 	"github.com/partyhall/partyhall/logs"
-	"github.com/partyhall/partyhall/models"
+	"github.com/partyhall/partyhall/middlewares"
 	"github.com/partyhall/partyhall/services"
 	"github.com/partyhall/partyhall/utils"
 	"gopkg.in/yaml.v2"
@@ -40,8 +41,8 @@ var (
 type ModuleKaraoke struct {
 	Actions Actions
 
-	CurrentSong  *models.Song
-	Queue        []*models.Song
+	CurrentSong  *dto.SongDto
+	Queue        []dto.SongDto
 	Started      bool
 	PreplayTimer int
 
@@ -238,7 +239,7 @@ func (m ModuleKaraoke) GetWebsocketHandlers() []easyws.MessageHandler {
 func (m ModuleKaraoke) UpdateFrontendSettings() {
 	queue := m.Queue
 	if queue == nil {
-		queue = []*models.Song{}
+		queue = []dto.SongDto{}
 	}
 
 	services.GET.ModuleSettings["karaoke"] = map[string]interface{}{
@@ -249,12 +250,11 @@ func (m ModuleKaraoke) UpdateFrontendSettings() {
 	}
 }
 
-// @TODO Secure routes correctly by user
 func (m ModuleKaraoke) RegisterApiRoutes(g *echo.Group) {
-	g.GET("/song", searchSongs)
-	g.POST("/song", songPost)
-	g.POST("/rescan", rescanSongs)
-	g.POST("/spotify-search", spotifySearch)
+	g.GET("/song", searchSongs, services.GET.EchoJwtMiddleware)
+	g.POST("/song", songPost, services.GET.EchoJwtMiddleware, middlewares.RequireAdmin)
+	g.POST("/rescan", rescanSongs, services.GET.EchoJwtMiddleware, middlewares.RequireAdmin)
+	g.POST("/spotify-search", spotifySearch, services.GET.EchoJwtMiddleware, middlewares.RequireAdmin)
 
 	g.GET("/fallback-image", func(c echo.Context) error {
 		c.Response().Header().Set("Content-Type", "image/jpeg")

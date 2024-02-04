@@ -25,8 +25,6 @@ func (e *Events) ClearExporting() error {
 func (e *Events) GetEvents() ([]models.Event, error) {
 	events := []models.Event{}
 
-	// @TODO created_at && order by created_at desc
-	// @TODO rewrite with no subquery
 	rows, err := e.db.Queryx(`
 		SELECT id, name, date, author, location, exporting, last_export, COALESCE(counts.handtaken, 0) amt_images_handtaken, COALESCE(counts.unattended, 0) amt_images_unattended
 		FROM event
@@ -135,7 +133,6 @@ func (e *Events) Save(event *models.Event) error {
 		last_export = &exp
 	}
 
-	// @TODO: find how to make date work with namedexec without this hack
 	_, err := e.db.NamedExec(`
 		UPDATE event
 		SET name = :name, date = :date, author = :author, location = :location, exporting = :exporting, last_export = :last_export

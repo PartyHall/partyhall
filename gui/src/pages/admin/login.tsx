@@ -6,11 +6,12 @@ export default function Login() {
     const {login} = useApi();
     const { handleSubmit, control } = useForm({
         defaultValues: {
+            username: localStorage.getItem('username') || '',
             password: '',
         }
     });
 
-    const onSubmit = (data: any) => login(data.password);
+    const onSubmit = (data: any) => login(data.username, data.password);
 
     return <Grid container spacing={0} direction="column" alignItems="center" justifyContent="center" minHeight="100%">
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -18,9 +19,14 @@ export default function Login() {
                 <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <Typography sx={{ fontSize: 20 }} variant="h1" color="text.secondary" gutterBottom>PartyHall Admin</Typography>
                     <Controller
+                        name="username"
+                        control={control}
+                        render={({ field }) => <Input placeholder="Username" type="username" required {...field} />}
+                    />
+                    <Controller
                         name="password"
                         control={control}
-                        render={({ field }) => <Input type="password" {...field} />}
+                        render={({ field }) => <Input placeholder="Password" type="password" required {...field} />}
                     />
 
                 </CardContent>

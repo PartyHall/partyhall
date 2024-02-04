@@ -14,6 +14,7 @@ type ORM struct {
 	DB       *sqlx.DB
 	AppState AppState
 	Events   Events
+	Users    Users
 }
 
 func Load() error {
@@ -23,6 +24,7 @@ func Load() error {
 		DB:       db,
 		AppState: AppState{db},
 		Events:   Events{db},
+		Users:    Users{db},
 	}
 
 	err := migrations.DoMigrations(db)

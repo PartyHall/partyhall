@@ -1,7 +1,9 @@
 package module_karaoke
 
 import (
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/partyhall/easyws"
+	"github.com/partyhall/partyhall/dto"
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/remote"
@@ -33,7 +35,16 @@ func (h PlaySongHandler) Do(s *easyws.Socket, payload interface{}) {
 		}
 	}
 
-	INSTANCE.Actions.StartSong(song)
+	singer := ""
+	if s.User != nil {
+		user := s.User.(*jwt.Token).Claims.(*models.JwtCustomClaims)
+		singer = user.Name
+	}
+
+	INSTANCE.Actions.StartSong(dto.SongDto{
+		Song:   song,
+		SungBy: singer,
+	})
 }
 
 type PlayingStatusHandler struct{}
@@ -65,7 +76,7 @@ func (h AddToQueueHandler) GetType() string {
 
 func (h AddToQueueHandler) Do(s *easyws.Socket, payload interface{}) {
 	if INSTANCE.Queue == nil {
-		INSTANCE.Queue = []*models.Song{}
+		INSTANCE.Queue = []dto.SongDto{}
 	}
 
 	song, err := ormLoadSongByFilename(payload.(string))
@@ -81,7 +92,16 @@ func (h AddToQueueHandler) Do(s *easyws.Socket, payload interface{}) {
 		}
 	}
 
-	INSTANCE.Queue = append(INSTANCE.Queue, song)
+	singer := ""
+	if s.User != nil {
+		user := s.User.(*jwt.Token).Claims.(*models.JwtCustomClaims)
+		singer = user.Name
+	}
+
+	INSTANCE.Queue = append(INSTANCE.Queue, dto.SongDto{
+		Song:   song,
+		SungBy: singer,
+	})
 	INSTANCE.UpdateFrontendSettings()
 	remote.BroadcastState()
 }
@@ -94,7 +114,7 @@ func (h DelFromQueueHandler) GetType() string {
 
 func (h DelFromQueueHandler) Do(s *easyws.Socket, payload interface{}) {
 	if INSTANCE.Queue == nil {
-		INSTANCE.Queue = []*models.Song{}
+		INSTANCE.Queue = []dto.SongDto{}
 	}
 
 	filename := payload.(string)

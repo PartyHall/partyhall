@@ -22,8 +22,8 @@ const linkStyle = {
 
 export default function AdminLayout() {
     const outlet = useOutlet();
-    const { socketMode, password, logout } = useApi();
-    const {appState} = useAdminSocket();
+    const { socketMode, isLoggedIn, logout, hasRole } = useApi();
+    const { appState } = useAdminSocket();
     const [state, setState] = useState<State>({
         menuOpen: false,
     });
@@ -32,11 +32,11 @@ export default function AdminLayout() {
         return <Navigate to={"/"} />
     }
 
-    if (!password) {
+    if (!isLoggedIn()) {
         return <Navigate to={"/admin/login"} />
     }
 
-    const close = () => setState({...state, menuOpen: false});
+    const close = () => setState({ ...state, menuOpen: false });
 
     return <>
         <AppBar position="static">
@@ -58,14 +58,17 @@ export default function AdminLayout() {
                             </ListItemButton>
                         </ListItem>
                     </Link>
-                    <Link to="/admin/photobooth" style={linkStyle}>
-                        <ListItem disablePadding>
-                            <ListItemButton>
-                                <ListItemIcon><PhotoIcon /></ListItemIcon>
-                                <ListItemText primary="Photobooth" />
-                            </ListItemButton>
-                        </ListItem>
-                    </Link>
+                    {
+                        hasRole('ADMIN_PHOTOBOOTH') &&
+                        <Link to="/admin/photobooth" style={linkStyle}>
+                            <ListItem disablePadding>
+                                <ListItemButton>
+                                    <ListItemIcon><PhotoIcon /></ListItemIcon>
+                                    <ListItemText primary="Photobooth" />
+                                </ListItemButton>
+                            </ListItem>
+                        </Link>
+                    }
                     <Link to="/admin/karaoke" style={linkStyle}>
                         <ListItem disablePadding>
                             <ListItemButton>
@@ -78,8 +81,8 @@ export default function AdminLayout() {
             </Box>
         </Drawer>
 
-        <div style={{height: '100%', paddingBottom: '5em'}}>
-            <Stack maxWidth="sm" spacing={2} margin="auto" paddingTop={2} style={{height: "100%"}}>
+        <div style={{ height: '100%', paddingBottom: '5em' }}>
+            <Stack maxWidth="sm" spacing={2} margin="auto" paddingTop={2} style={{ height: "100%" }}>
                 {outlet}
             </Stack>
         </div>

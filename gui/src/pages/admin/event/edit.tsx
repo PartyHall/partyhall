@@ -10,6 +10,7 @@ import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import { Event, EditedEvent } from '../../../types/appstate';
 import { useAdminSocket } from "../../../hooks/adminSocket";
 import { useApi } from "../../../hooks/useApi";
+import { useSnackbar } from "../../../hooks/snackbar";
 
 const getEmptyEvent = (): EditedEvent => ({
     id: '',
@@ -30,8 +31,9 @@ function getEditedEventFromEvent(event: Event): EditedEvent {
 }
 
 export default function EditEvent() {
+    const {showSnackbar} = useSnackbar();
     const { appState } = useAdminSocket();
-    const { saveEvent } = useApi();
+    const { api } = useApi();
     const { id: eventId } = useParams();
     const [editedEvent, setEditedEvent] = useState<EditedEvent | null>(null);
     const navigate = useNavigate();
@@ -63,9 +65,12 @@ export default function EditEvent() {
 
     const title = !eventId ? "Creating event" : ("Editing event " + (editedEvent?.name ?? ''));
     const save = async (data: EditedEvent) => {
-        const saved = await saveEvent(data);
-        if (saved) {
+        try {
+            await api.events.save(data);
+            showSnackbar('Event saved !', 'success');
             navigate('/admin');
+        } catch (e) {
+            showSnackbar('Failed to save event: ' + e, 'error');
         }
     };
 
@@ -111,7 +116,6 @@ export default function EditEvent() {
                         render={({ field }) => <LocalizationProvider dateAdapter={AdapterLuxon}>
                             <DateTimePicker
                                 label="Date"
-                                // @TODO: fix this properly
                                 //@ts-ignore
                                 renderInput={(props: any) => <TextField {...props} />}
                                 InputProps={{ required: true }}

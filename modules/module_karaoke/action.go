@@ -3,14 +3,14 @@ package module_karaoke
 import (
 	"time"
 
-	"github.com/partyhall/partyhall/models"
+	"github.com/partyhall/partyhall/dto"
 	"github.com/partyhall/partyhall/remote"
 )
 
 type Actions struct{}
 
-func (a Actions) StartSong(song *models.Song) {
-	INSTANCE.CurrentSong = song
+func (a Actions) StartSong(song dto.SongDto) {
+	INSTANCE.CurrentSong = &song
 	INSTANCE.PreplayTimer = CONFIG.PrePlayTimer
 	INSTANCE.Started = true
 	INSTANCE.UpdateFrontendSettings()

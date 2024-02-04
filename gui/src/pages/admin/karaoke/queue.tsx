@@ -4,6 +4,10 @@ import Song from "./song";
 import { useEffect, useState } from "react";
 
 const secondsToDisplay = (seconds: number) => {
+    if (seconds < 0) {
+        return '--:--'
+    }
+
     const remainingSeconds = Math.floor(seconds) % 60;
     const remainingMinutes = Math.floor(seconds/60);
 
@@ -12,7 +16,7 @@ const secondsToDisplay = (seconds: number) => {
 
 export default function KaraokeQueue() {
     const [currentPosition, setCurrentPosition] = useState<number>(0);
-    const [duration, setDuration] = useState<number>(300);
+    const [duration, setDuration] = useState<number>(-1);
 
     const {appState, lastMessage} = useAdminSocket();
     const module = appState.modules.karaoke;
@@ -20,9 +24,7 @@ export default function KaraokeQueue() {
     useEffect(() => {
         if (lastMessage?.type == 'karaoke/PLAYING_STATUS') {
             setCurrentPosition(lastMessage.payload['current']);
-            if (!isNaN(lastMessage.payload.total)) {
-                setDuration(lastMessage.payload.total);
-            }
+            setDuration(lastMessage.payload.total);
         }
     }, [lastMessage]);
 
@@ -51,8 +53,8 @@ export default function KaraokeQueue() {
                     key={x.id}
                     song={x}
                     type="QUEUE" 
-                    first={idx === 0}
-                    last={idx === module.queue.length - 1}
+                    isFirst={idx === 0}
+                    isLast={idx === module.queue.length - 1}
                 />)
                 }
             </List>

@@ -20,6 +20,8 @@ services:
       context: .docker/backend
     working_dir: /app
     user: 1000:1000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     volumes:
       - ./:/app
       - ./config.yaml:/etc/partyhall.yaml
@@ -40,6 +42,8 @@ services:
     volumes: ['./gui:/app']
     working_dir: '/app'
     user: "${UID:-1000}:${GID:-1000}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - '127.0.0.1:5993:5173'
     command: ['bash', '-c', '[ ! -d node_modules ] && npm install; npm run dev -- --host']

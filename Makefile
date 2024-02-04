@@ -21,8 +21,8 @@ show-debug:
 set-mode-photobooth:
 	docker compose exec mosquitto mosquitto_pub -h 127.0.0.1 -t partyhall/admin/set_mode -m "PHOTOBOOTH"
 
-set-mode-quiz:
-	docker compose exec mosquitto mosquitto_pub -h 127.0.0.1 -t partyhall/admin/set_mode -m "QUIZ"
+set-mode-karaoke:
+	docker compose exec mosquitto mosquitto_pub -h 127.0.0.1 -t partyhall/admin/set_mode -m "KARAOKE"
 
 set-mode-disabled:
 	docker compose exec mosquitto mosquitto_pub -h 127.0.0.1 -t partyhall/admin/set_mode -m "DISABLED"

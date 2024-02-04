@@ -6,11 +6,11 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func IsRemote(c *echo.Context) bool {
+func IsRemote(c echo.Context) bool {
 	// addr := r.Header.Get("X-Real-IP")
-	addr := (*c).Request().Header.Get("X-Real-IP")
+	addr := c.Request().Header.Get("X-Real-IP")
 	if len(addr) == 0 {
-		ip, _, err := net.SplitHostPort((*c).RealIP())
+		ip, _, err := net.SplitHostPort(c.Request().RemoteAddr)
 		if err != nil {
 			// Just to be on the safe side, we say that it's a remote connection when we can't parse the hostport (shouldn't happen)
 			return true

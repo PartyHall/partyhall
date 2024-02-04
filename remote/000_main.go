@@ -2,7 +2,6 @@ package remote
 
 import (
 	"errors"
-	"fmt"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/labstack/echo/v4"
@@ -32,13 +31,9 @@ func Initialize() {
 	EasyWS = easyws.NewWithTypes(
 		utils.SOCKET_TYPES,
 		func(socketType string, c *echo.Context) bool {
-			fmt.Println("Validating auth")
 			if socketType == utils.SOCKET_TYPE_BOOTH {
-				fmt.Println("Is booth")
-				if utils.IsRemote(c) {
-					fmt.Println("Is remote")
+				if utils.IsRemote(*c) {
 					if !config.GET.DebugMode && !config.IsInDev() {
-						fmt.Println("No debg no dev")
 						return false
 					}
 
@@ -47,9 +42,7 @@ func Initialize() {
 				}
 			} else {
 				pwd := (*c).QueryParam("password")
-				fmt.Println("chk pwd")
 				if pwd != config.GET.Web.AdminPassword {
-					fmt.Println("pwd invalid: ", pwd, config.GET.Web.AdminPassword)
 					return false
 				}
 			}

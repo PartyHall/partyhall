@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"net/http"
 	"os"
 
 	"github.com/labstack/echo/v4"
@@ -14,6 +15,7 @@ import (
 	"github.com/partyhall/partyhall/remote"
 	"github.com/partyhall/partyhall/routes"
 	"github.com/partyhall/partyhall/services"
+	"github.com/partyhall/partyhall/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -70,6 +72,21 @@ var rootCmd = &cobra.Command{
 
 		routes.Register(e.Group("/api"))
 
+		if services.WEBAPP_FS != nil {
+			e.GET("/", func(c echo.Context) error {
+				mode := "booth"
+				if utils.IsRemote(c) {
+					mode = "admin"
+				}
+
+				return c.HTMLBlob(http.StatusOK, []byte(services.InjectHtmlMode(mode)))
+			})
+
+			e.GET("/assets/*", echo.WrapHandler(http.FileServer(http.FS(*services.WEBAPP_FS))))
+		} else {
+			logs.Error("Failed to embed webapp: not loaded")
+		}
+
 		log.Info("Registered routes: ")
 		for _, r := range e.Routes() {
 			log.Info("\t- " + r.Path)
@@ -77,25 +94,6 @@ var rootCmd = &cobra.Command{
 
 		logs.Infof("PartyHall app is listening on %v\n", config.GET.Web.ListeningAddr)
 		logs.Error(e.Start(config.GET.Web.ListeningAddr))
-
-		/*
-			r.PathPrefix("/media/partyhall").Handler(http.StripPrefix("/media/partyhall", http.FileServer(http.Dir(utils.GetPath("images")))))
-
-			if services.WEBAPP_FS != nil {
-				r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-					mode := "booth"
-					if utils.IsRemote(r) {
-						mode = "admin"
-					}
-
-					w.Write([]byte(services.InjectHtmlMode(mode)))
-				})
-
-				r.PathPrefix("/").Handler(http.FileServer(http.FS(*services.WEBAPP_FS)))
-			} else {
-				logs.Error("Failed to embed webapp: not loaded")
-			}
-		*/
 	},
 }
 

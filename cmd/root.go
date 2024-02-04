@@ -102,8 +102,12 @@ func Execute() {
 }
 
 func init() {
+	userCmd.AddCommand(getUserCmd)
+	userCmd.AddCommand(createUserCmd)
+
 	rootCmd.AddCommand(hwhandlerCmd)
 	rootCmd.AddCommand(convertVideoCmd)
 	rootCmd.AddCommand(spotifySearchCmd)
+	rootCmd.AddCommand(userCmd)
 	rootCmd.AddCommand(versionCmd)
 }

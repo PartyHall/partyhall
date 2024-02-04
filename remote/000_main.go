@@ -31,22 +31,8 @@ func Initialize() {
 	EasyWS = easyws.NewWithTypes(
 		utils.SOCKET_TYPES,
 		func(socketType string, c *echo.Context) bool {
-			if socketType == utils.SOCKET_TYPE_BOOTH {
-				if utils.IsRemote(*c) {
-					if !config.GET.DebugMode && !config.IsInDev() {
-						return false
-					}
-
-					logs.Debug("Letting a remote connection")
-					return true
-				}
-			} else {
-				pwd := (*c).QueryParam("password")
-				if pwd != config.GET.Web.AdminPassword {
-					return false
-				}
-			}
-
+			// @TODO:
+			// Deprecated, use middleware
 			return true
 		},
 	)

@@ -5,10 +5,12 @@ import useAsyncEffect from "use-async-effect";
 import Loader from "../../../components/loader";
 import Song from "./song";
 import { Meta } from "../../../types/contextualized_response";
+import { useApi } from "../../../hooks/useApi";
 
 // @TODO: debounce
 export default function KaraokeSearch() {
     const [wasSearch, setWasSearch] = useState<boolean>(false);
+    const {karaokeSongSearch} = useApi();
 
     const [loading, setLoading] = useState<boolean>(true);
     const [page, setPage] = useState<number>(1);
@@ -25,11 +27,9 @@ export default function KaraokeSearch() {
         }
 
         setLoading(true);
-        let resp: any = await fetch(`/api/modules/karaoke/song?page=${currPage}` + (search.length > 0 ? `&q=${encodeURI(search)}` : ''))
-
-        resp = await resp.json();
-        setResults(resp['results']);
-        setMeta(resp['meta']);
+        const resp = await karaokeSongSearch(currPage, search);
+        setResults(resp.results);
+        setMeta(resp.meta);
 
         setLoading(false);
     };

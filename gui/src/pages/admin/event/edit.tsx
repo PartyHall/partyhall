@@ -111,7 +111,6 @@ export default function EditEvent() {
                         render={({ field }) => <LocalizationProvider dateAdapter={AdapterLuxon}>
                             <DateTimePicker
                                 label="Date"
-                                // @TODO: fix this properly
                                 //@ts-ignore
                                 renderInput={(props: any) => <TextField {...props} />}
                                 InputProps={{ required: true }}

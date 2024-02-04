@@ -30,14 +30,14 @@ const WebsocketContext = createContext<WebsocketContextProps>({
 });
 
 export default function AdminSocketProvider({ children }: { children: ReactNode }) {
-    const { password, logout } = useApi();
+    const { token, logout } = useApi();
     const { sendJsonMessage, lastMessage, readyState } = useWebSocket(
         `ws://${window.location.host}/api/socket/admin`,
         {
             shouldReconnect: () => true,
             reconnectAttempts: 10,
             reconnectInterval: 3000,
-            queryParams: {password: password ?? ''},
+            queryParams: {token: token ?? ''},
             onError: () => logout(), // @TODO: find a way to check if 401 and only in this case logout
         }
     );

@@ -39,7 +39,7 @@ const WebsocketContext = createContext<WebsocketContextProps>({
 
 export default function BoothSocketProvider({ children }: { children: ReactNode }) {
     const { sendJsonMessage, lastMessage, readyState } = useWebSocket(
-        `ws://${window.location.host}/api/socket/booth`,
+        `ws://${window.location.host}/api/socket/booth?token=empty`,
         {
             shouldReconnect: () => true,
             reconnectAttempts: 10,

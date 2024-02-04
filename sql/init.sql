@@ -51,4 +51,11 @@ CREATE TABLE app_state (
     last_applied_migration INTEGER NOT NULL DEFAULT 0
 );
 
+CREATE TABLE ph_user (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username VARCHAR(512) NOT NULL UNIQUE,
+    password VARCHAR(512) NOT NULL,
+    roles JSON NOT NULL DEFAULT '["USER"]'
+);
+
 --

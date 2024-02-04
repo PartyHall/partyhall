@@ -19,7 +19,6 @@ func (h MqttSenderHandler) GetType() string {
 }
 
 func (h MqttSenderHandler) Do(s *easyws.Socket, payload interface{}) {
-	// @TODO: Do the fmt.Sprintf in EasyMqtt
 	err := EasyMqtt.Send(h.Topic, fmt.Sprintf("%v", h.GetPayload(payload)))
 	if err != nil {
 		logs.Errorf("Failed to send mqtt message on topic %v: %v", h.Topic, err)

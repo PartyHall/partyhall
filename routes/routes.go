@@ -9,26 +9,65 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/labstack/echo/v4"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
+	"github.com/partyhall/partyhall/middlewares"
 	"github.com/partyhall/partyhall/modules"
 	"github.com/partyhall/partyhall/orm"
 	"github.com/partyhall/partyhall/remote"
 	"github.com/partyhall/partyhall/services"
+	"github.com/partyhall/partyhall/utils"
 )
 
 func Register(g *echo.Group) {
 	g.GET("/settings", settings)
-	g.GET("/socket/:type", remote.EasyWS.Route)
+	g.POST("/login", login)
+
+	// @TODO secure
+	g.GET("/socket/:type", remote.EasyWS.Route, services.GET.EchoWsJwtMiddleware)
+
+	// @TODO secure
 	g.POST("/picture", picture)
 
-	registerAdminRoutes(g.Group("/admin"))
+	registerAdminRoutes(g.Group("/admin", services.GET.EchoJwtMiddleware, middlewares.RequireAdmin))
 	modules.RegisterRoutes(g.Group("/modules"))
 }
 
 func settings(c echo.Context) error {
 	return c.JSON(http.StatusOK, services.BuildFrontendSettings())
+}
+
+func login(c echo.Context) error {
+	type LoginRequest struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
+	var loginRequest LoginRequest
+	if err := c.Bind(&loginRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid JSON format"})
+	}
+
+	dbUser, err := orm.GET.Users.FindByUsername(loginRequest.Username)
+	if err != nil {
+		// @TODO Check if DB error
+		return c.NoContent(http.StatusNotFound)
+	}
+
+	match, _ := services.GetArgon().VerifyPassword(loginRequest.Password, dbUser.Password)
+	if !match {
+		return c.NoContent(http.StatusNotFound)
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, utils.GetClaimsFromUser(dbUser))
+	tokenString, err := token.SignedString(services.GET.EchoJWTPrivateKey)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to generate token"})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"token": tokenString})
 }
 
 func getEventAndFilename(event string, isUnattended bool) (int, string) {
@@ -64,6 +103,7 @@ func getEventAndFilename(event string, isUnattended bool) (int, string) {
 	return evt.Id, imageName
 }
 
+// @TODO only accessible from localhost
 func picture(c echo.Context) error {
 	event := c.FormValue("event")
 	unattended := c.FormValue("unattended")
@@ -101,7 +141,6 @@ func picture(c echo.Context) error {
 	}
 
 	if _, err := io.Copy(f, src); err != nil {
-		// @TODO: Remove the picture from the DB
 		f.Close()
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to save image file: "+err.Error())
 	}

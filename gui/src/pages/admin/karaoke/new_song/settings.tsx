@@ -3,8 +3,10 @@ import { useState } from "react";
 
 import ScanIcon from '@mui/icons-material/Radar'
 import { useSnackbar } from "../../../../hooks/snackbar";
+import { useApi } from "../../../../hooks/useApi";
 
 export default function SettingsKaraoke() {
+    const {token} = useApi();
     const [scanning, setScanning] = useState<boolean>(false);
     const {showSnackbar} = useSnackbar();
 
@@ -13,6 +15,9 @@ export default function SettingsKaraoke() {
         try {
             const resp = await fetch('/api/modules/karaoke/rescan', {
                 method: 'POST',
+                headers: {
+                    'Authorization': token ? ('Bearer ' + token) : '',
+                }
             });
     
             if (resp.status != 200) {

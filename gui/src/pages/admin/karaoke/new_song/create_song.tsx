@@ -5,6 +5,7 @@ import { MusicNote as MusicNoteIcon, Lyrics as LyricsIcon } from '@mui/icons-mat
 
 import SearchSpotify from "./search_spotify";
 import { useSnackbar } from "../../../../hooks/snackbar";
+import { useApi } from "../../../../hooks/useApi";
 
 type COVER_SOURCE = 'NO_COVER'|'LINK'|'UPLOADED';
 type FORMAT = 'CDG'|'WEBM'|'MP4';
@@ -21,6 +22,7 @@ type NewSong = {
 };
 
 export default function CreateSong() {
+    const {token} = useApi();
     const {showSnackbar} = useSnackbar();
     const [coverSource, setCoverSource] = useState<COVER_SOURCE>('LINK');
     const [format, setFormat] = useState<FORMAT>('CDG');
@@ -54,6 +56,9 @@ export default function CreateSong() {
         try {
             const resp = await fetch('/api/modules/karaoke/song', {
                 method: 'POST',
+                headers: {
+                    'Authorization': token ? ('Bearer ' + token) : '',
+                },
                 body: fd,
             });
     
@@ -62,6 +67,8 @@ export default function CreateSong() {
             } else {
                 showSnackbar('Music created', 'success');
                 reset();
+                setSongFilename('');
+                setCdgFilename('');
             }
         } catch (e) {
             console.log(e);

@@ -13,6 +13,7 @@ import (
 	"github.com/partyhall/easyws"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
+	"github.com/partyhall/partyhall/middlewares"
 	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/services"
 	"github.com/partyhall/partyhall/utils"
@@ -249,12 +250,11 @@ func (m ModuleKaraoke) UpdateFrontendSettings() {
 	}
 }
 
-// @TODO Secure routes correctly by user
 func (m ModuleKaraoke) RegisterApiRoutes(g *echo.Group) {
-	g.GET("/song", searchSongs)
-	g.POST("/song", songPost)
-	g.POST("/rescan", rescanSongs)
-	g.POST("/spotify-search", spotifySearch)
+	g.GET("/song", searchSongs, services.GET.EchoJwtMiddleware)
+	g.POST("/song", songPost, services.GET.EchoJwtMiddleware, middlewares.RequireAdmin)
+	g.POST("/rescan", rescanSongs, services.GET.EchoJwtMiddleware, middlewares.RequireAdmin)
+	g.POST("/spotify-search", spotifySearch, services.GET.EchoJwtMiddleware, middlewares.RequireAdmin)
 
 	g.GET("/fallback-image", func(c echo.Context) error {
 		c.Response().Header().Set("Content-Type", "image/jpeg")

@@ -92,7 +92,6 @@ func BroadcastFrontendSettings() {
 	remote.BroadcastState()
 }
 
-// @TODO remove spaces & not url valid characters
 func NormalizeModuleName(m Module) string {
 	return strings.ToLower(m.GetModuleName())
 }

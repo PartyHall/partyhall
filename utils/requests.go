@@ -7,7 +7,6 @@ import (
 )
 
 func IsRemote(c echo.Context) bool {
-	// addr := r.Header.Get("X-Real-IP")
 	addr := c.Request().Header.Get("X-Real-IP")
 	if len(addr) == 0 {
 		ip, _, err := net.SplitHostPort(c.Request().RemoteAddr)

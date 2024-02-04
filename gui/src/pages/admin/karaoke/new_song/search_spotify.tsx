@@ -3,6 +3,7 @@ import { Button, Card, Grid, List, ListItem, Stack, Typography } from "@mui/mate
 
 import {faSpotify as SpotifyIcon} from '@fortawesome/free-brands-svg-icons';
 import { useState } from "react";
+import { useApi } from "../../../../hooks/useApi";
 
 type Props = {
     artist: string;
@@ -18,6 +19,7 @@ type ApiSong = {
 }
 
 export default function SearchSpotify({ artist, title, onChange }: Props) {
+    const {token} = useApi();
     const [loading, setLoading] = useState<boolean>(false);
     const [results, setResults] = useState<ApiSong[]|null>(null);
 
@@ -28,7 +30,7 @@ export default function SearchSpotify({ artist, title, onChange }: Props) {
 
         let resp = await fetch(
             `/api/modules/karaoke/spotify-search?q=${encodeURI(artist + ' ' + title)}`,
-            { method: 'POST' },
+            { method: 'POST', headers: { 'Authorization': token ? ('Bearer ' + token) : ''} },
         );
         resp = await resp.json();
         //@ts-ignore

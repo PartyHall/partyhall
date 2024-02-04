@@ -5,6 +5,7 @@ go 1.19
 require (
 	github.com/eclipse/paho.mqtt.golang v1.4.3
 	github.com/go-playground/validator v9.31.0+incompatible
+	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/google/uuid v1.5.0
 	github.com/gorilla/websocket v1.5.1
 	github.com/h2non/bimg v1.1.9
@@ -18,6 +19,7 @@ require (
 	github.com/spf13/cobra v1.8.0
 	go.bug.st/serial v1.6.1
 	go.uber.org/zap v1.26.0
+	golang.org/x/crypto v0.18.0
 	golang.org/x/exp v0.0.0-20240119083558-1b970713d09a
 	golang.org/x/text v0.14.0
 	gopkg.in/yaml.v2 v2.4.0
@@ -41,6 +43,7 @@ require (
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/pty v1.1.8 // indirect
 	github.com/kr/text v0.2.0 // indirect
+	github.com/labstack/echo-jwt/v4 v4.2.0 // indirect
 	github.com/leodido/go-urn v1.4.0 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -59,7 +62,6 @@ require (
 	go.uber.org/atomic v1.11.0 // indirect
 	go.uber.org/goleak v1.3.0 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
-	golang.org/x/crypto v0.18.0 // indirect
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sync v0.6.0 // indirect

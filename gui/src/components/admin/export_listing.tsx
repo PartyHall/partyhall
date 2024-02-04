@@ -14,7 +14,7 @@ import { useConfirmDialog } from "../../hooks/dialog";
 export default function ExportListing() {
     const { showSnackbar } = useSnackbar();
     const { showDialog } = useConfirmDialog();
-    const { password, getLastExports } = useApi();
+    const { token, getLastExports } = useApi();
     const { appState, sendMessage, lastMessage } = useAdminSocket();
 
     const [downloadInProgress, setDownloadInProgress] = useState<boolean>(false);
@@ -49,7 +49,7 @@ export default function ExportListing() {
         try {
             const resp = await fetch(
                 `/api/admin/event/${id}/export/download`,
-                { 'headers': { 'Authorization': password ?? '' } }
+                { 'headers': { 'Authorization': token ? ('Bearer ' + token) : '' } }
             );
             if (resp.status != 200) {
                 throw 'Failed to download file';

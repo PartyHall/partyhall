@@ -12,7 +12,7 @@ import (
 
 func OnExportZip(client mqtt.Client, msg mqtt.Message) {
 	eventIdStr := string(msg.Payload())
-	eventId, err := strconv.ParseInt(eventIdStr, 10, 64)
+	eventId, err := strconv.Atoi(eventIdStr)
 	if err != nil {
 		logs.Error("Failed to export event: bad eventid => ", eventIdStr)
 		logs.Error(err)

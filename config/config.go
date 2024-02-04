@@ -56,7 +56,7 @@ type Config struct {
 	Modules []string
 }
 
-func (c *Config) GetImageFolder(eventId int64, unattended bool) (string, error) {
+func (c *Config) GetImageFolder(eventId int, unattended bool) (string, error) {
 	subfolder := "pictures"
 	if unattended {
 		subfolder = "unattended"

@@ -8,10 +8,10 @@ export default function SettingsKaraoke() {
     const [scanning, setScanning] = useState<boolean>(false);
     const {showSnackbar} = useSnackbar();
 
-    const rescanSongs = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rescanSongs = async (e: any) => {
         setScanning(true);
         try {
-            const resp = await fetch('/api/modules/karaoke/rescan_songs', {
+            const resp = await fetch('/api/modules/karaoke/rescan', {
                 method: 'POST',
             });
     
@@ -27,7 +27,7 @@ export default function SettingsKaraoke() {
     };
 
     return <>
-        <Button variant="contained" component="label" color="primary" onClick={() => rescanSongs} disabled={scanning}>
+        <Button variant="contained" component="label" color="primary" onClick={rescanSongs} disabled={scanning}>
             <ScanIcon/> Re-scan songs
         </Button>
     </>

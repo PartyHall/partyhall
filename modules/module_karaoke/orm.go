@@ -9,9 +9,6 @@ func ormSearchSong(song string) ([]models.Song, error) {
 	rows, err := orm.GET.DB.Queryx(`
 		SELECT id, filename, COALESCE(artist, '') artist, COALESCE(title, '') title, format
 		FROM song
-		WHERE LOWER(filename) LIKE CONCAT('%', LOWER($1), '%')
-		   OR LOWER(artist) LIKE CONCAT('%', LOWER($1), '%')
-		   OR LOWER(title) LIKE CONCAT('%', LOWER($1), '%')
 		LIMIT 20
 	`, song)
 
@@ -34,14 +31,20 @@ func ormSearchSong(song string) ([]models.Song, error) {
 	return songs, nil
 }
 
-func ormListSongs(offset int64, limit int64) ([]models.Song, error) {
+func ormListSongs(query string, offset int, limit int) ([]models.Song, error) {
 	rows, err := orm.GET.DB.Queryx(`
 		SELECT id, filename, COALESCE(artist, '') artist, COALESCE(title, '') title, format
 		FROM song
+		WHERE LENGTH($1) == 0
+		OR (
+			LOWER(filename) LIKE CONCAT('%', LOWER($1), '%')
+			OR LOWER(artist) LIKE CONCAT('%', LOWER($1), '%')
+			OR LOWER(title) LIKE CONCAT('%', LOWER($1), '%')
+		)
 		ORDER BY artist, title
-		LIMIT $1
-		OFFSET $2
-	`, limit, offset)
+		LIMIT $2
+		OFFSET $3
+	`, query, limit, offset)
 
 	if err != nil {
 		return nil, err
@@ -82,13 +85,24 @@ func ormLoadSongByFilename(filename string) (*models.Song, error) {
 	return &song, nil
 }
 
-func ormCreateSong(filename, artist, title, format string) error {
-	_, err := orm.GET.DB.Exec(`
+func ormCreateSong(filename, artist, title, format string) (*models.Song, error) {
+	row := orm.GET.DB.QueryRowx(`
 		INSERT INTO song (filename, artist, title, format)
 		VALUES ($1, $2, $3, $4)
+		RETURNING id, filename, artist, title, format
 	`, filename, artist, title, format)
 
-	return err
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+
+	var song models.Song
+	err := row.StructScan(&song)
+	if err != nil {
+		return nil, err
+	}
+
+	return &song, nil
 }
 
 func ormDeleteSong(filename string) {

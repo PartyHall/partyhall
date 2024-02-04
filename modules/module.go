@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
-	"github.com/gorilla/mux"
+	"github.com/labstack/echo/v4"
 	"github.com/partyhall/easyws"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
@@ -27,7 +27,7 @@ type Module interface {
 	GetMqttHandlers() map[string]mqtt.MessageHandler
 	GetWebsocketHandlers() []easyws.MessageHandler
 	UpdateFrontendSettings()
-	RegisterApiRoutes(router *mux.Router)
+	RegisterApiRoutes(*echo.Group)
 }
 
 func LoadModules() error {
@@ -97,9 +97,9 @@ func NormalizeModuleName(m Module) string {
 	return strings.ToLower(m.GetModuleName())
 }
 
-func RegisterRoutes(r *mux.Router) {
+func RegisterRoutes(g *echo.Group) {
 	for _, module := range MODULES {
-		sr := r.PathPrefix("/" + NormalizeModuleName(module) + "/").Subrouter()
+		sr := g.Group("/" + NormalizeModuleName(module))
 		module.RegisterApiRoutes(sr)
 	}
 }

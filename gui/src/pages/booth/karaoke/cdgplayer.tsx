@@ -125,7 +125,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
         this.stopCDG();
 
         try {
-            const resp = await fetch('/media/karaoke/' + this.props.song.filename + '/song.cdg');
+            const resp = await fetch('/api/modules/karaoke/medias/' + this.props.song.filename + '/song.cdg');
             const buf = await resp.arrayBuffer();
     
             if (!this.audio.current || !this.cdg) {
@@ -134,7 +134,7 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
     
             //@ts-ignore
             this.cdg.load(buf);
-            this.audio.current.src = '/media/karaoke/' + this.props.song.filename + '/song.mp3';
+            this.audio.current.src = '/api/modules/karaoke/medias/' + this.props.song.filename + '/song.mp3';
             this.audio.current.load();
         } catch (err: any) {
             this.props.onError(err.message);

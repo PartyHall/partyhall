@@ -26,7 +26,10 @@ export default function SearchSpotify({ artist, title, onChange }: Props) {
     const searchSpotify = async () => {
         setLoading(true);
 
-        let resp = await fetch(`/api/modules/karaoke/search/spotify?q=${encodeURI(artist + ' ' + title)}`);
+        let resp = await fetch(
+            `/api/modules/karaoke/spotify-search?q=${encodeURI(artist + ' ' + title)}`,
+            { method: 'POST' },
+        );
         resp = await resp.json();
         //@ts-ignore
         setResults(resp as ApiSong[]);

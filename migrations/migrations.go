@@ -6,6 +6,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/utils"
@@ -64,6 +65,10 @@ func CheckDbExists(scripts embed.FS) error {
 	envHwid := os.Getenv("PARTYHALL_HWID")
 	envToken := os.Getenv("PARTYHALL_TOKEN")
 	token := ""
+	if len(envHwid) == 0 {
+		envHwid = uuid.New().String()
+	}
+
 	if len(envToken) > 0 {
 		token = envToken
 	}

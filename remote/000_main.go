@@ -2,9 +2,9 @@ package remote
 
 import (
 	"errors"
-	"net/http"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
+	"github.com/labstack/echo/v4"
 	"github.com/partyhall/easymqtt"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
@@ -30,9 +30,9 @@ func RegisterOnJoin(module string, function func(socketType string, s *easyws.So
 func Initialize() {
 	EasyWS = easyws.NewWithTypes(
 		utils.SOCKET_TYPES,
-		func(socketType string, r *http.Request) bool {
+		func(socketType string, c *echo.Context) bool {
 			if socketType == utils.SOCKET_TYPE_BOOTH {
-				if utils.IsRemote(r) {
+				if utils.IsRemote(*c) {
 					if !config.GET.DebugMode && !config.IsInDev() {
 						return false
 					}
@@ -41,7 +41,7 @@ func Initialize() {
 					return true
 				}
 			} else {
-				pwd := r.URL.Query().Get("password")
+				pwd := (*c).QueryParam("password")
 				if pwd != config.GET.Web.AdminPassword {
 					return false
 				}

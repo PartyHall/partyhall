@@ -124,7 +124,7 @@ export default function ApiProvider({ children }: { children: ReactNode }) {
     }
 
     const getLastExports = async (eventId: number) => {
-        const resp = await fetch(`/api/admin/exports/${eventId}`, {
+        const resp = await fetch(`/api/admin/event/${eventId}/export`, {
             'method': 'GET',
             'headers': { 'Authorization': context.password ?? '' }
         });

@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/partyhall/partyhall/dto"
 	"github.com/partyhall/partyhall/models"
 )
 
@@ -56,7 +57,7 @@ func (e *Events) GetEvents() ([]models.Event, error) {
 	return events, nil
 }
 
-func (e *Events) GetEvent(id int64) (*models.Event, error) {
+func (e *Events) GetEvent(id int) (*models.Event, error) {
 	row := e.db.QueryRowx(`
 		SELECT id, name, date, author, location, exporting, last_export, COALESCE(counts.handtaken, 0) amt_images_handtaken, COALESCE(counts.unattended, 0) amt_images_unattended
 		FROM event
@@ -84,12 +85,12 @@ func (e *Events) GetEvent(id int64) (*models.Event, error) {
 	return &evt, err
 }
 
-func (e *Events) CreateEvent(name string, author, location *string, date *int64) (*models.Event, error) {
+func (e *Events) CreateEvent(eventDto *dto.EventPost) (*models.Event, error) {
 	row := e.db.QueryRowx(`
 		INSERT INTO event (name, date, author, location)
 		VALUES (?, ?, ?, ?)
 		RETURNING *
-	`, name, date, author, location)
+	`, eventDto.Name, time.Time(eventDto.Date), eventDto.Author, eventDto.Location)
 
 	if row.Err() != nil {
 		return nil, row.Err()
@@ -104,11 +105,29 @@ func (e *Events) CreateEvent(name string, author, location *string, date *int64)
 	return &event, nil
 }
 
-func (e *Events) Save(event *models.Event) error {
-	var date int64 = 0
-	if event.Date != nil {
-		date = (time.Time(*event.Date)).Unix()
+func (e *Events) Update(eventId int, event *dto.EventPut) (*models.Event, error) {
+	row := e.db.QueryRowx(`
+		UPDATE event
+		SET name = ?, date = ?, author = ?, location = ?
+		WHERE id = ?
+		RETURNING *
+	`, event.Name, time.Time(event.Date), event.Author, event.Location, eventId)
+
+	if row.Err() != nil {
+		return nil, row.Err()
 	}
+
+	var dbEvent models.Event = models.Event{}
+	err := row.StructScan(&dbEvent)
+	if err != nil {
+		return nil, err
+	}
+
+	return &dbEvent, nil
+}
+
+func (e *Events) Save(event *models.Event) error {
+	var date int64 = (time.Time(event.Date)).Unix()
 
 	var last_export *int64 = nil
 	if event.LastExport != nil {
@@ -177,7 +196,7 @@ func (e *Events) GetImage(id int64) (*models.Image, error) {
 	return &pct, err
 }
 
-func (e *Events) InsertImage(eventId int64, unattended bool) (*models.Image, error) {
+func (e *Events) InsertImage(eventId int, unattended bool) (*models.Image, error) {
 	currTime := time.Now().Unix()
 
 	row := e.db.QueryRowx(`
@@ -219,7 +238,7 @@ func (e *Events) InsertExportedEvent(event *models.Event, filename string) (*mod
 	return &exportedEvent, nil
 }
 
-func (e *Events) GetExportedEvent(exportedEventId int64) (*models.ExportedEvent, error) {
+func (e *Events) GetExportedEvent(exportedEventId int) (*models.ExportedEvent, error) {
 	row := e.db.QueryRowx(`
 		SELECT id, event_id, filename, date
 		FROM exported_event

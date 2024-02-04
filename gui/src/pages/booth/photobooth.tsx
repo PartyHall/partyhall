@@ -4,6 +4,7 @@ import LockedModal from "../../components/locked_modal";
 import { useBoothSocket } from "../../hooks/boothSocket";
 
 import '../../assets/css/photobooth.scss';
+import { b64ImageToBlob } from "../../utils/files";
 
 type LastPicture = {
     url: string;
@@ -29,7 +30,7 @@ export default function Photobooth() {
         if (imageSrc) {
             let form = new FormData();
 
-            form.append('image', imageSrc);
+            form.append('image', b64ImageToBlob(imageSrc));
             form.append('unattended', unattended ? 'true' : 'false')
             form.append('event', ''+appState?.app_state?.current_event?.id)
 

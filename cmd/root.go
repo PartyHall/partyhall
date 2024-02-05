@@ -104,6 +104,7 @@ func Execute() {
 func init() {
 	userCmd.AddCommand(getUserCmd)
 	userCmd.AddCommand(createUserCmd)
+	userCmd.AddCommand(getInitializeUserCmd())
 
 	rootCmd.AddCommand(hwhandlerCmd)
 	rootCmd.AddCommand(convertVideoCmd)

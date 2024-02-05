@@ -6,7 +6,7 @@ bindsym $mod+q kill
 bindsym $mod+space exec --no-startup-id dmenu_run
 bindsym $mod+Shift+space floating toggle
 bindsym $mod+f fullscreen toggle
-bindsym $mod+Return lxterm
+bindsym $mod+Return exec --no-startup-id i3-sensible-terminal
 
 set $ws1 "1"
 

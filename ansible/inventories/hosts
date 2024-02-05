@@ -1,1 +1,1 @@
-partyhall ansible_user=partyhall ansible_host=192.168.14.170 ansible_port=22
+partyhall ansible_user=partyhall ansible_host=192.168.14.121 ansible_port=22

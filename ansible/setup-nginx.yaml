@@ -19,5 +19,5 @@
       systemd:
         name: 'nginx'
         daemon_reload: yes
-        state: 'started'
+        state: 'restarted'
         enabled: yes

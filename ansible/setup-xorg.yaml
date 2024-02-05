@@ -9,6 +9,9 @@
         preferences:
           privacy.webrtc.legacyGlobalIndicator: false  # Disable the small "webcam indicator" on top of the window
           media.navigator.permission.disabled: true    # Let all website access webcam without permissions
+          browser.sessionsore.resume_from_crash: false
+          browser.startup.homepage_override.mstone: 'ignore'
+          browser.messaging-system.whatsNewPanel.enabled: false
 
   tasks:
     - name: 'Setting up xorg'
@@ -49,8 +52,9 @@
         mode: '0774'
 
     - name: 'Enabling the DM service'
+      become: yes
       systemd:
         name: 'lightdm'
         daemon_reload: yes
         enabled: yes
-        state: 'started'
+        state: 'restarted'

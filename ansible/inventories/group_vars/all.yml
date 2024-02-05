@@ -1,5 +1,6 @@
 ---
 partyhall_debug_mode: false
+partyhall_guests_allowed: true
 
 # Photobooth module
 partyhall_photobooth_has_hardware_flash: false

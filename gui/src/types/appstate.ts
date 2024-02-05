@@ -57,6 +57,8 @@ export type AppState = {
     debug: boolean;
     app_state: appstate;
     current_mode: string;
+    guests_allowed: boolean;
+
     ip_addresses: { [key: string]: string[]; };
     known_events: Event[];
     known_modes: string[];

@@ -7,6 +7,9 @@ root_path: './0_DATA/'
 # Default mode can be either PARTYHALL or KARAOKE
 default_mode: 'PHOTOBOOTH'
 
+# Allow guest login (For karaoke or other stuff that should be accessible)
+guests_allowed: true
+
 web:
   listening_addr: 0.0.0.0:8039
   admin_password: "admin"

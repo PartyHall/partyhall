@@ -5,7 +5,6 @@ import { AppState } from "../types/appstate";
 import { WsMessage } from "../types/ws_message";
 import { useSnackbar } from "./snackbar";
 import { SOCKET_MODE_DEBUG, useApi } from "./useApi";
-import useRefresher from "./useRefresher";
 
 type WebsocketProps = {
     lastMessage: WsMessage | null;

@@ -33,6 +33,7 @@ type ApiProps = {
 
 type ApiContextProps = ApiProps & {
     login: (username: string, password: string) => Promise<void>;
+    loginAsGuest: (username: string) => Promise<void>;
     logout: () => void;
     isLoggedIn: () => boolean;
     hasRole: (role: ROLES) => boolean;
@@ -46,6 +47,7 @@ const defaultState: ApiProps = {
 const ApiContext = createContext<ApiContextProps>({
     ...defaultState,
     login: async (username: string, password: string) => { },
+    loginAsGuest: async (username: string) => { },
     logout: () => { },
     isLoggedIn: () => false,
     hasRole: () => false,
@@ -68,8 +70,12 @@ export default function ApiProvider({ children }: { children: ReactNode }) {
         setContext({ ...context, socketMode: KNOWN_SOCKET_MODE[idx] })
     };
 
-    const setToken = useCallback((token?: string, refresh?: string) => {
-        if (!token || !refresh) {
+    const setToken = useCallback((token?: string, refresh?: string, guestUsername: string|null = null) => {
+        if (context && context.api) {
+            context.api.clearRefresh();
+        }
+
+        if (!token || (!guestUsername && !refresh)) {
             localStorage.removeItem('token');
             localStorage.removeItem('refresh_token');
 
@@ -78,15 +84,21 @@ export default function ApiProvider({ children }: { children: ReactNode }) {
             return;
         }
 
-        setContext({...context, api: new SDK(token, refresh, storeToken)});
+        setContext({...context, api: new SDK(token, refresh, storeToken, guestUsername)});
 
         localStorage.setItem('token', token);
-        localStorage.setItem('refresh_token', refresh);
+        if (!!refresh)
+            localStorage.setItem('refresh_token', refresh);
     }, [context]);
 
     const login = async (username: string, password: string) => {
         const data = await context.api.auth.login(username, password);
         setToken(data.token, data.refresh_token);
+    };
+
+    const loginAsGuest = async (username: string) => {
+        const data = await context.api.auth.loginAsGuest(username);
+        setToken(data.token, data.refresh_token, username);
     };
 
     const isLoggedIn = () => {
@@ -102,6 +114,7 @@ export default function ApiProvider({ children }: { children: ReactNode }) {
     return <ApiContext.Provider value={{
         ...context,
         login,
+        loginAsGuest,
         logout,
         isLoggedIn,
         hasRole,

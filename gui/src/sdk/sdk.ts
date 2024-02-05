@@ -16,21 +16,24 @@ export class SDK {
     private autorefreshTimeout: number | null = null;
     private storeToken: StoreToken = () => { };
     private onExpired: OnExpired = () => { };
+    public guestUsername: string|null = null;
     tokenUser: TokenUser | null = null;
 
     auth: Auth;
     events: Events;
     karaoke: Karaoke;
 
-    constructor(token?: string | null, refreshToken?: string | null, storeToken?: StoreToken) {
+    constructor(token?: string | null, refreshToken?: string | null, storeToken?: StoreToken, guestUsername: string|null = null) {
+        this.guestUsername = guestUsername;
+
         this.auth = new Auth(this);
         this.events = new Events(this);
         this.karaoke = new Karaoke(this);
 
         this.storeToken = storeToken || (() => { });
 
-        if (!!token && !!refreshToken) {
-            this.setToken(token, refreshToken);
+        if (!!token && (!!guestUsername || !!refreshToken)) {
+            this.setToken(token, refreshToken || null);
         }
     }
 
@@ -178,7 +181,13 @@ export class SDK {
             clearTimeout(this.previousTokenRefresher);
         }
 
-        if (!this.refreshToken || !this.tokenUser) {
+        const isGuest = !!this.guestUsername;
+
+        if (!this.tokenUser) {
+            return;
+        }
+
+        if (!isGuest && !this.refreshToken) {
             return;
         }
 
@@ -189,7 +198,7 @@ export class SDK {
 
         if (diffSeconds < 30) {
             try {
-                const data = await this.auth.refresh(this.refreshToken);
+                const data = await this.auth.refresh(this.refreshToken || null);
                 this.setToken(data.token, data.refresh_token);
             } catch {
                 this.setToken(null, null);

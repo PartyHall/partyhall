@@ -17,6 +17,7 @@ import (
 	"github.com/partyhall/partyhall/dto"
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/middlewares"
+	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/modules"
 	"github.com/partyhall/partyhall/orm"
 	"github.com/partyhall/partyhall/remote"
@@ -27,6 +28,7 @@ import (
 func Register(g *echo.Group) {
 	g.GET("/settings", settings)
 	g.POST("/login", login)
+	g.POST("/login-guest", loginGuest)
 	g.POST("/refresh", refresh)
 
 	g.GET("/socket/:type", remote.EasyWS.Route, services.GET.EchoWsJwtMiddleware)
@@ -86,6 +88,37 @@ func login(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]string{
 		"token":         tokenString,
 		"refresh_token": newRefreshToken,
+	})
+}
+
+func loginGuest(c echo.Context) error {
+	if !config.GET.GuestsAllowed {
+		return c.NoContent(http.StatusForbidden)
+	}
+
+	type LoginRequest struct {
+		Username string `json:"username"`
+	}
+
+	var loginRequest LoginRequest
+	if err := c.Bind(&loginRequest); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid JSON format"})
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, utils.GetClaimsFromUser(&models.User{
+		Id:       0,
+		Name:     loginRequest.Username,
+		Username: loginRequest.Username,
+		Roles:    []string{"GUEST"},
+	}))
+	tokenString, err := token.SignedString(services.GET.EchoJWTPrivateKey)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Failed to generate token"})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{
+		"token":         tokenString,
+		"refresh_token": "",
 	})
 }
 

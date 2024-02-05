@@ -19,8 +19,9 @@ func BuildFrontendSettings() map[string]interface{} {
 		"app_state":    GET.CurrentState,
 		"current_mode": GET.CurrentMode,
 
-		"known_modes": config.MODES,
-		"modules":     GET.ModuleSettings,
+		"known_modes":    config.MODES,
+		"guests_allowed": config.GET.GuestsAllowed,
+		"modules":        GET.ModuleSettings,
 
 		"ip_addresses":      utils.GetIPs(),
 		"partyhall_version": utils.CURRENT_VERSION,

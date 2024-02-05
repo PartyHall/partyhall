@@ -7,6 +7,9 @@ root_path: '/home/{{ansible_user}}/data'
 # Default mode can be either PHOTOBOOTH or KARAOKE
 default_mode: 'PHOTOBOOTH'
 
+# Allow guest login (For karaoke or other stuff that should be accessible)
+guests_allowed: {{ 'true' if partyhall_guests_allowed else 'false' }}
+
 web:
   listening_addr: 127.0.0.1:8039
   admin_password: "{{partyhall_admin_password}}"

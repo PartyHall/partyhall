@@ -3,6 +3,10 @@
   tags: ['partyhall']
 
   tasks:
+    - name: 'Install partyhall dependencies'
+      become: yes
+      apt:
+        name: [ 'libvips' ]
     - name: 'Make partyhall dirs'
       become: yes
       file:
@@ -86,7 +90,10 @@
       systemd:
         name: '{{item}}'
         daemon_reload: yes
-        state: 'started'
+        state: 'restarted'
         enabled: yes
         scope: 'user'
       loop: ['partyhall', 'hardware_handler']
+
+    - name: 'Initializing with the admin account'
+      command: 'partyhall user initialize --username "{{partyhall_admin_username}}" --password "{{partyhall_admin_password}}" --name "{{partyhall_admin_fullname}}"'

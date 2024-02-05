@@ -2,6 +2,10 @@
 partyhall_debug_mode: false
 partyhall_guests_allowed: true
 
+# Admin account
+partyhall_admin_username: 'username' # Your admin username
+partyhall_admin_fullname: 'user fullname' # The name that is displayed when you choose a song
+
 # Photobooth module
 partyhall_photobooth_has_hardware_flash: false
 partyhall_photobooth_default_timer: 3
@@ -11,15 +15,17 @@ partyhall_photobooth_webcam_width: 1280
 partyhall_photobooth_webcam_height: 720
 
 # Karaoke module
-partyhall_karaoke_amt_songs_per_page: 15
+partyhall_karaoke_amt_songs_per_page: 20
 partyhall_karaoke_pre_play_timer: 5
 
 ntp_enabled: true
 ntp_timezone: Europe/Paris
 
-ethernet_interface: ens33
+ethernet_interface: enp2s0
 
-hotspot_interface: wlan0
+hotspot_enabled: true
+hotspot_interface: wlx9ca2f4bcc3da
+hotspot_driver: 'rtl8192eu'
 hotspot_ssid: "PartyHall"
-hotspot_dns_name: "partyhall.lan"
+hotspot_dns_name: "partyhall.local"
 hotspot_wifi_channel: 11

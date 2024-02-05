@@ -7,7 +7,7 @@
     # rfkill is added just so that if we setup on a non-rpi machine this does not cause issues
     - name: 'Install hotspot softwares'
       apt:
-        name: [ 'rfkill', 'dnsmasq', 'hostapd', 'firmware-ralink', 'bridge-utils', 'iptables-persistent' ]
+        name: [ 'rfkill', 'dnsmasq', 'hostapd', 'firmware-realtek', 'firmware-ralink', 'bridge-utils', 'iptables-persistent' ]
 
     - name: 'Setting up interfaces'
       template:
@@ -33,7 +33,7 @@
         name: 'rfkill-unblock.service'
         daemon_reload: yes
         enabled: yes
-        state: 'started'
+        state: 'restarted'
 
     - name: 'Setting up dnsmasq'
       template:
@@ -51,7 +51,7 @@
         name: 'dnsmasq'
         daemon_reload: yes
         enabled: yes
-        state: 'started'
+        state: 'restarted'
 
     - name: 'Make hostapd dirs'
       file:
@@ -76,7 +76,8 @@
         daemon_reload: yes
         enabled: yes
         masked: false
-        state: 'started'
+        state: 'restarted'
+      when: 'hotspot_enabled is true'
 
     - name: 'Adding iptables rules'
       iptables:
@@ -95,4 +96,4 @@
         name: 'netfilter-persistent.service'
         daemon_reload: yes
         enabled: yes
-        state: 'started'
+        state: 'restarted'

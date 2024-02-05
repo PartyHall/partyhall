@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v2
       - run: docker run -v $PWD:/app oxodao/oxbuilder:n20g21 bash -c "cd /app/gui && npm i && npm run build"
       - run: docker run -e APP_VERSION="${GITHUB_REF##*/}" -e COMMIT_HASH="${GITHUB_SHA}" -v $PWD:/app oxodao/oxbuilder:n20g21 bash -c 'cd /app && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -buildvcs=false -ldflags="-X github.com/partyhall/partyhall/utils.CURRENT_VERSION=${APP_VERSION} -X github.com/partyhall/partyhall/utils.CURRENT_COMMIT=${COMMIT_HASH}" -o partyhall-${APP_VERSION}-linux-amd64 .'
-      - run: docker run -e APP_VERSION="${GITHUB_REF##*/}" -e COMMIT_HASH="${GITHUB_SHA}" -v $PWD:/app oxodao/oxbuilder:n20g21 bash -c 'cd /app && CGO_ENABLED=1 GOOS=linux GOARCH=arm64 CC=aarch64-linux-gnu-gcc go build -buildvcs=false -ldflags="-X github.com/partyhall/partyhall/utils.CURRENT_VERSION=${APP_VERSION} -X github.com/partyhall/partyhall/utils.CURRENT_COMMIT=${COMMIT_HASH}" -o partyhall-${APP_VERSION}-linux-arm64 .'
+      #- run: docker run -e APP_VERSION="${GITHUB_REF##*/}" -e COMMIT_HASH="${GITHUB_SHA}" -v $PWD:/app oxodao/oxbuilder:n20g21 bash -c 'cd /app && CGO_ENABLED=1 GOOS=linux GOARCH=arm64 CC=aarch64-linux-gnu-gcc go build -buildvcs=false -ldflags="-X github.com/partyhall/partyhall/utils.CURRENT_VERSION=${APP_VERSION} -X github.com/partyhall/partyhall/utils.CURRENT_COMMIT=${COMMIT_HASH}" -o partyhall-${APP_VERSION}-linux-arm64 .'
       - uses: ncipollo/release-action@v1
         with:
           artifacts: "partyhall-*-*-*"

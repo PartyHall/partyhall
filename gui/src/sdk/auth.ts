@@ -17,7 +17,20 @@ export default class Auth {
         return await resp.json();
     }
 
-    async refresh(refresh_token: string): Promise<AuthResponse> {
+    async loginAsGuest(username: string): Promise<AuthResponse> {
+        const resp = await this.sdk.post('/api/login-guest', {
+            username: username,
+        });
+
+        return await resp.json();
+    }
+
+    async refresh(refresh_token: string|null): Promise<AuthResponse> {
+        // If we are a guest
+        if (this.sdk.tokenUser?.subject == '0' && this.sdk.guestUsername) {
+            return await this.loginAsGuest(this.sdk.guestUsername);
+        }
+
         const resp = await this.sdk.request('/api/refresh', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},

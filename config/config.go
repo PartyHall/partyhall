@@ -53,6 +53,8 @@ type Config struct {
 	SpotifyClientID     string `yaml:"spotify_client_id"`
 	SpotifyClientSecret string `yaml:"spotify_client_secret"`
 
+	GuestsAllowed bool `yaml:"guests_allowed"`
+
 	Modules []string
 }
 

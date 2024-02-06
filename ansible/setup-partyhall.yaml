@@ -7,6 +7,13 @@
       become: yes
       apt:
         name: [ 'libvips' ]
+
+    - name: 'Adding the user to the serial group'
+      become: yes
+      user:
+        name: '{{ansible_user}}'
+        groups: ['dialout', 'audio', 'video', 'dip', 'plugdev', 'users', 'netdev', '{{ansible_user}}', 'wheel']
+
     - name: 'Make partyhall dirs'
       become: yes
       file:

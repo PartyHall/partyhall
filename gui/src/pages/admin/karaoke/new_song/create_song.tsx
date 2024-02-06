@@ -7,12 +7,14 @@ import SearchSpotify from "./search_spotify";
 import { useSnackbar } from "../../../../hooks/snackbar";
 import { useApi } from "../../../../hooks/useApi";
 import { COVER_SOURCE, FORMAT, SongPost } from "../../../../sdk/requests/song";
+import { useTranslation } from "react-i18next";
 
 export default function CreateSong() {
     const {api} = useApi();
+    const {t} = useTranslation();
     const {showSnackbar} = useSnackbar();
     const [coverSource, setCoverSource] = useState<COVER_SOURCE>('LINK');
-    const [format, setFormat] = useState<FORMAT>('CDG');
+    const [songFormat, setFormat] = useState<FORMAT>('CDG');
     const [title, setTitle] = useState<string>("");
     const [artist, setArtist] = useState<string>("");
 
@@ -37,31 +39,31 @@ export default function CreateSong() {
 
     return <form onSubmit={handleSubmit(submit)}>
         <Stack direction="column" gap={2}>
-            <TextField required placeholder="Title" {...register('title')} onChange={x => {
+            <TextField required placeholder={t('karaoke.title')} {...register('title')} onChange={x => {
                 setTitle(x.target.value);
                 register('title').onChange(x);
             }} />
-            <TextField required placeholder="Artist" {...register('artist')} onChange={x => {
+            <TextField required placeholder={t('karaoke.artist')} {...register('artist')} onChange={x => {
                 setArtist(x.target.value);
                 register('artist').onChange(x);
             }} />
             <FormControl fullWidth>
-                <InputLabel id="label_select_cover_source">Cover source</InputLabel>
-                <Select required defaultValue='LINK' placeholder='Cover source' labelId='label_select_cover_source' {...register('cover_type')} onChange={x => {
+                <InputLabel id="label_select_cover_source">{t('karaoke.cover_source')}</InputLabel>
+                <Select required defaultValue='LINK' placeholder={t('karaoke.cover_source')} labelId='label_select_cover_source' {...register('cover_type')} onChange={x => {
                     setCoverSource(x.target.value as COVER_SOURCE);
                     register('cover_type').onChange(x);
                 }}>
-                    <MenuItem value='NO_COVER'>No cover</MenuItem>
+                    <MenuItem value='NO_COVER'>{t('karaoke.no_cover')}</MenuItem>
                     <MenuItem value='LINK'>Spotify</MenuItem>
-                    <MenuItem value='UPLOADED'>Upload</MenuItem>
+                    <MenuItem value='UPLOADED'>{t('karaoke.uploaded')}</MenuItem>
                 </Select>
             </FormControl>
 
             { coverSource === 'LINK' && <SearchSpotify artist={artist} title={title} onChange={x => setValue('cover_data', x)}/> }
 
             <FormControl fullWidth>
-                <InputLabel id="label_select_format">Format</InputLabel>
-                <Select required defaultValue='CDG' placeholder='Format' labelId='label_select_format' {...register('format')} onChange={x => {
+                <InputLabel id="label_select_format">{t('karaoke.format')}</InputLabel>
+                <Select required defaultValue='CDG' placeholder={t('karaoke.format')} labelId='label_select_format' {...register('format')} onChange={x => {
                     setFormat(x.target.value as FORMAT);
                     register('format').onChange(x)
                     resetField('song')
@@ -75,7 +77,7 @@ export default function CreateSong() {
 
             <Stack direction="column" gap={2} justifyContent="center">
                 <Button variant="contained" component="label" color="primary">
-                    <MusicNoteIcon/> Upload {format === 'CDG' ? 'mp3' : format}
+                    <MusicNoteIcon/> {t('karaoke.upload', {format: (songFormat === 'CDG' ? 'mp3' : songFormat)})}
                     <input type="file" hidden required {...register('song')} onChange={x => {
                         register('song').onChange(x);
                         if (x.target.files && x.target.files.length > 0) {
@@ -87,10 +89,10 @@ export default function CreateSong() {
                 <Typography variant="body1" textAlign="center">{songFilename}</Typography>
 
                 {
-                    format === 'CDG' &&
+                    songFormat === 'CDG' &&
                     <>
                         <Button variant="contained" component="label" color="primary">
-                            <LyricsIcon/> Upload CDG
+                            <LyricsIcon/> {t('karaoke.upload', {format: 'CDG'})}
                             <input type="file" hidden required {...register('cdg')} onChange={x => {
                                 register('cdg').onChange(x);
                                 if (x.target.files && x.target.files.length > 0) {
@@ -107,8 +109,8 @@ export default function CreateSong() {
             <Button
                 variant='outlined'
                 type='submit'
-                disabled={songFilename.length === 0 || (format === 'CDG' && cdgFilename.length === 0)}
-            >Add song</Button>
+                disabled={songFilename.length === 0 || (songFormat === 'CDG' && cdgFilename.length === 0)}
+            >{t('karaoke.add')}</Button>
         </Stack>
     </form>;
 }

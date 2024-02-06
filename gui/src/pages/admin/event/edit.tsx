@@ -11,6 +11,7 @@ import { Event, EditedEvent } from '../../../types/appstate';
 import { useAdminSocket } from "../../../hooks/adminSocket";
 import { useApi } from "../../../hooks/useApi";
 import { useSnackbar } from "../../../hooks/snackbar";
+import { useTranslation } from "react-i18next";
 
 const getEmptyEvent = (): EditedEvent => ({
     id: '',
@@ -31,6 +32,7 @@ function getEditedEventFromEvent(event: Event): EditedEvent {
 }
 
 export default function EditEvent() {
+    const {t} = useTranslation();
     const {showSnackbar} = useSnackbar();
     const { appState } = useAdminSocket();
     const { api } = useApi();
@@ -63,7 +65,7 @@ export default function EditEvent() {
         }
     }, [eventId]);
 
-    const title = !eventId ? "Creating event" : ("Editing event " + (editedEvent?.name ?? ''));
+    const title = !eventId ? t('event.create') : (t('event.edit', {name: (editedEvent?.name ?? '')}));
     const save = async (data: EditedEvent) => {
         try {
             await api.events.save(data);
@@ -92,7 +94,7 @@ export default function EditEvent() {
                         name="name"
                         control={control}
                         render={({ field }) => <TextField
-                            label="Name"
+                            label={t('event.name')}
                             InputLabelProps={{ required: false }}
                             required
                             {...field}
@@ -103,7 +105,7 @@ export default function EditEvent() {
                         name="author"
                         control={control}
                         render={({ field }) => <TextField
-                            label="Author"
+                            label={t('event.host')}
                             InputLabelProps={{ required: false }}
                             required
                             {...field}
@@ -115,7 +117,7 @@ export default function EditEvent() {
                         control={control}
                         render={({ field }) => <LocalizationProvider dateAdapter={AdapterLuxon}>
                             <DateTimePicker
-                                label="Date"
+                                label={t('event.date')}
                                 //@ts-ignore
                                 renderInput={(props: any) => <TextField {...props} />}
                                 InputProps={{ required: true }}
@@ -130,12 +132,12 @@ export default function EditEvent() {
                         name="location"
                         control={control}
                         render={({ field }) => <TextField
-                            label="Location"
+                            label={t('event.location')}
                             {...field}
                         />}
                     />
 
-                    <Button type="submit">Save</Button>
+                    <Button type="submit">{t('event.save')}</Button>
                 </CardContent>
             </Card>
         </form>

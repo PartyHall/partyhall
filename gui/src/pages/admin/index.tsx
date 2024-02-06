@@ -7,9 +7,11 @@ import { useConfirmDialog } from "../../hooks/dialog";
 import { useAdminSocket } from "../../hooks/adminSocket";
 import { useNavigate } from "react-router-dom";
 import { useApi } from "../../hooks/useApi";
+import { useTranslation } from "react-i18next";
 
 export default function AdminIndex() {
     const { hasRole } = useApi();
+    const { t } = useTranslation();
     const { sendMessage, appState, currentTime } = useAdminSocket();
     const { showDialog } = useConfirmDialog();
     const navigate = useNavigate();
@@ -54,7 +56,7 @@ export default function AdminIndex() {
     return <>
         <Card>
             <CardContent>
-                <Typography variant="h2" fontSize={18}>Current event</Typography>
+                <Typography variant="h2" fontSize={18}>{t('admin_main.current_event')}</Typography>
                 {
                     appState.known_events.length > 0
                     &&
@@ -86,7 +88,7 @@ export default function AdminIndex() {
             !!appState.known_modes && appState.known_modes.length > 0
             && <Card>
                 <CardContent>
-                    <Typography variant="h2" fontSize={18}>Mode</Typography>
+                    <Typography variant="h2" fontSize={18}>{t('admin_main.mode')}</Typography>
                     {
                         appState?.current_mode &&
                         <Select value={appState.current_mode} label="Mode" onChange={(evt: SelectChangeEvent) => sendMessage('SET_MODE', evt.target.value)} style={{ marginTop: '1em' }} disabled={!hasRole('ADMIN')}>
@@ -100,16 +102,16 @@ export default function AdminIndex() {
         }
         <Card>
             <CardContent>
-                <Typography variant="h2" fontSize={18}>System info</Typography>
+                <Typography variant="h2" fontSize={18}>{t('admin_main.system_info')}</Typography>
                 <Box mt={2}>
                     <Typography variant="body1" color="GrayText">PartyHall {appState.partyhall_version} ({appState.partyhall_commit})</Typography>
-                    <Typography variant="body1" color="GrayText">Current time: {currentTime}</Typography>
+                    <Typography variant="body1" color="GrayText">{t('admin_main.current_time')}: {currentTime}</Typography>
                 </Box>
             </CardContent>
             <CardActions>
                 {
                     hasRole('ADMIN') &&
-                    <Button style={{ width: '100%' }} onClick={() => sendMessage('SET_DATETIME', DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'))}>Set to my device's time</Button>
+                    <Button style={{ width: '100%' }} onClick={() => sendMessage('SET_DATETIME', DateTime.now().toFormat('yyyy-MM-dd HH:mm:ss'))}>{t('admin_main.set_to_my_time')}</Button>
                 }
             </CardActions>
         </Card>
@@ -118,7 +120,7 @@ export default function AdminIndex() {
             hasRole('ADMIN') &&
             <Card>
                 <CardActions>
-                    <Button style={{ width: '100%' }} onClick={() => sendMessage('DISPLAY_DEBUG', null)}>Show debug info (30 sec)</Button>
+                    <Button style={{ width: '100%' }} onClick={() => sendMessage('DISPLAY_DEBUG', null)}>{t('admin_main.show_debug_info')}</Button>
                 </CardActions>
             </Card>
         }
@@ -127,7 +129,7 @@ export default function AdminIndex() {
             hasRole('ADMIN') &&
             <Card>
                 <CardActions>
-                    <Button style={{ width: '100%' }} color="error" onClick={shutdown}>Shutdown</Button>
+                    <Button style={{ width: '100%' }} color="error" onClick={shutdown}>{t('admin_main.shutdown')}</Button>
                 </CardActions>
             </Card>
         }

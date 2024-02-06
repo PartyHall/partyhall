@@ -1,14 +1,10 @@
 import { Stack, Typography } from "@mui/material";
 import { KaraokeSong } from "../../../types/appstate";
 
-import { useAdminSocket } from "../../../hooks/adminSocket";
 import { useRef } from "react";
-import { useSnackbar } from "../../../hooks/snackbar";
 
 export default function OsdSong({ song }: { song: KaraokeSong }) {
     const imgRef = useRef<HTMLImageElement>(null);
-    const { sendMessage } = useAdminSocket();
-    const { showSnackbar } = useSnackbar();
 
     const onImgError = () => {
         if (!imgRef.current) {

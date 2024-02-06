@@ -9,8 +9,10 @@ import { songTitle } from "../../../utils/songs";
 import OsdSong from "./osd_song";
 import VideoPlayer from "./videoplayer";
 import { b64ImageToBlob } from "../../../utils/files";
+import { useTranslation } from "react-i18next";
 
 export default function Karaoke() {
+    const {t} = useTranslation();
     const { appState, lastMessage, sendMessage } = useBoothSocket();
     const webcamRef = useRef<Webcam>(null);
     const module = appState.modules.karaoke;
@@ -90,25 +92,25 @@ export default function Karaoke() {
         {
             module.currentSong && module.preplayTimer > 0 &&
             <Stack display="column" className="karaoke__no_song">
-                <Typography variant="h1">Now playing:</Typography>
+                <Typography variant="h1">{t('karaoke.now_playing')}:</Typography>
                 <Typography variant="h2">{songTitle(module.currentSong)}</Typography>
                 <Typography variant="h3">{module.preplayTimer}</Typography>
                 {
                     module.currentSong.sung_by && module.currentSong.sung_by.length > 0 &&
-                    <Typography variant="h2">Sung by {module.currentSong.sung_by}</Typography>
+                    <Typography variant="h2">{t('karaoke.sung_by')} {module.currentSong.sung_by}</Typography>
                 }
             </Stack>
         }
         {
             !module.currentSong &&
             <Stack display="column" className="karaoke__no_song">
-                <Typography variant="h1">No song playing !</Typography>
+                <Typography variant="h1">{t('karaoke.no_song_playing')}</Typography>
             </Stack>
         }
         {
             module.queue.length > 0 &&
             <Stack className="karaoke__next_song" gap={1}>
-                <Typography variant="h3">Next up:</Typography>
+                <Typography variant="h3">{t('karaoke.next_up')}:</Typography>
                 <OsdSong song={module.queue[0]} />
             </Stack>
         }

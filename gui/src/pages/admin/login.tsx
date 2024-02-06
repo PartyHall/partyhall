@@ -52,7 +52,6 @@ export default function Login() {
                 </CardContent>
                 <CardActions>
                     <Switch onChange={(_, x) => {
-                        console.log("Login as user: ", x)
                         setLoginAsUser(x)
                     }} value={loginAsUser} />
                     <Button style={{ width: '100%' }} size="small" type="submit" variant="outlined">Login</Button>

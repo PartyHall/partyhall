@@ -3,8 +3,10 @@ import { Navigate, useOutlet } from "react-router-dom";
 import { useApi } from "../hooks/useApi";
 import useKeyPress from "../hooks/useKeyPress";
 import { useBoothSocket } from "../hooks/boothSocket";
+import { useTranslation } from "react-i18next";
 
 export default function BoothLayout() {
+    const {t} = useTranslation();
     const outlet = useOutlet();
     const {socketMode} = useApi();
     const { appState, currentTime, showDebug } = useBoothSocket();
@@ -24,7 +26,7 @@ export default function BoothLayout() {
     }
 
     const datetime = currentTime ?? 'Datetime not available';
-    const eventName = !!appState.app_state?.current_event ? appState.app_state.current_event.name : 'No event selected !';
+    const eventName = !!appState.app_state?.current_event ? appState.app_state.current_event.name : t('osd.no_event');
 
     const D = (title: string, child: ReactNode) => <div><span style={{ fontWeight: 'bold' }}>{title}</span>: {child}</div>
 

@@ -6,6 +6,8 @@ partyhall_guests_allowed: true
 partyhall_admin_username: 'username' # Your admin username
 partyhall_admin_fullname: 'user fullname' # The name that is displayed when you choose a song
 
+partyhall_language: 'en' # Either en or fr, lowercase only!
+
 # Photobooth module
 partyhall_photobooth_has_hardware_flash: false
 partyhall_photobooth_default_timer: 3

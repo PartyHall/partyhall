@@ -10,6 +10,7 @@ import KaraokeIcon from '@mui/icons-material/Mic';
 import { useApi } from "../hooks/useApi";
 import { useState } from "react";
 import { useAdminSocket } from "../hooks/adminSocket";
+import { useTranslation } from "react-i18next";
 
 type State = {
     menuOpen: boolean;
@@ -21,6 +22,7 @@ const linkStyle = {
 };
 
 export default function AdminLayout() {
+    const {t} = useTranslation();
     const outlet = useOutlet();
     const { socketMode, isLoggedIn, logout, hasRole } = useApi();
     const { appState } = useAdminSocket();
@@ -42,7 +44,7 @@ export default function AdminLayout() {
         <AppBar position="static">
             <Toolbar>
                 <IconButton size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }} onClick={() => setState({ ...state, menuOpen: true })}><MenuIcon /></IconButton>
-                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>Mode: {appState?.current_mode}</Typography>
+                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>{t('admin_main.mode')}: {appState?.current_mode}</Typography>
                 <IconButton size="large" edge="start" color="inherit" aria-label="menu" onClick={logout}><LogoutIcon /></IconButton>
             </Toolbar>
         </AppBar>
@@ -54,7 +56,7 @@ export default function AdminLayout() {
                         <ListItem disablePadding>
                             <ListItemButton>
                                 <ListItemIcon><SettingsIcon /></ListItemIcon>
-                                <ListItemText primary="Settings" />
+                                <ListItemText primary={t('admin_main.settings')} />
                             </ListItemButton>
                         </ListItem>
                     </Link>
@@ -64,7 +66,7 @@ export default function AdminLayout() {
                             <ListItem disablePadding>
                                 <ListItemButton>
                                     <ListItemIcon><PhotoIcon /></ListItemIcon>
-                                    <ListItemText primary="Photobooth" />
+                                    <ListItemText primary={t('admin_main.photobooth')} />
                                 </ListItemButton>
                             </ListItem>
                         </Link>
@@ -73,7 +75,7 @@ export default function AdminLayout() {
                         <ListItem disablePadding>
                             <ListItemButton>
                                 <ListItemIcon><KaraokeIcon /></ListItemIcon>
-                                <ListItemText primary="Karaoke" />
+                                <ListItemText primary={t('admin_main.karaoke')} />
                             </ListItemButton>
                         </ListItem>
                     </Link>

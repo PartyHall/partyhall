@@ -10,8 +10,10 @@ import { useAdminSocket } from "../../hooks/adminSocket";
 import { EventExport } from "../../types/event_export";
 import { useSnackbar } from "../../hooks/snackbar";
 import { useConfirmDialog } from "../../hooks/dialog";
+import { useTranslation } from "react-i18next";
 
 export default function ExportListing() {
+    const {t} = useTranslation();
     const { showSnackbar } = useSnackbar();
     const { showDialog } = useConfirmDialog();
     const { api } = useApi();
@@ -48,7 +50,7 @@ export default function ExportListing() {
         try {
             const resp = await api.events.downloadExport(id);
             if (resp.status != 200) {
-                throw 'Failed to download file';
+                throw t('exports.failed_to_download');
             }
 
             const filename = resp.headers.get('Content-Disposition')?.split('filename=')[1] ?? 'partyhall.zip';
@@ -59,19 +61,15 @@ export default function ExportListing() {
             anchor.href = window.URL.createObjectURL(data);
             anchor.click();
         } catch (e) {
-            showSnackbar('An error has occured: ' + e, 'error');
+            showSnackbar(t('general.export_occured') + ': ' + e, 'error');
         }
         setDownloadInProgress(false);
     };
 
     const askExport = () => showDialog(
-        'Export as zip',
-        <>
-            You are trying to export the event {appState.app_state.current_event?.name}. <br />
-            This will create a zip with all the pictures and let you download, thus it could take a long time. <br />
-            Are you sure you want to continue ?
-        </>,
-        'Export',
+        t('exports.export_as_zip'),
+        <div dangerouslySetInnerHTML={{__html: t('exports.modal_infos', {name: appState.app_state.current_event?.name})}} />,
+        t('exports.export'),
         async () => {
             exportAsZip();
         },
@@ -80,13 +78,13 @@ export default function ExportListing() {
     return <>
         <Card>
             <CardContent>
-                <Typography variant="h2" fontSize={18}>Last exports</Typography>
+                <Typography variant="h2" fontSize={18}>{t('exports.last_exports')}</Typography>
                 <TableContainer component={Paper}>
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell>File</TableCell>
-                                <TableCell>Date</TableCell>
+                                <TableCell>{t('exports.file')}</TableCell>
+                                <TableCell>{t('exports.date')}</TableCell>
                                 <TableCell></TableCell>
                             </TableRow>
                         </TableHead>
@@ -108,7 +106,7 @@ export default function ExportListing() {
                 </TableContainer>
             </CardContent>
             <CardActions>
-                <Button style={{ width: '100%' }} color="error" onClick={askExport}>Export as zip</Button>
+                <Button style={{ width: '100%' }} color="error" onClick={askExport}>{t('exports.export_as_zip')}</Button>
             </CardActions>
         </Card>
     </>

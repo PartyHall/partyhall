@@ -2,6 +2,7 @@ import { Card, CardContent, LinearProgress, List, Slider, Stack, Typography } fr
 import { useAdminSocket } from "../../../hooks/adminSocket"
 import Song from "./song";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const secondsToDisplay = (seconds: number) => {
     if (seconds < 0) {
@@ -15,6 +16,7 @@ const secondsToDisplay = (seconds: number) => {
 };
 
 export default function KaraokeQueue() {
+    const {t} = useTranslation();
     const [currentPosition, setCurrentPosition] = useState<number>(0);
     const [duration, setDuration] = useState<number>(-1);
 
@@ -33,7 +35,7 @@ export default function KaraokeQueue() {
             module.currentSong && <Card elevation={2}>
                 <CardContent>
                     <Stack gap={3}>
-                        <Typography variant="h4">Current:</Typography>
+                        <Typography variant="h4">{t('karaoke.current')}:</Typography>
                         <Song song={module.currentSong} type="QUEUE" mb={0} />
                         <Stack direction="row" gap={3}>
                             <Typography variant={"body1"}>{secondsToDisplay(currentPosition)}</Typography>
@@ -45,8 +47,8 @@ export default function KaraokeQueue() {
             </Card>
         }
 
-        <Typography variant="h4">Queue:</Typography>
-        {module.queue.length == 0 && <Typography variant="body1">Empty queue</Typography>}
+        <Typography variant="h4">{t('karaoke.queue')}:</Typography>
+        {module.queue.length == 0 && <Typography variant="body1">{t('karaoke.empty_queue')}</Typography>}
         <Stack flex="1 1 0" style={{overflowY: 'scroll'}}>
             <List>
                 { module.queue.map((x, idx) => <Song 

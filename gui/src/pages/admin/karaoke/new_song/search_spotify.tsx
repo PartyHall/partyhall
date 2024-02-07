@@ -5,6 +5,7 @@ import {faSpotify as SpotifyIcon} from '@fortawesome/free-brands-svg-icons';
 import { useState } from "react";
 import { useApi } from "../../../../hooks/useApi";
 import { ApiSong } from "../../../../sdk/responses/karaoke";
+import { useTranslation } from "react-i18next";
 
 type Props = {
     artist: string;
@@ -15,6 +16,7 @@ type Props = {
 
 export default function SearchSpotify({ artist, title, onChange }: Props) {
     const {api} = useApi();
+    const {t} = useTranslation();
     const [loading, setLoading] = useState<boolean>(false);
     const [results, setResults] = useState<ApiSong[]|null>(null);
 
@@ -34,7 +36,7 @@ export default function SearchSpotify({ artist, title, onChange }: Props) {
             onClick={searchSpotify}
             disabled={loading || artist.length == 0 || title.length == 0}
         >
-            Search
+            {t('karaoke.search')}
         </Button>
 
         {

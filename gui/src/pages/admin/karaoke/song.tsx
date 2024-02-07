@@ -14,6 +14,7 @@ import { useSnackbar } from "../../../hooks/snackbar";
 import { useRef } from "react";
 import { useConfirmDialog } from "../../../hooks/dialog";
 import { songTitle } from "../../../utils/songs";
+import { useTranslation } from "react-i18next";
 
 // interface SongProps extends React.HTMLAttributes<HTMLDivElement>{
 interface SongProps extends StackProps {
@@ -26,6 +27,7 @@ interface SongProps extends StackProps {
 export default function Song(props: SongProps) {
     const imgRef = useRef<HTMLImageElement>(null);
     const { appState } = useAdminSocket();
+    const {t} = useTranslation();
     const { sendMessage } = useAdminSocket();
     const { showSnackbar } = useSnackbar();
 
@@ -65,7 +67,7 @@ export default function Song(props: SongProps) {
             <Typography variant="body1" fontSize=".6em" color="GrayText">{props.song.format}</Typography>
             {
                 props.song.sung_by && props.song.sung_by.length > 0 &&
-                <Typography variant="body1" fontSize="1em" color="GrayText">Sung by {props.song.sung_by}</Typography>
+                <Typography variant="body1" fontSize="1em" color="GrayText">{t('karaoke.sung_by')} {props.song.sung_by}</Typography>
             }
         </Stack>
         <Stack direction="column" alignItems="center">
@@ -74,9 +76,9 @@ export default function Song(props: SongProps) {
                 <IconButton onClick={() => {
                     if (module.currentSong != null) {
                         showDialog(
-                            "Skipping song?",
-                            "There is a song currently playing. You might want to put it in queue instead.",
-                            "Skip & Play",
+                            t('karaoke.skip.title'),
+                            t('karaoke.skip.content'),
+                            t('karaoke.skip.skip_and_play'),
                             async () => sendMessage('karaoke/PLAY', props.song.filename)
                         )
                     } else {
@@ -99,7 +101,7 @@ export default function Song(props: SongProps) {
                 props.type === 'SEARCH' &&
                 <IconButton onClick={() => {
                     sendMessage('karaoke/ADD_TO_QUEUE', props.song.filename);
-                    showSnackbar('Adding song to the queue', 'success');
+                    showSnackbar(t('karaoke.adding_to_queue'), 'success');
                 }} disabled={module.queue.map(x => x.id).includes(props.song.id) || (module.currentSong && props.song.id == module.currentSong.id)}>
                     <AddToQueueIcon />
                 </IconButton>
@@ -109,19 +111,19 @@ export default function Song(props: SongProps) {
                 <IconButton onClick={() => {
                     if (module.currentSong && module.currentSong.filename === props.song.filename) {
                         showDialog(
-                            "Skip current song",
-                            "Are you sure you want to skip the currently playing song?",
-                            "Skip",
+                            t('karaoke.current_remove.title'),
+                            t('karaoke.current_remove.content', {name: songTitle(props.song)}),
+                            t('karaoke.current_remove.remove'),
                             async () => sendMessage('karaoke/DEL_FROM_QUEUE', props.song.filename),
                         );
                     } else {
                         showDialog(
-                            "Remove from the queue",
-                            `Are you sure you want to remove "${songTitle(props.song)}" from the queue?`,
-                            "Remove",
+                            t('karaoke.skip.title'),
+                            t('karaoke.skip.content'),
+                            t('karaoke.skip.skip'),
                             async () => {
                                 sendMessage('karaoke/DEL_FROM_QUEUE', props.song.filename);
-                                showSnackbar('Removing song from the queue', 'error');
+                                showSnackbar(t('karaoke.queue_remove.removed'), 'error');
                             }
                         );
                     }

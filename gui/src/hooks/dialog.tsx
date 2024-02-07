@@ -1,5 +1,6 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from "@mui/material";
 import { createContext, ReactNode, useContext, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 type ConfirmDialogProps = {
     open: boolean;
@@ -27,6 +28,7 @@ const ConfirmDialogContext = createContext<ConfirmDialogContextProps>({
 });
 
 export default function ConfirmDialogProvider({ children }: { children: ReactNode }) {
+    const {t} = useTranslation();
     const [context, setContext] = useState<ConfirmDialogProps>(defaultState);
 
     const show = (title: string, message: string | ReactNode, validateButton: string, action: () => Promise<void>) => setContext({ ...context, open: true, title, message, validateButton, action });
@@ -43,7 +45,7 @@ export default function ConfirmDialogProvider({ children }: { children: ReactNod
                 <DialogContentText>{context.message}</DialogContentText>
             </DialogContent>
             <DialogActions>
-                <Button onClick={close}>Cancel</Button>
+                <Button onClick={close}>{t('general.cancel')}</Button>
                 <Button onClick={async () => {
                     await context.action();
                     close();

@@ -7,10 +7,12 @@ import { useApi } from "../../../hooks/useApi";
 import { PaginatedResponse } from "../../../sdk/responses/paginated_responses";
 import Loader from "../../../components/loader";
 import Song from "./song";
+import { useTranslation } from "react-i18next";
 
 // @TODO: debounce
 export default function KaraokeSearch() {
     const [wasSearch, setWasSearch] = useState<boolean>(false);
+    const {t} = useTranslation();
     const {api} = useApi();
 
     const [loading, setLoading] = useState<boolean>(true);
@@ -37,7 +39,7 @@ export default function KaraokeSearch() {
     }, [search, page]);
 
     return <Stack direction="column" alignItems="stretch" flex={1} gap={1}>
-        <TextField placeholder="Search..." value={search} onChange={x => setSearch(x.target.value)}/>
+        <TextField placeholder={t('karaoke.search') + '...'} value={search} onChange={x => setSearch(x.target.value)}/>
         <Loader loading={loading}>
             <Stack direction="column" gap={1} pt={1} flex="1 1 0" style={{overflowY: 'scroll'}}>
                 { 
@@ -47,7 +49,7 @@ export default function KaraokeSearch() {
             </Stack>
         </Loader>
         <Stack direction="column" alignItems="center" justifyContent="center" gap={2}>
-            <Typography variant="body1">Amt of songs: {apiResponse?.meta.total}</Typography>
+            <Typography variant="body1">{t('karaoke.amt_songs')}: {apiResponse?.meta.total}</Typography>
             <Pagination 
                 count={apiResponse?.meta.last_page}
                 shape="rounded"

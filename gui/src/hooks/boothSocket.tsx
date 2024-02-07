@@ -6,6 +6,7 @@ import { WsMessage } from "../types/ws_message";
 import { useSnackbar } from "./snackbar";
 import { SOCKET_MODE_DEBUG } from "./useApi";
 import useRefresher from "./useRefresher";
+import { useTranslation } from "react-i18next";
 
 type WebsocketProps = {
     lastMessage: WsMessage | null;
@@ -37,6 +38,8 @@ const WebsocketContext = createContext<WebsocketContextProps>({
 });
 
 export default function BoothSocketProvider({ children }: { children: ReactNode }) {
+    const { i18n } = useTranslation();
+    const [currentLanguage, setCurrentLanguage] = useState<string>('en');
     const { sendJsonMessage, lastMessage, readyState } = useWebSocket(
         `ws://${window.location.host}/api/socket/booth`,
         {
@@ -83,6 +86,19 @@ export default function BoothSocketProvider({ children }: { children: ReactNode 
 
         setContext(newContext);
     }, [lastMessage]);
+
+    useEffect(() => {
+        if (!ctx.appState || !ctx.appState.language) {
+            return;
+        }
+
+        if (ctx.appState.language === currentLanguage) {
+            return;
+        }
+
+        i18n.changeLanguage(ctx.appState.language);
+        setCurrentLanguage(ctx.appState.language);
+    }, [ctx]);
 
     return <WebsocketContext.Provider value={{
         ...ctx,

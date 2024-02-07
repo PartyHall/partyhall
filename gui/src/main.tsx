@@ -40,11 +40,11 @@ i18n
   .use(initReactI18next)
   .init({
     resources: {
-      en: {translation: ENGLISH},
-      fr: {translation: FRENCH},
+      en: { translation: ENGLISH },
+      fr: { translation: FRENCH },
     },
-    lng: "fr",
-    fallbackLng: "en",
+    lng: 'en',
+    fallbackLng: 'en',
     interpolation: {
       // react already safes from xss => https://www.i18next.com/translation-function/interpolation#unescape
       escapeValue: false,

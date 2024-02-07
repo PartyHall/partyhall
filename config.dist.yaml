@@ -25,6 +25,7 @@ hardware_handler:
     BTN_1: DISPLAY_DEBUG
     BTN_2: SHUTDOWN
 
+language: en
 spotify_client_id: ''
 spotify_client_secret: ''
 

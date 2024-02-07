@@ -7,6 +7,12 @@ export const FRENCH = {
     osd: {
         no_event: "Pas d'évènement sélectionné !"
     },
+    login: {
+        name: 'Nom affiché',
+        username: 'Pseudo',
+        password: 'Mot de passe',
+        bt: 'Connexion',
+    },
     admin_main: {
         current_event: "Event sélectionné",
         mode: "Mode",

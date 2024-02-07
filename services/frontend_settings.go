@@ -7,6 +7,10 @@ import (
 	"github.com/partyhall/partyhall/utils"
 )
 
+// @TODO: Kick this fcking function
+// its a pain to maintain, its badly engineered
+// it makes cycle imports everywhere, it should not work like that
+// burn it with fire
 func BuildFrontendSettings() map[string]interface{} {
 	if GET.CurrentState.CurrentEvent != nil {
 		evt, err := orm.GET.Events.GetEvent(*GET.CurrentState.CurrentEvent)
@@ -23,6 +27,7 @@ func BuildFrontendSettings() map[string]interface{} {
 		"guests_allowed": config.GET.GuestsAllowed,
 		"modules":        GET.ModuleSettings,
 
+		"language":          config.GET.Language,
 		"ip_addresses":      utils.GetIPs(),
 		"partyhall_version": utils.CURRENT_VERSION,
 		"partyhall_commit":  utils.CURRENT_COMMIT,

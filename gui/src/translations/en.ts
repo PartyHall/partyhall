@@ -7,6 +7,12 @@ export const ENGLISH = {
     osd: {
         no_event: "No event selected !"
     },
+    login: {
+        name: 'Displayed name',
+        username: 'Username',
+        password: 'Password',
+        bt: 'Login',
+    },
     admin_main: {
         current_event: "Selected event",
         mode: "Mode",
@@ -38,7 +44,7 @@ export const ENGLISH = {
         save: "Save"
     },
     karaoke: {
-        no_song_playing: "No music plaing",
+        no_song_playing: "No music playing",
         now_playing: "Now playing",
         sung_by: "Sung by",
         next_up: "Next up",

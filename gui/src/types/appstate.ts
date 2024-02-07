@@ -70,4 +70,5 @@ export type AppState = {
 
     partyhall_version: string;
     partyhall_commit: string;
+    language: string;
 };

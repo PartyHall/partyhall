@@ -5,6 +5,7 @@ import { AppState } from "../types/appstate";
 import { WsMessage } from "../types/ws_message";
 import { useSnackbar } from "./snackbar";
 import { SOCKET_MODE_DEBUG, useApi } from "./useApi";
+import { useTranslation } from "react-i18next";
 
 type WebsocketProps = {
     lastMessage: WsMessage | null;
@@ -29,6 +30,8 @@ const WebsocketContext = createContext<WebsocketContextProps>({
 });
 
 export default function AdminSocketProvider({ children }: { children: ReactNode }) {
+    const { i18n } = useTranslation();
+    const [currentLanguage, setCurrentLanguage] = useState<string>('en');
     const { api, logout } = useApi();
     const { sendJsonMessage, lastMessage, readyState } = useWebSocket(
         `ws://${window.location.host}/api/socket/admin`,
@@ -36,7 +39,7 @@ export default function AdminSocketProvider({ children }: { children: ReactNode 
             shouldReconnect: () => true,
             reconnectAttempts: 10,
             reconnectInterval: 3000,
-            queryParams: {token: api.getToken() ?? ''},
+            queryParams: { token: api.getToken() ?? '' },
             onError: () => logout(), // @TODO: find a way to check if 401 and only in this case logout
         }
     );
@@ -75,6 +78,19 @@ export default function AdminSocketProvider({ children }: { children: ReactNode 
                 setContext({ ...ctx, lastMessage: data });
         }
     }, [lastMessage]);
+
+    useEffect(() => {
+        if (!ctx.appState || !ctx.appState.language) {
+            return;
+        }
+
+        if (ctx.appState.language === currentLanguage) {
+            return;
+        }
+
+        i18n.changeLanguage(ctx.appState.language);
+        setCurrentLanguage(ctx.appState.language);
+    }, [ctx]);
 
     return <WebsocketContext.Provider value={{
         ...ctx,

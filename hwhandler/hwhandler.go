@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -14,14 +15,11 @@ import (
 
 var client mqtt.Client
 
-var lastButtonPress string = ""
-var lastButtonPressTime time.Time = time.Now()
-
-// @TODO:
-// PINGPONG with the arduino & autorestart when its not working
-
 type HardwareHandler struct {
-	PortName string
+	PortName            string
+	LastPing            time.Time
+	LastButtonPress     string
+	LastButtonPressTime time.Time
 }
 
 func Load() error {
@@ -49,6 +47,17 @@ func (hh *HardwareHandler) ProcessSerialConn() {
 		fmt.Println(err)
 		return
 	}
+	hh.LastPing = time.Now()
+
+	go func() {
+		for {
+			time.Sleep(time.Second)
+			if hh.LastPing.Add(15 * time.Second).Before(time.Now()) {
+				fmt.Println("No ping received for the last 15 seconds. Crashing !")
+				os.Exit(1)
+			}
+		}
+	}()
 
 	for {
 		line, err := hh.readLine(port)
@@ -109,16 +118,16 @@ func (hh *HardwareHandler) processSerialMessage(msg string) {
 		}
 
 		currTime := time.Now()
-		diff := currTime.Sub(lastButtonPressTime).Seconds()
+		diff := currTime.Sub(hh.LastButtonPressTime).Seconds()
 
 		// Debounce
-		if lastButtonPress != val || diff > 1 {
+		if hh.LastButtonPress != val || diff > 1 {
 			topic := config.GetMqttTopic("", strings.ToLower(val))
 			fmt.Println("Button pressed: ", msg, " sending ", topic)
 			client.Publish(topic, 2, false, "press")
 
-			lastButtonPress = val
-			lastButtonPressTime = currTime
+			hh.LastButtonPress = val
+			hh.LastButtonPressTime = currTime
 		}
 
 		return
@@ -137,6 +146,8 @@ func (hh *HardwareHandler) processSerialMessage(msg string) {
 		fmt.Println("Arduino's starting up...")
 	case "OK_RF24":
 		fmt.Println("Wireless device detected & ready to be used")
+	case "PING":
+		hh.LastPing = time.Now()
 	default:
 		hh.DebugMsg(msg, hx)
 		fmt.Println(strings.Join(append([]string{"\targs: "}, data[1:]...), " "))

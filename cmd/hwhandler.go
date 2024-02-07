@@ -7,6 +7,7 @@ import (
 	"runtime"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/partyhall/partyhall/hwhandler"
 	"github.com/spf13/cobra"
@@ -40,7 +41,12 @@ var hwhandlerCmd = &cobra.Command{
 				continue
 			}
 
-			hh := hwhandler.HardwareHandler{PortName: p}
+			hh := hwhandler.HardwareHandler{
+				PortName:            p,
+				LastButtonPress:     "",
+				LastPing:            time.Now(),
+				LastButtonPressTime: time.Now(),
+			}
 			go hh.ProcessSerialConn()
 		}
 

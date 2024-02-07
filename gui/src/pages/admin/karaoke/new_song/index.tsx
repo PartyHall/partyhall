@@ -12,7 +12,7 @@ export default function KaraokeSettings() {
     const [method, setMethod] = useState<METHOD>('CREATE');
     const {t} = useTranslation();
  
-    return <Stack direction="column" gap={2} flex="1">
+    return <Stack direction="column" gap={2} flex="1" pt={2} pb={2}>
         <Box mb={3}>
             <FormControl fullWidth>
                 <InputLabel id="label_select_method">{t('karaoke.what_to_do')}</InputLabel>

@@ -56,7 +56,7 @@ func (u *Users) FindByUsername(username string) (*models.User, error) {
 	row := u.db.QueryRowx(`
 		SELECT id, username, name, password, roles
 		FROM ph_user
-		WHERE username = ?
+		WHERE LOWER(username) = LOWER(?)
 	`, username)
 
 	if row.Err() != nil {

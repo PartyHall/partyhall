@@ -17,9 +17,14 @@ export const FRENCH = {
         password: 'Mot de passe',
         bt: 'Connexion',
         failed: 'Échec de la connexion',
+        logout: 'Déconnexion',
     },
     admin_main: {
-        current_event: "Event sélectionné",
+        partyhall: {
+            current_event: "Event sélectionné",
+            new_event: "Nouvel évènement",
+            logged_in_as: "Connecté en tant que {{name}}"
+        },
         mode: "Mode",
         hw_flash: "Flash matériel",
         system_info: "Info système",

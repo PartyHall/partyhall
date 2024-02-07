@@ -1,4 +1,4 @@
-import { Button, Card, CardActions, CardContent, Typography } from "@mui/material";
+import { Button, Card, CardActions, CardContent, Stack, Typography } from "@mui/material";
 import ExportListing from "../../../components/admin/export_listing";
 import { useAdminSocket } from "../../../hooks/adminSocket";
 import { useTranslation } from "react-i18next";
@@ -9,14 +9,14 @@ export default function AdminPhotobooth() {
 
     const hasEvent = !!appState.app_state.current_event;
 
-    return <>
+    return <Stack gap={3}>
         <Card>
             <CardContent>
                 {
                     hasEvent &&
                     <>
                         <Typography variant="h2" fontSize={18}>
-                            {t('admin_main.current_event')}:  {appState?.app_state.current_event?.name}
+                            {t('admin_main.partyhall.current_event')}:  {appState?.app_state.current_event?.name}
                         </Typography>
                         <ul>
                             <li>{t('photobooth.amt_hand_taken')}: {appState?.app_state?.current_event?.amt_images_handtaken}</li>
@@ -36,5 +36,5 @@ export default function AdminPhotobooth() {
         </Card>
 
         { hasEvent && <ExportListing /> }
-    </>
+    </Stack>
 }

@@ -5,5 +5,6 @@ export type TokenUser = {
     iat: DateTime;
     subject: string;
     username: string;
+    name: string;
     roles: string[];
 };

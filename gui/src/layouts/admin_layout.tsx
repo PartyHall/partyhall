@@ -1,4 +1,4 @@
-import { AppBar, Box, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Toolbar, Typography } from "@mui/material";
+import { AppBar, BottomNavigation, BottomNavigationAction, Box, Drawer, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Stack, Toolbar, Typography } from "@mui/material";
 import { Link, Navigate, useOutlet } from "react-router-dom";
 
 import MenuIcon from '@mui/icons-material/Menu';
@@ -22,13 +22,10 @@ const linkStyle = {
 };
 
 export default function AdminLayout() {
-    const {t} = useTranslation();
+    const { t } = useTranslation();
     const outlet = useOutlet();
-    const { socketMode, isLoggedIn, logout, hasRole } = useApi();
+    const { socketMode, isLoggedIn, hasRole } = useApi();
     const { appState } = useAdminSocket();
-    const [state, setState] = useState<State>({
-        menuOpen: false,
-    });
 
     if (socketMode != 'admin') {
         return <Navigate to={"/"} />
@@ -38,55 +35,35 @@ export default function AdminLayout() {
         return <Navigate to={"/admin/login"} />
     }
 
-    const close = () => setState({ ...state, menuOpen: false });
-
-    return <>
-        <AppBar position="static">
-            <Toolbar>
-                <IconButton size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }} onClick={() => setState({ ...state, menuOpen: true })}><MenuIcon /></IconButton>
-                <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>{t('admin_main.mode')}: {appState?.current_mode}</Typography>
-                <IconButton size="large" edge="start" color="inherit" aria-label="menu" onClick={logout}><LogoutIcon /></IconButton>
-            </Toolbar>
-        </AppBar>
-
-        <Drawer anchor="left" open={state.menuOpen} onClose={close}>
-            <Box sx={{ width: 250 }} role="presentation" onClick={close} onKeyDown={close}>
-                <List>
-                    <Link to="/admin/" style={linkStyle}>
-                        <ListItem disablePadding>
-                            <ListItemButton>
-                                <ListItemIcon><SettingsIcon /></ListItemIcon>
-                                <ListItemText primary={t('admin_main.settings')} />
-                            </ListItemButton>
-                        </ListItem>
-                    </Link>
-                    {
-                        hasRole('ADMIN_PHOTOBOOTH') &&
-                        <Link to="/admin/photobooth" style={linkStyle}>
-                            <ListItem disablePadding>
-                                <ListItemButton>
-                                    <ListItemIcon><PhotoIcon /></ListItemIcon>
-                                    <ListItemText primary={t('admin_main.photobooth')} />
-                                </ListItemButton>
-                            </ListItem>
-                        </Link>
-                    }
-                    <Link to="/admin/karaoke" style={linkStyle}>
-                        <ListItem disablePadding>
-                            <ListItemButton>
-                                <ListItemIcon><KaraokeIcon /></ListItemIcon>
-                                <ListItemText primary={t('admin_main.karaoke')} />
-                            </ListItemButton>
-                        </ListItem>
-                    </Link>
-                </List>
-            </Box>
-        </Drawer>
-
-        <div style={{ height: '100%', paddingBottom: '5em' }}>
-            <Stack maxWidth="sm" spacing={2} margin="auto" paddingTop={2} style={{ height: "100%" }}>
-                {outlet}
-            </Stack>
-        </div>
-    </>
+    return <Stack height="100%">
+        <Stack maxWidth="sm" flex="1" margin="0 auto" spacing={2} padding={2} style={{ overflowY: 'scroll', width: '100%' }}>
+            {outlet}
+        </Stack>
+        <BottomNavigation showLabels>
+            <BottomNavigationAction
+                component={Link}
+                to="/admin/"
+                label={t('admin_main.settings')}
+                icon={<SettingsIcon />}
+            />
+            {
+                appState && appState.current_mode && hasRole('ADMIN_PHOTOBOOTH') &&
+                <BottomNavigationAction
+                    component={Link}
+                    to="/admin/photobooth"
+                    label={t('admin_main.photobooth')}
+                    icon={<PhotoIcon />}
+                />
+            }
+            {
+                appState && appState.current_mode &&
+                <BottomNavigationAction
+                    component={Link}
+                    to="/admin/karaoke"
+                    label={t('admin_main.karaoke')}
+                    icon={<KaraokeIcon />}
+                />
+            }
+        </BottomNavigation>
+    </Stack>
 }

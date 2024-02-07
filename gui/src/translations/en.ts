@@ -17,9 +17,14 @@ export const ENGLISH = {
         password: 'Password',
         bt: 'Login',
         failed: 'Failed to login',
+        logout: 'Logout',
     },
     admin_main: {
-        current_event: "Selected event",
+        partyhall: {
+            current_event: "Selected event",
+            new_event: "New event",
+            logged_in_as: "Logged in as {{name}}"
+        },
         mode: "Mode",
         hw_flash: "Hardware flash",
         system_info: "System infos",

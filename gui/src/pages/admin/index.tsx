@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardActions, CardContent, IconButton, MenuItem, Select, SelectChangeEvent, Typography } from "@mui/material";
+import { Box, Button, Card, CardActions, CardContent, IconButton, MenuItem, Select, SelectChangeEvent, Stack, Typography } from "@mui/material";
 import { DateTime } from 'luxon';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -10,7 +10,7 @@ import { useApi } from "../../hooks/useApi";
 import { useTranslation } from "react-i18next";
 
 export default function AdminIndex() {
-    const { hasRole } = useApi();
+    const { hasRole, logout, api } = useApi();
     const { t } = useTranslation();
     const { sendMessage, appState, currentTime } = useAdminSocket();
     const { showDialog } = useConfirmDialog();
@@ -46,59 +46,56 @@ export default function AdminIndex() {
 
         showDialog(
             t('admin_main.change_event.title'),
-            t('admin_main.change_event.title', {event: newEvent.name, author: newEvent.author}),
+            t('admin_main.change_event.title', { event: newEvent.name, author: newEvent.author }),
             t('admin_main.change_event.bt'),
             async () => sendMessage('SET_EVENT', newEvent.id),
         );
     };
 
-    return <>
+    return <Stack gap={3}>
         <Card>
             <CardContent>
-                <Typography variant="h2" fontSize={18}>{t('admin_main.current_event')}</Typography>
-                {
-                    appState.known_events.length > 0
-                    &&
-                    <Select value={currentEvent} label="Event" onChange={setNewEvent} style={{ marginTop: '1em' }} disabled={!hasRole('ADMIN')}>
-                        {
-                            appState.known_events.map(x => <MenuItem key={x.id} value={x.id}>{x.name}</MenuItem>)
-                        }
-                    </Select>
-                }
-            </CardContent>
-            <CardActions style={{ justifyContent: 'center' }}>
-                {
-                    hasRole('ADMIN') && <>
-                        <IconButton color="primary" onClick={() => navigate('/admin/event/edit')}>
-                            <AddIcon />
-                        </IconButton>
-
-                        {
-                            currentEvent != ''
-                            && <IconButton color="warning" onClick={() => navigate(`/admin/event/edit/${currentEvent}`)}>
-                                <EditIcon />
-                            </IconButton>
-                        }
-                    </>
-                }
-            </CardActions>
-        </Card>
-        {
-            !!appState.known_modes && appState.known_modes.length > 0
-            && <Card>
-                <CardContent>
-                    <Typography variant="h2" fontSize={18}>{t('admin_main.mode')}</Typography>
+                <Stack width="100%" gap={2}>
+                    <Typography variant="h1" fontSize={20}>PartyHall</Typography>
+                    <Typography variant="body1" color="GrayText" textAlign="center">
+                        {t('admin_main.partyhall.logged_in_as', {name: api.tokenUser?.name})}
+                    </Typography>
+                    <Typography variant="h2" fontSize={18}>{t('admin_main.partyhall.current_event')}</Typography>
                     {
-                        appState?.current_mode &&
-                        <Select value={appState.current_mode} label="Mode" onChange={(evt: SelectChangeEvent) => sendMessage('SET_MODE', evt.target.value)} style={{ marginTop: '1em' }} disabled={!hasRole('ADMIN')}>
+                        appState.known_events.length > 0
+                        &&
+                        <Stack direction="row" alignItems="center" justifyContent="center" width="100%">
+                            <Select value={currentEvent} label="Event" onChange={setNewEvent} disabled={!hasRole('ADMIN')} style={{ maxWidth: '80%' }}>
+                                {
+                                    appState.known_events.map(x => <MenuItem key={x.id} value={x.id}>{x.name}</MenuItem>)
+                                }
+                            </Select>
                             {
-                                appState.known_modes.map(x => <MenuItem key={x} value={x}>{x}</MenuItem>)
+                                hasRole('ADMIN') && currentEvent != ''
+                                && <IconButton color="warning" onClick={() => navigate(`/admin/event/edit/${currentEvent}`)}>
+                                    <EditIcon />
+                                </IconButton>
                             }
-                        </Select>
+                        </Stack>
                     }
-                </CardContent>
-            </Card>
-        }
+                    {
+                        hasRole('ADMIN') && <Button color="primary" onClick={() => navigate('/admin/event/edit')} startIcon={<AddIcon />}>
+                            {t('admin_main.partyhall.new_event')}
+                        </Button>
+                    }
+                    {
+                        !!appState.known_modes && appState.known_modes.length > 0 && appState?.current_mode && <>
+                            <Typography variant="h2" fontSize={18}>{t('admin_main.mode')}</Typography>
+                            <Select value={appState.current_mode} label="Mode" onChange={(evt: SelectChangeEvent) => sendMessage('SET_MODE', evt.target.value)} style={{ marginTop: '1em' }} disabled={!hasRole('ADMIN')}>
+                                {
+                                    appState.known_modes.map(x => <MenuItem key={x} value={x}>{x}</MenuItem>)
+                                }
+                            </Select>
+                        </>
+                    }
+                </Stack>
+            </CardContent>
+        </Card>
         <Card>
             <CardContent>
                 <Typography variant="h2" fontSize={18}>{t('admin_main.system_info')}</Typography>
@@ -124,13 +121,16 @@ export default function AdminIndex() {
             </Card>
         }
 
-        {
-            hasRole('ADMIN') &&
-            <Card>
-                <CardActions>
-                    <Button style={{ width: '100%' }} color="error" onClick={shutdown}>{t('admin_main.shutdown.title')}</Button>
-                </CardActions>
-            </Card>
-        }
-    </>
+        <Card>
+            <CardActions>
+                <Stack alignItems="center" justifyContent="center" width="100%" gap={2}>
+                    <Button style={{ width: '100%' }} color="error" onClick={logout}>{t('login.logout')}</Button>
+                    {
+                        hasRole('ADMIN') &&
+                        <Button style={{ width: '100%' }} color="error" onClick={shutdown}>{t('admin_main.shutdown.title')}</Button>
+                    }
+                </Stack>
+            </CardActions>
+        </Card>
+    </Stack>
 }

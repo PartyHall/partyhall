@@ -3,9 +3,11 @@ import { Controller, useForm } from "react-hook-form";
 import { useApi } from "../../hooks/useApi";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useSnackbar } from "../../hooks/snackbar";
 
 export default function Login() {
     const {t} = useTranslation();
+    const {showSnackbar} = useSnackbar();
     const { login, loginAsGuest } = useApi();
     const [loginAsUser, setLoginAsUser] = useState<boolean>(false);
     const { handleSubmit, control } = useForm({
@@ -16,10 +18,14 @@ export default function Login() {
     });
 
     const onSubmit = (data: any) => {
-        if (loginAsUser) {
-            login(data.username, data.password);
-        } else {
-            loginAsGuest(data.username);
+        try {
+            if (loginAsUser) {
+                login(data.username, data.password);
+            } else {
+                loginAsGuest(data.username);
+            }
+        } catch (e) {
+            showSnackbar(t('login.failed') + ': ' + e, 'error');
         }
     };
 

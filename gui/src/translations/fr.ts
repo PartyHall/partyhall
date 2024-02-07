@@ -2,7 +2,11 @@ export const FRENCH = {
     general: {
         error_occured: "Une erreur est survenue",
         something_went_wrong: "Quelque chose s'est mal passé",
-        cancel: "Annuler"
+        cancel: "Annuler",
+        dt_not_available: "Heure non disponible",
+        yes: 'Oui',
+        no: 'Non',
+        version: 'Version',
     },
     osd: {
         no_event: "Pas d'évènement sélectionné !"
@@ -12,15 +16,26 @@ export const FRENCH = {
         username: 'Pseudo',
         password: 'Mot de passe',
         bt: 'Connexion',
+        failed: 'Échec de la connexion',
     },
     admin_main: {
         current_event: "Event sélectionné",
         mode: "Mode",
+        hw_flash: "Flash matériel",
         system_info: "Info système",
         current_time: "Heure serveur",
         set_to_my_time: "Configurer à mon heure actuelle",
         show_debug_info: "Afficher les info de debug (30s)",
-        shutdown: "Éteindre",
+        shutdown: {
+            title: "Éteindre",
+            text: "Vous tentez d'éteindre la machine, êtes-vous sûr ?",
+            bt: 'Éteindre',
+        },
+        change_event: {
+            title: "Changer d'évènement",
+            content: 'Vous allez changer l\'évènement pour "{{event}}" (Par {{author}})<br />Toutes les nouvelles photos iront sur cet évènement.',
+            bt: "Changer"
+        },
         settings: "Global",
         photobooth: "Photomaton",
         karaoke: "Karaoké"
@@ -41,7 +56,9 @@ export const FRENCH = {
         host: "Hôte",
         date: "Date",
         location: "Lieux",
-        save: "Sauvegarder"
+        save: "Sauvegarder",
+        saved: "Évènement sauvegardé !",
+        failed: "Échec de la sauvegarde"
     },
     karaoke: {
         no_song_playing: "Pas de musique en cours",
@@ -65,6 +82,8 @@ export const FRENCH = {
         format: "Format",
         upload: "Téléverser {{ format }}",
         add: "Créer",
+        created: "Musique créée",
+        failed: "Échec de la création",
         waiting_song_upload: "En attente de l'envoi d'une musique",
         upload_a_song: "Téléverser une musique",
         upload_in_progress: "En cours...",
@@ -72,6 +91,7 @@ export const FRENCH = {
         songs_rescanned: "Scan des musiques terminé",
         song_rescan_failed: "Échec du scan des musiques",
         adding_to_queue: 'Ajouté à la queue',
+        empty_queue: "Queue vide",
         skip: {
             title: "Passer la musique?",
             content: "Il y a une musique en cours, vous voulez peut-être plutôt la mettre en queue.",
@@ -93,5 +113,9 @@ export const FRENCH = {
         remote_take_picture: "Photo à distance",
         amt_hand_taken: "Prises manuellement",
         amt_unattended: "Prises automatiquement"
+    },
+    disabled: {
+        partyhall_disabled: 'PartyHall désactivé',
+        msg: 'Ce photomaton est désactivé par un admin. Désolé pour le dérangement.'
     }
 };

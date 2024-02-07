@@ -30,7 +30,7 @@ const WebsocketContext = createContext<WebsocketContextProps>({
 });
 
 export default function AdminSocketProvider({ children }: { children: ReactNode }) {
-    const { i18n } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [currentLanguage, setCurrentLanguage] = useState<string>('en');
     const { api, logout } = useApi();
     const { sendJsonMessage, lastMessage, readyState } = useWebSocket(
@@ -67,11 +67,11 @@ export default function AdminSocketProvider({ children }: { children: ReactNode 
                 setContext({ ...ctx, lastMessage: data });
                 break
             case "EXPORT_STARTED":
-                showSnackbar('Export started', 'info');
+                showSnackbar(t('exports.started'), 'info');
                 setContext({ ...ctx, lastMessage: data });
                 break
             case "EXPORT_COMPLETED":
-                showSnackbar('Export completed', 'success');
+                showSnackbar(t('exports.completed'), 'success');
                 setContext({ ...ctx, lastMessage: data });
                 break
             default:

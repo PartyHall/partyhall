@@ -2,9 +2,11 @@ import { Stack, Typography } from "@mui/material";
 import { KaraokeSong } from "../../../types/appstate";
 
 import { useRef } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function OsdSong({ song }: { song: KaraokeSong }) {
     const imgRef = useRef<HTMLImageElement>(null);
+    const {t} = useTranslation();
 
     const onImgError = () => {
         if (!imgRef.current) {
@@ -21,7 +23,7 @@ export default function OsdSong({ song }: { song: KaraokeSong }) {
             <Typography variant="body1" fontSize=".9em" color="GrayText">{song.artist}</Typography>
             {
                 song.sung_by && song.sung_by.length > 0 &&
-                <Typography variant="body1" fontSize="1em" color="GrayText">Sung by {song.sung_by}</Typography>
+                <Typography variant="body1" fontSize="1em" color="GrayText">{t('karaoke.sung_by')} {song.sung_by}</Typography>
             }
         </Stack>
     </Stack>

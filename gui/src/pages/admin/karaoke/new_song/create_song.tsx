@@ -30,10 +30,10 @@ export default function CreateSong() {
             setSongFilename('');
             setCdgFilename('');
 
-            showSnackbar('Music created', 'success');
+            showSnackbar(t('karaoke.created'), 'success');
         } catch (e) {
             console.log(e);
-            showSnackbar('Failed to create song: ' + e, 'error');
+            showSnackbar(t('karaoke.failed') + ': ' + e, 'error');
         }
     };
 

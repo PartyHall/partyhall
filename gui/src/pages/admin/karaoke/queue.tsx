@@ -48,7 +48,7 @@ export default function KaraokeQueue() {
         }
 
         <Typography variant="h4">{t('karaoke.queue')}:</Typography>
-        {module.queue.length == 0 && <Typography variant="body1">Empty queue</Typography>}
+        {module.queue.length == 0 && <Typography variant="body1">{t('karaoke.empty_queue')}</Typography>}
         <Stack flex="1 1 0" style={{overflowY: 'scroll'}}>
             <List>
                 { module.queue.map((x, idx) => <Song 

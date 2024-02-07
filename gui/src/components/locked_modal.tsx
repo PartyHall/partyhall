@@ -1,6 +1,10 @@
+import { useTranslation } from "react-i18next";
+
 export default function LockedModal() {
+    const {t} = useTranslation();
+
     return <div id="modal">
-        <h1>PartyHall disabled</h1>
-        <span>This PartyHall booth is currently disabled by an admin. Sorry for the inconvenience.</span>
+        <h1>{t('disabled.partyhall_disabled')}</h1>
+        <span>{t('disabled.msg')}</span>
     </div>;
 }

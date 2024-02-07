@@ -19,9 +19,9 @@ export default function AdminIndex() {
     const currentEvent = '' + (appState.app_state.current_event?.id ?? '');
 
     const shutdown = () => showDialog(
-        'Shutting down',
-        'You are trying to shutdown the partyhall. Are you sure ?',
-        'Shut down',
+        t('admin_main.shutdown.title'),
+        t('admin_main.shutdown.text'),
+        t('admin_main.shutdown.bt'),
         async () => sendMessage('SHUTDOWN', null),
     );
 
@@ -45,10 +45,9 @@ export default function AdminIndex() {
         const newEvent = events[0];
 
         showDialog(
-            'Change event',
-            `You are updating the current event to "${newEvent.name} (by ${newEvent.author})".
-             Doing so will make that all new pictures are sent to this event instead of the current one.`,
-            'Change event',
+            t('admin_main.change_event.title'),
+            t('admin_main.change_event.title', {event: newEvent.name, author: newEvent.author}),
+            t('admin_main.change_event.bt'),
             async () => sendMessage('SET_EVENT', newEvent.id),
         );
     };
@@ -129,7 +128,7 @@ export default function AdminIndex() {
             hasRole('ADMIN') &&
             <Card>
                 <CardActions>
-                    <Button style={{ width: '100%' }} color="error" onClick={shutdown}>{t('admin_main.shutdown')}</Button>
+                    <Button style={{ width: '100%' }} color="error" onClick={shutdown}>{t('admin_main.shutdown.title')}</Button>
                 </CardActions>
             </Card>
         }

@@ -69,10 +69,10 @@ export default function EditEvent() {
     const save = async (data: EditedEvent) => {
         try {
             await api.events.save(data);
-            showSnackbar('Event saved !', 'success');
+            showSnackbar(t('event.saved'), 'success');
             navigate('/admin');
         } catch (e) {
-            showSnackbar('Failed to save event: ' + e, 'error');
+            showSnackbar(t('event.failed') + ': ' + e, 'error');
         }
     };
 

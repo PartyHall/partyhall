@@ -17,12 +17,12 @@ export default function Login() {
         }
     });
 
-    const onSubmit = (data: any) => {
+    const onSubmit = async (data: any) => {
         try {
             if (loginAsUser) {
-                login(data.username, data.password);
+                await login(data.username, data.password);
             } else {
-                loginAsGuest(data.username);
+                await loginAsGuest(data.username);
             }
         } catch (e) {
             showSnackbar(t('login.failed') + ': ' + e, 'error');
@@ -44,7 +44,7 @@ export default function Login() {
                             <Controller
                                 name="password"
                                 control={control}
-                                render={({ field }) => <Input placeholder="Password" type={t('login.password')} required {...field} />}
+                                render={({ field }) => <Input placeholder={t('login.password')} type="password" required {...field} />}
                             />
                         </>
                     }

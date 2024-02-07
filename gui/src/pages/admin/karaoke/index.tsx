@@ -11,7 +11,7 @@ export default function AdminKaraoke() {
     const {t} = useTranslation();
     const [currentTab, setCurrentTab] = useState<number>(0);
 
-    return <Stack direction="column" flex={1} style={{ marginTop: 0, height: "100%"}} gap={2}>
+    return <Stack direction="column" flex={1} style={{ marginTop: 0, height: "100%"}} gap={3}>
         <Box>
             <Tabs value={currentTab} onChange={(_, x) => setCurrentTab(x)}>
                 <Tab label={t('karaoke.search')}/>
@@ -20,7 +20,7 @@ export default function AdminKaraoke() {
             </Tabs>
         </Box>
 
-        <Stack flex={1}>
+        <Stack flex="1 0 0" overflow="scroll">
             {
                 currentTab == 0 &&
                 <KaraokeSearch />

@@ -30,12 +30,12 @@ export default function KaraokeQueue() {
         }
     }, [lastMessage]);
 
-    return <Stack direction="column" gap={1} mt={1} flex="1 1 0">
+    return <Stack direction="column" gap={1} mt={1}>
         {
             module.currentSong && <Card elevation={2}>
                 <CardContent>
                     <Stack gap={3}>
-                        <Typography variant="h4">{t('karaoke.current')}:</Typography>
+                        <Typography variant="h4" textAlign="center" fontSize="1.3em">{t('karaoke.current')}</Typography>
                         <Song song={module.currentSong} type="QUEUE" mb={0} />
                         <Stack direction="row" gap={3}>
                             <Typography variant={"body1"}>{secondsToDisplay(currentPosition)}</Typography>
@@ -47,19 +47,17 @@ export default function KaraokeQueue() {
             </Card>
         }
 
-        <Typography variant="h4">{t('karaoke.queue')}:</Typography>
+        <Typography variant="h4" fontSize="1.3em" textAlign="center">{t('karaoke.queue')}</Typography>
         {module.queue.length == 0 && <Typography variant="body1">{t('karaoke.empty_queue')}</Typography>}
-        <Stack flex="1 1 0" style={{overflowY: 'scroll'}}>
-            <List>
-                { module.queue.map((x, idx) => <Song 
-                    key={x.id}
-                    song={x}
-                    type="QUEUE" 
-                    isFirst={idx === 0}
-                    isLast={idx === module.queue.length - 1}
-                />)
-                }
-            </List>
-        </Stack>
+        <List>
+            { module.queue.map((x, idx) => <Song 
+                key={x.id}
+                song={x}
+                type="QUEUE" 
+                isFirst={idx === 0}
+                isLast={idx === module.queue.length - 1}
+            />)
+            }
+        </List>
     </Stack>
 }

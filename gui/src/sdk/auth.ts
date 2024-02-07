@@ -9,12 +9,20 @@ export default class Auth {
     }
 
     async login(username: string, password: string): Promise<AuthResponse> {
-        const resp = await this.sdk.post('/api/login', {
-            username: username,
-            password: password,
-        });
+        try {
+            const resp = await this.sdk.post('/api/login', {
+                username: username,
+                password: password,
+            });
 
-        return await resp.json();
+            if (resp.status !== 200) {
+                throw 'Invalid username/password';
+            }
+
+            return await resp.json();
+        } catch {
+            throw 'Invalid username/password';
+        }
     }
 
     async loginAsGuest(username: string): Promise<AuthResponse> {

@@ -82,11 +82,7 @@ func (ee EventExporter) Export() (*models.ExportedEvent, error) {
 	basepath := fmt.Sprintf("images/%v/exports/", ee.event.Id)
 	err := utils.MakeOrCreateFolder(basepath)
 	if err != nil {
-		if err2 := ee.setEventExporting(true); err2 != nil {
-			return nil, err
-		}
-
-		return nil, err
+		return nil, errors.Join(err, ee.setEventExporting(false))
 	}
 
 	basefilepath := exportTime.Format("20060201-150405") + ".zip"
@@ -94,11 +90,7 @@ func (ee EventExporter) Export() (*models.ExportedEvent, error) {
 
 	archive, err := os.Create(filepath)
 	if err != nil {
-		if err2 := ee.setEventExporting(true); err2 != nil {
-			return nil, err
-		}
-
-		return nil, err
+		return nil, errors.Join(err, ee.setEventExporting(false))
 	}
 	defer archive.Close()
 
@@ -108,11 +100,7 @@ func (ee EventExporter) Export() (*models.ExportedEvent, error) {
 	//#region Exporting non-unattended images
 	images, err := orm.GET.Events.GetImages(ee.event, false)
 	if err != nil {
-		if err2 := ee.setEventExporting(true); err2 != nil {
-			return nil, err
-		}
-
-		return nil, err
+		return nil, errors.Join(err, ee.setEventExporting(false))
 	}
 
 	for _, i := range images {
@@ -145,56 +133,46 @@ func (ee EventExporter) Export() (*models.ExportedEvent, error) {
 
 	//#region Exporting unattended images
 	unattendedRoot := utils.GetPath(fmt.Sprintf("images/%v/unattended/", ee.event.Id))
-	outvid := unattendedRoot + "/000_recap.mp4"
-
-	if _, err := os.Stat(outvid); !os.IsNotExist(err) {
-		os.Remove(outvid)
-	}
-
-	cmd := ee.BuildFfmpegCommand(RecapParams{
-		PictureFolder:  unattendedRoot,
-		OutputFilename: "000_recap.mp4",
-		Framerate:      6,
-	})
-	err = cmd.Run()
-	if err != nil {
-		if err2 := ee.setEventExporting(false); err2 != nil {
-			return nil, err
-		}
-		return nil, err
-	}
-
-	fr, err := os.Open(outvid)
-	if err != nil {
-		logs.Errorf("Failed to open the recap video for the event %v: %v\n", ee.event.Id, err)
-		if err2 := ee.setEventExporting(false); err2 != nil {
-			return nil, err
+	if _, err := os.Stat(unattendedRoot); !os.IsNotExist(err) {
+		outvid := unattendedRoot + "/000_recap.mp4"
+		if _, err := os.Stat(outvid); !os.IsNotExist(err) {
+			os.Remove(outvid)
 		}
 
-		return nil, err
-	}
-
-	fw, err := zipWriter.Create("000_recap.mp4")
-	if err != nil {
-		logs.Errorf("Failed to create the recap video for the event %v in the zip file: %v\n", ee.event.Id, err)
-		if err2 := ee.setEventExporting(false); err2 != nil {
-			return nil, err
+		cmd := ee.BuildFfmpegCommand(RecapParams{
+			PictureFolder:  unattendedRoot,
+			OutputFilename: "000_recap.mp4",
+			Framerate:      6,
+		})
+		err = cmd.Run()
+		if err != nil {
+			return nil, errors.Join(err, ee.setEventExporting(false))
 		}
-		return nil, err
-	}
 
-	if _, err := io.Copy(fw, fr); err != nil {
-		logs.Errorf("Failed to copy the recap video for the event %v in the zip file: %v\n", ee.event.Id, err)
-		if err2 := ee.setEventExporting(false); err2 != nil {
-			return nil, err
+		fr, err := os.Open(outvid)
+		if err != nil {
+			logs.Errorf("Failed to open the recap video for the event %v: %v\n", ee.event.Id, err)
+			return nil, errors.Join(err, ee.setEventExporting(false))
 		}
-		return nil, err
-	}
 
-	fr.Close()
+		fw, err := zipWriter.Create("000_recap.mp4")
+		if err != nil {
+			logs.Errorf("Failed to create the recap video for the event %v in the zip file: %v\n", ee.event.Id, err)
+			return nil, errors.Join(err, ee.setEventExporting(false))
+		}
 
-	if _, err := os.Stat(outvid); !os.IsNotExist(err) {
-		os.Remove(outvid)
+		if _, err := io.Copy(fw, fr); err != nil {
+			logs.Errorf("Failed to copy the recap video for the event %v in the zip file: %v\n", ee.event.Id, err)
+			return nil, errors.Join(err, ee.setEventExporting(false))
+		}
+
+		fr.Close()
+
+		if _, err := os.Stat(outvid); !os.IsNotExist(err) {
+			os.Remove(outvid)
+		}
+	} else {
+		logs.Warn("Unattended folder doesn't exists, skipping...")
 	}
 	//#region
 
@@ -210,21 +188,15 @@ func (ee EventExporter) Export() (*models.ExportedEvent, error) {
 	}
 	jsonData, _ := json.MarshalIndent(data, "", "  ")
 
-	fw, err = zipWriter.Create("001_infos.json")
+	fw, err := zipWriter.Create("001_infos.json")
 	if err != nil {
 		logs.Errorf("Failed to add the info json")
-		if err2 := ee.setEventExporting(false); err2 != nil {
-			return nil, err
-		}
-		return nil, err
+		return nil, errors.Join(err, ee.setEventExporting(false))
 	}
 
 	if _, err := io.Copy(fw, bytes.NewReader(jsonData)); err != nil {
 		logs.Errorf("Failed to copy the info json for the event %v in the zip file: %v\n", ee.event.Id, err)
-		if err2 := ee.setEventExporting(false); err2 != nil {
-			return nil, err
-		}
-		return nil, err
+		return nil, errors.Join(err, ee.setEventExporting(false))
 	}
 	//#endregion
 

@@ -24,6 +24,7 @@ ntp_enabled: true
 ntp_timezone: Europe/Paris
 
 ethernet_interface: ens33
+grub_resolution: 1920x1080 # Any grub-supported resolution, it might be 1280x720 if you use an older screen
 
 spotify_name: 'PartyHall'
 

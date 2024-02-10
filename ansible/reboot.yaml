@@ -5,5 +5,10 @@
 
   tasks:
     - name: 'Reboot to finish the setup'
-      command: 'reboot'
+      reboot:
+        reboot_timeout: 1
+        connect_timeout: 1
+      async: 1
+      poll: 0
       failed_when: false
+      ignore_errors: true

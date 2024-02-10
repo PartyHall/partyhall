@@ -6,4 +6,5 @@
 - import_playbook: setup-nginx.yaml
 - import_playbook: setup-hotspot.yaml
 - import_playbook: setup-xorg.yaml
+- import_playbook: setup-plymouth.yaml
 - import_playbook: reboot.yaml

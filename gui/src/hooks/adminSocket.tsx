@@ -56,24 +56,30 @@ export default function AdminSocketProvider({ children }: { children: ReactNode 
 
         switch (data.type) {
             case "PING":
-                sendJsonMessage({ 'type': 'PONG' })
-                setContext({ ...ctx, lastMessage: data, currentTime: data.payload })
-                break
+                sendJsonMessage({ 'type': 'PONG' });
+                setContext({ ...ctx, lastMessage: data, currentTime: data.payload });
+                break;
             case "APP_STATE":
-                setContext({ ...ctx, lastMessage: data, appState: data.payload })
-                break
+                setContext({ ...ctx, lastMessage: data, appState: data.payload });
+                break;
             case "ERR_MODAL":
                 showSnackbar(data.payload, 'error');
                 setContext({ ...ctx, lastMessage: data });
-                break
+                break;
             case "EXPORT_STARTED":
                 showSnackbar(t('exports.started'), 'info');
                 setContext({ ...ctx, lastMessage: data });
-                break
+                break;
             case "EXPORT_COMPLETED":
                 showSnackbar(t('exports.completed'), 'success');
                 setContext({ ...ctx, lastMessage: data });
-                break
+                break;
+            case "SOUND_DEVICE":
+                setContext({...ctx, appState: {
+                    ...ctx.appState,
+                    pulseaudio_selected: data.payload,
+                }});
+                break;
             default:
                 setContext({ ...ctx, lastMessage: data });
         }

@@ -1,15 +1,15 @@
 import useAsyncEffect from "use-async-effect";
 
 import { Pagination, Stack, TextField, Typography } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { KaraokeSong } from "../../../types/appstate";
 import { useApi } from "../../../hooks/useApi";
 import { PaginatedResponse } from "../../../sdk/responses/paginated_responses";
 import Loader from "../../../components/loader";
 import Song from "./song";
 import { useTranslation } from "react-i18next";
+import { debounce } from "lodash";
 
-// @TODO: debounce
 export default function KaraokeSearch() {
     const [wasSearch, setWasSearch] = useState<boolean>(false);
     const {t} = useTranslation();
@@ -34,9 +34,19 @@ export default function KaraokeSearch() {
         setLoading(false);
     };
 
+    const debouncedSearch = useRef(
+        debounce(loadSongs, 250)
+    ).current;
+
     useAsyncEffect(async () => {
-        await loadSongs();
+        await debouncedSearch();
     }, [search, page]);
+
+    useEffect(() => {
+        return () => {
+            debouncedSearch.cancel();
+        }
+    }, [debouncedSearch]);
 
     return <Stack direction="column" alignItems="stretch" flex={1} gap={1}>
         <TextField placeholder={t('karaoke.search') + '...'} value={search} onChange={x => setSearch(x.target.value)}/>

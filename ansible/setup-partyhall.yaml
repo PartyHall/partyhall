@@ -6,7 +6,7 @@
     - name: 'Install partyhall dependencies'
       become: yes
       apt:
-        name: [ 'libvips' ]
+        name: [ 'libvips', 'pavucontrol' ]
 
     - name: 'Adding the user to the serial group'
       become: yes
@@ -82,16 +82,10 @@
     - name: 'Pushing the services (Partyhall)'
       become: yes
       template:
-        src: 'templates/partyhall.service.j2'
-        dest: '/usr/lib/systemd/user/partyhall.service'
+        src: 'templates/{{item}}.service.j2'
+        dest: '/usr/lib/systemd/user/{{item}}.service'
         mode: '0644'
-
-    - name: 'Pushing the services (Hardware handler)'
-      become: yes
-      template:
-        src: 'templates/hardware_handler.service.j2'
-        dest: '/usr/lib/systemd/user/hardware_handler.service'
-        mode: '0644'
+      loop: ['partyhall', 'hardware_handler']
 
     - name: 'Enabling the services'
       systemd:

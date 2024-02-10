@@ -43,7 +43,9 @@ export const ENGLISH = {
         },
         settings: "Global",
         photobooth: "Photobooth",
-        karaoke: "Karaoke"
+        karaoke: "Karaoke",
+        volume: "Volume",
+        device: "Device"
     },
     exports: {
         last_exports: "Last exports",

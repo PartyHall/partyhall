@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardActions, CardContent, IconButton, MenuItem, Select, SelectChangeEvent, Stack, Typography } from "@mui/material";
+import { Box, Button, Card, CardActions, CardContent, IconButton, InputLabel, MenuItem, Select, SelectChangeEvent, Slider, Stack, Typography } from "@mui/material";
 import { DateTime } from 'luxon';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
@@ -8,6 +8,8 @@ import { useAdminSocket } from "../../hooks/adminSocket";
 import { useNavigate } from "react-router-dom";
 import { useApi } from "../../hooks/useApi";
 import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
+import VolumeAdmin from "../../components/admin/volume";
 
 export default function AdminIndex() {
     const { hasRole, logout, api } = useApi();
@@ -24,7 +26,6 @@ export default function AdminIndex() {
         t('admin_main.shutdown.bt'),
         async () => sendMessage('SHUTDOWN', null),
     );
-
 
     const setNewEvent = (evt: SelectChangeEvent) => {
         const newId = (evt.target.value as unknown as number);
@@ -58,7 +59,7 @@ export default function AdminIndex() {
                 <Stack width="100%" gap={2}>
                     <Typography variant="h1" fontSize={20}>PartyHall</Typography>
                     <Typography variant="body1" color="GrayText" textAlign="center">
-                        {t('admin_main.partyhall.logged_in_as', {name: api.tokenUser?.name})}
+                        {t('admin_main.partyhall.logged_in_as', { name: api.tokenUser?.name })}
                     </Typography>
                     <Typography variant="h2" fontSize={18}>{t('admin_main.partyhall.current_event')}</Typography>
                     {
@@ -86,13 +87,14 @@ export default function AdminIndex() {
                     {
                         !!appState.known_modes && appState.known_modes.length > 0 && appState?.current_mode && <>
                             <Typography variant="h2" fontSize={18}>{t('admin_main.mode')}</Typography>
-                            <Select value={appState.current_mode} label="Mode" onChange={(evt: SelectChangeEvent) => sendMessage('SET_MODE', evt.target.value)} style={{ marginTop: '1em' }} disabled={!hasRole('ADMIN')}>
+                            <Select value={appState.current_mode} label={t('admin_main.mode')} onChange={(evt: SelectChangeEvent) => sendMessage('SET_MODE', evt.target.value)} style={{ marginTop: '1em' }} disabled={!hasRole('ADMIN')}>
                                 {
                                     appState.known_modes.map(x => <MenuItem key={x} value={x}>{x}</MenuItem>)
                                 }
                             </Select>
                         </>
                     }
+                    <VolumeAdmin />
                 </Stack>
             </CardContent>
         </Card>

@@ -4,9 +4,10 @@ from ansible.module_utils.basic import *
 import requests
 import platform
 
+# -linux-xxxx-default.tar.gz = spotifyd
 CUSTOM_ARCH_NAMES = {
-    'x86_64': 'amd64',
-    'aarch64': 'arm64',
+    'x86_64': ['amd64', '-linux-default.tar.gz'],
+    'aarch64': ['arm64', '-linux-armhf-default.tar.gz'],
 }
 
 def main():
@@ -29,8 +30,9 @@ def main():
     data = resp.json()
 
     for asset in data['assets']:
-        if asset['name'].endswith(arch):
-            module.exit_json(changed=False, meta=asset['browser_download_url'])
+        for curr_arch in arch:
+            if asset['name'].endswith(curr_arch):
+                module.exit_json(changed=False, meta=asset['browser_download_url'])
 
     module.fail_json(changed=False, msg=f'Binary not available for this architecture: {arch}')
 

@@ -1,5 +1,19 @@
 import { DateTime } from "luxon";
 
+export type SoundDevice = {
+    index: number;
+    state: string;
+    name: string;
+    description: string;
+    driver: string;
+    mute: boolean;
+    volume: {
+        db: string;
+        value: number;
+        value_percent: string;
+    }
+};
+
 export type Event = {
     id: number;
     name: string;
@@ -62,6 +76,9 @@ export type AppState = {
     ip_addresses: { [key: string]: string[]; };
     known_events: Event[];
     known_modes: string[];
+
+    pulseaudio_selected: SoundDevice|null;
+    pulseaudio_devices: SoundDevice[];
 
     modules: {
         photobooth: PhotoboothModule;

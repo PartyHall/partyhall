@@ -11,6 +11,7 @@ import (
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/partyhall/easymqtt"
+	"github.com/partyhall/pacliwrapper"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/migrations"
@@ -42,6 +43,8 @@ type Provider struct {
 	CurrentMode    string
 	Spotify        Spotify
 	ModuleSettings map[string]interface{}
+
+	PulseAudio *pacliwrapper.PaCliWrapper
 }
 
 func (prv *Provider) loadState() error {
@@ -81,6 +84,13 @@ func Load() error {
 		return err
 	}
 
+	pcw, err := pacliwrapper.New()
+	if err != nil {
+		return err
+	}
+
+	pcw.Refresh()
+
 	prv := &Provider{
 		CurrentMode:    config.GET.DefaultMode,
 		Spotify:        Spotify{},
@@ -116,6 +126,8 @@ func Load() error {
 		},
 		EchoJWTPrivateKey: private,
 		EchoJWTPublicKey:  public,
+
+		PulseAudio: pcw,
 	}
 
 	prv.EchoJwtMiddleware = echojwt.WithConfig(prv.EchoJwtConfig)

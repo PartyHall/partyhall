@@ -27,10 +27,12 @@ func BuildFrontendSettings() map[string]interface{} {
 		"guests_allowed": config.GET.GuestsAllowed,
 		"modules":        GET.ModuleSettings,
 
-		"language":          config.GET.Language,
-		"ip_addresses":      utils.GetIPs(),
-		"partyhall_version": utils.CURRENT_VERSION,
-		"partyhall_commit":  utils.CURRENT_COMMIT,
+		"pulseaudio_devices":  GET.PulseAudio.Devices,
+		"pulseaudio_selected": GET.PulseAudio.MainDevice,
+		"language":            config.GET.Language,
+		"ip_addresses":        utils.GetIPs(),
+		"partyhall_version":   utils.CURRENT_VERSION,
+		"partyhall_commit":    utils.CURRENT_COMMIT,
 	}
 
 	//#region Adding known events

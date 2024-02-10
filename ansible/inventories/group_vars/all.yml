@@ -25,6 +25,8 @@ ntp_timezone: Europe/Paris
 
 ethernet_interface: enp2s0
 
+spotify_name: 'PartyHall'
+
 hotspot_enabled: true
 hotspot_interface: wlx9ca2f4bcc3da
 hotspot_driver: 'rtl8192eu'

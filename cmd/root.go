@@ -51,6 +51,12 @@ var rootCmd = &cobra.Command{
 			remote.EasyWS.RegisterMessageHandlers(module.GetWebsocketHandlers()...)
 		}
 
+		remote.EasyWS.RegisterMessageHandlers(
+			services.UpdateVolumeHandler{},
+			services.SetMuteHandler{},
+			services.SetSoundcardHandler{},
+		)
+
 		modules.InitializeModules()
 
 		_, err = orm.GET.AppState.GetState()

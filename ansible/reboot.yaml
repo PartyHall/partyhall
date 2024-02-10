@@ -1,0 +1,9 @@
+---
+- hosts: 'all'
+  become: yes
+  tags: ['reboot']
+
+  tasks:
+    - name: 'Reboot to finish the setup'
+      command: 'reboot'
+      failed_when: false

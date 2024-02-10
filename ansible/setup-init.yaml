@@ -17,7 +17,7 @@
 
     - name: 'Install some softwares'
       apt:
-        name: ['zip', 'unzip', 'sqlite3', 'vim', 'sudo', 'ffmpeg']
+        name: ['zip', 'unzip', 'sqlite3', 'vim', 'sudo', 'ffmpeg', 'pipewire-audio', 'pulseaudio-utils']
 
     - name: 'Make users passwordless for sudo in group wheel'
       lineinfile:
@@ -38,6 +38,17 @@
         groups: 'wheel'
         append: yes
 
+    - name: 'Enabling the PipeWire services'
+      become: yes
+      become_user: '{{ansible_user}}'
+      systemd:
+        name: 'wireplumber'
+        daemon_reload: yes
+        state: 'restarted'
+        enabled: yes
+        scope: 'user'
+
+
     # @TODO those three probably won't work on a Raspberry Pi
     # Check first if grub is installed and do these only in this case
     - name: 'Disabling grub boot menu'
@@ -54,4 +65,3 @@
       command: 'update-grub'
       environment:
         PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/sbin:/bin'
-

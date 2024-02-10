@@ -43,7 +43,9 @@ export const FRENCH = {
         },
         settings: "Global",
         photobooth: "Photomaton",
-        karaoke: "Karaoké"
+        karaoke: "Karaoké",
+        volume: "Volume",
+        device: "Carte son"
     },
     exports: {
         last_exports: "Derniers exports",

@@ -3,6 +3,11 @@
   become: yes
   tags: ['plymouth']
 
+  # This is black magic that barely works on real hardware
+  # I how no clue how plymouth works
+  # it sucks
+  # *please help*
+  # it does work on vm though
   tasks:
     - name: 'Install plymouth'
       apt:
@@ -25,6 +30,12 @@
         path: '/etc/default/grub'
         regexp: '^GRUB_CMDLINE_LINUX_DEFAULT='
         line: 'GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"'
+
+    - name: 'Setting up grub gfxpayload'
+      lineinfile:
+        path: '/etc/default/grub'
+        regexp: '^GRUB_GFXPAYLOAD_LINUX='
+        line: 'GRUB_GFXPAYLOAD_LINUX=keep'
 
     - name: 'Setting the plymouth theme'
       command: 'plymouth-set-default-theme -R simple-image'

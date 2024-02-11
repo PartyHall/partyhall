@@ -318,7 +318,7 @@ func searchSongs(c echo.Context) error {
 		})
 	}
 
-	count, err := ormCountSongs()
+	count, err := ormCountSongs(query)
 	if err != nil {
 		count = len(songs)
 	}

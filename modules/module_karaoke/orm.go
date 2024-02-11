@@ -134,8 +134,17 @@ func ormCountSongPlayed(filename string) {
 	orm.GET.DB.Exec(`UPDATE song SET play_count = play_count + 1 WHERE filename = $1`, filename)
 }
 
-func ormCountSongs() (int, error) {
-	row := orm.GET.DB.QueryRow(`SELECT COUNT(*) FROM song`)
+func ormCountSongs(query string) (int, error) {
+	row := orm.GET.DB.QueryRow(`
+		SELECT COUNT(*)
+		FROM song
+		WHERE LENGTH($1) == 0
+		OR (
+			LOWER(filename) LIKE CONCAT('%', LOWER($1), '%')
+			OR LOWER(artist) LIKE CONCAT('%', LOWER($1), '%')
+			OR LOWER(title) LIKE CONCAT('%', LOWER($1), '%')
+		)
+	`, query)
 	if row.Err() != nil {
 		return -1, row.Err()
 	}

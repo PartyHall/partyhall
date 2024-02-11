@@ -21,26 +21,19 @@ export default function KaraokeSearch() {
 
     const [apiResponse, setApiResponse] = useState<PaginatedResponse<KaraokeSong>|null>(null);
 
-    const loadSongs = async () => {
-        let currPage = page;
-        if ((wasSearch && search.length == 0) || (!wasSearch && search.length > 0)) {
-            currPage = 1;
-            setWasSearch(!wasSearch);
-            setPage(currPage);
-        }
-
+    const doSearch = async (query: string, requestedPage: number) => {
         setLoading(true);
-        setApiResponse(await api.karaoke.search(search, currPage));
+        setApiResponse(await api.karaoke.search(query, requestedPage));
         setLoading(false);
     };
 
     const debouncedSearch = useRef(
-        debounce(loadSongs, 250)
+        debounce(async (query: string, requestedPage: number) => await doSearch(query, requestedPage), 250)
     ).current;
 
     useAsyncEffect(async () => {
-        await debouncedSearch();
-    }, [search, page]);
+        await debouncedSearch('', 1);
+    }, []);
 
     useEffect(() => {
         return () => {
@@ -49,7 +42,11 @@ export default function KaraokeSearch() {
     }, [debouncedSearch]);
 
     return <Stack direction="column" alignItems="stretch" flex={1} gap={1}>
-        <TextField placeholder={t('karaoke.search') + '...'} value={search} onChange={x => setSearch(x.target.value)}/>
+        <TextField placeholder={t('karaoke.search') + '...'} value={search} onChange={x => {
+            setSearch(x.target.value);
+            setPage(1);
+            debouncedSearch(x.target.value, 1);
+        }} />
         <Loader loading={loading}>
             <Stack direction="column" gap={1} pt={1} flex="1 1 0" style={{overflowY: 'scroll'}}>
                 { 
@@ -65,7 +62,10 @@ export default function KaraokeSearch() {
                 shape="rounded"
                 variant="outlined"
                 page={page}
-                onChange={(event: React.ChangeEvent<unknown>, value: number) => setPage(value)}
+                onChange={async (event: React.ChangeEvent<unknown>, value: number) => {
+                    setPage(value);
+                    await doSearch(search, value);
+                }}
             />
         </Stack>
     </Stack>

@@ -9,6 +9,7 @@
         preferences:
           privacy.webrtc.legacyGlobalIndicator: false  # Disable the small "webcam indicator" on top of the window
           media.navigator.permission.disabled: true    # Let all website access webcam without permissions
+          media.autoplay.default: '0' # Allow autoplay for karaoke
           browser.sessionsore.resume_from_crash: false
           browser.startup.homepage_override.mstone: 'ignore'
           browser.messaging-system.whatsNewPanel.enabled: false

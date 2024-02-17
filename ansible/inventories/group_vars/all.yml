@@ -30,7 +30,7 @@ spotify_name: 'PartyHall'
 
 hotspot_enabled: false
 hotspot_interface: wlan0
-# hotspot_driver: 'rtl8192eu'
+hotspot_driver: 'rtl8192eu'
 hotspot_ssid: "PartyHall"
 hotspot_dns_name: "partyhall.local"
 hotspot_wifi_channel: 11

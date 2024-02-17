@@ -5,3 +5,5 @@ tmp/
 /partyhall
 config.yaml
 .cache
+
+ansible/inventories/host_vars/partyhall.yml

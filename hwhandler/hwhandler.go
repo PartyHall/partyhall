@@ -109,6 +109,8 @@ func (hh *HardwareHandler) processSerialMessage(msg string) {
 
 	hx := hex.EncodeToString([]byte(msg))
 
+	// @TODO: Send raw BTN_XXX to the main software
+	// So that its customizable in the admin
 	if strings.HasPrefix(msg, "BTN_") {
 		msg = strings.Trim(msg, " \t")
 		val, ok := config.GET.HardwareHandler.Mappings[msg]

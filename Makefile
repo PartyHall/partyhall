@@ -13,7 +13,7 @@ reset-db:
 	sqlite3 0_DATA/partyhall.db < sql/fixtures.sql
 
 take-picture:
-	docker compose exec mosquitto mosquitto_pub -h 127.0.0.1 -t partyhall/button_press -m "TAKE_PICTURE"
+	docker compose exec mosquitto mosquitto_pub -h 127.0.0.1 -t partyhall/button_press -m "partyhall/photobooth/take_picture"
 
 show-debug:
 	docker compose exec mosquitto mosquitto_pub -h 127.0.0.1 -t partyhall/button_press -m "DISPLAY_DEBUG"

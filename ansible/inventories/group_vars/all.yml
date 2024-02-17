@@ -3,8 +3,8 @@ partyhall_debug_mode: false
 partyhall_guests_allowed: true
 
 # Admin account
-partyhall_admin_username: 'username' # Your admin username
-partyhall_admin_fullname: 'user fullname' # The name that is displayed when you choose a song
+partyhall_admin_username: 'admin' # Your admin username
+partyhall_admin_fullname: 'Admin' # The name that is displayed when you choose a song
 
 partyhall_language: 'en' # Either en or fr, lowercase only!
 
@@ -23,14 +23,14 @@ partyhall_karaoke_pre_play_timer: 5
 ntp_enabled: true
 ntp_timezone: Europe/Paris
 
-ethernet_interface: ens33
+ethernet_interface: enp2s0
 grub_resolution: 1920x1080 # Any grub-supported resolution, it might be 1280x720 if you use an older screen
 
 spotify_name: 'PartyHall'
 
 hotspot_enabled: false
-hotspot_interface: wlx9ca2f4bcc3da
-hotspot_driver: 'rtl8192eu'
+hotspot_interface: wlan0
+# hotspot_driver: 'rtl8192eu'
 hotspot_ssid: "PartyHall"
 hotspot_dns_name: "partyhall.local"
 hotspot_wifi_channel: 11

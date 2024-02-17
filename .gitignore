@@ -5,3 +5,8 @@ tmp/
 /partyhall
 config.yaml
 .cache
+
+ansible/inventories/host_vars/partyhall.yml
+
+# Temporary while I make the docs
+docs/

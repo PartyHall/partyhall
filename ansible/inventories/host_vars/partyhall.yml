@@ -1,5 +1,0 @@
----
-partyhall_admin_password: 'admin password' # Your admin password
-partyhall_spotify_client_id: 'Your Spotify API client id'
-partyhall_spotify_client_secret: 'Your Spotify API client secret'
-hotspot_password: "hotspot password"

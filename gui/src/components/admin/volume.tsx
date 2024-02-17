@@ -41,10 +41,17 @@ export default function VolumeAdmin() {
         }
     }, [debouncedSetVolume]);
 
+    if (!appState.pulseaudio_devices || appState.pulseaudio_devices.length === 0) {
+        return <>
+            <Typography variant="h2" fontSize={18}>{t('admin_main.volume')}</Typography>
+            <Typography variant="body1" color="GrayText">{t('admin_main.no_devices')}</Typography>
+        </>
+    }
+
     return <>
         <Typography variant="h2" fontSize={18}>{t('admin_main.volume')}</Typography>
         {
-            hasRole('ADMIN') &&
+            hasRole('ADMIN') && appState.pulseaudio_devices && appState.pulseaudio_devices.length > 0 &&
             <>
                 <InputLabel id="volume-device-label">{t('admin_main.device')}</InputLabel>
                 <Select value={appState.pulseaudio_selected?.index} labelId="volume-device-label" onChange={x => sendMessage('SET_SOUND_CARD', x.target.value)}>

@@ -45,7 +45,8 @@ export const ENGLISH = {
         photobooth: "Photobooth",
         karaoke: "Karaoke",
         volume: "Volume",
-        device: "Device"
+        device: "Device",
+        no_devices: "No audio devices detected"
     },
     exports: {
         last_exports: "Last exports",

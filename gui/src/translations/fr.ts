@@ -45,7 +45,8 @@ export const FRENCH = {
         photobooth: "Photomaton",
         karaoke: "Karaoké",
         volume: "Volume",
-        device: "Carte son"
+        device: "Carte son",
+        no_devices: "Aucune carte son détectée"
     },
     exports: {
         last_exports: "Derniers exports",

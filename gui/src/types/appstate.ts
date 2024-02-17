@@ -78,7 +78,7 @@ export type AppState = {
     known_modes: string[];
 
     pulseaudio_selected: SoundDevice|null;
-    pulseaudio_devices: SoundDevice[];
+    pulseaudio_devices?: SoundDevice[];
 
     modules: {
         photobooth: PhotoboothModule;

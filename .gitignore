@@ -6,7 +6,11 @@ tmp/
 config.yaml
 .cache
 
-ansible/inventories/host_vars/partyhall.yml
-
 # Temporary while I make the docs
 docs/
+
+.vscode
+ansible/inventory.yaml
+
+ansible/files/karaoke/*
+!ansible/files/karaoke/.gitkeep

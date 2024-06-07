@@ -1,0 +1,17 @@
+---
+- hosts: 'all'
+  tags: ['karaoke']
+
+  tasks:
+    - name: 'Creating the karaoke folder'
+      file:
+        path: '/home/{{ansible_user}}/data/karaoke/'
+        state: 'directory'
+        owner: '{{ansible_user}}'
+        group: '{{ansible_user}}'
+        recurse: yes
+
+    - name: 'Copying the songs to the appliance'
+      copy:
+        src: 'files/karaoke/' # Keep the / !! Copies the content of the folder rather than the folder itself
+        dest: '/home/{{ansible_user}}/data/karaoke/'

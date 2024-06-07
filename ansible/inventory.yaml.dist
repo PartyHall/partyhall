@@ -1,0 +1,50 @@
+all:
+  hosts:
+    appliance:
+      ansible_host: '192.168.14.84' # Your appliance IP address
+      ansible_username: 'partyhall'
+      ansible_port: 22
+
+
+      partyhall_debug_mode: false
+      partyhall_guests_allowed: true
+
+      # Admin account
+      partyhall_admin_username: 'your_username' # Your admin username
+      partyhall_admin_fullname: 'Your firstname' # The name that is displayed when you choose a song
+      partyhall_admin_password: ''
+
+      partyhall_language: 'fr' # Either en or fr, lowercase only!
+
+      # Photobooth module
+      partyhall_photobooth_has_hardware_flash: false
+      partyhall_photobooth_default_timer: 3
+      partyhall_photobooth_unattended_interval: 5
+
+      partyhall_photobooth_webcam_width: 1280
+      partyhall_photobooth_webcam_height: 720
+
+      # Karaoke module
+      partyhall_karaoke_amt_songs_per_page: 20
+      partyhall_karaoke_pre_play_timer: 5
+
+      # Spotify creds to fetch the covers
+      partyhall_spotify_client_id: ''
+      partyhall_spotify_client_secret: ''
+
+      ntp_enabled: true
+      ntp_timezone: 'Europe/Paris'
+
+      ethernet_interface: 'enp2s0'
+      grub_resolution: '1920x1080' # Any grub-supported resolution, it might be 1280x720 if you use an older screen
+
+      # Spotify device name for SpotifyConnect
+      spotify_name: 'PartyHall'
+
+      hotspot_enabled: false
+      hotspot_interface: 'wlx9ca2f4bcc3da'
+      hotspot_driver: 'rtl8192eu'
+      hotspot_ssid: 'PartyHall'
+      hotspot_password: ''
+      hotspot_dns_name: 'partyhall.local'
+      hotspot_wifi_channel: 11

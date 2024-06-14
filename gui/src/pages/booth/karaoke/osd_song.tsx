@@ -1,29 +1,23 @@
 import { Stack, Typography } from "@mui/material";
-import { KaraokeSong } from "../../../types/appstate";
+import { KaraokeSongSession } from "../../../types/appstate";
 
-import { useRef } from "react";
 import { useTranslation } from "react-i18next";
+import SongCoverImage from "../../admin/karaoke/song/song_img";
 
-export default function OsdSong({ song }: { song: KaraokeSong }) {
-    const imgRef = useRef<HTMLImageElement>(null);
+export default function OsdSong({ session }: { session: KaraokeSongSession }) {
     const {t} = useTranslation();
 
-    const onImgError = () => {
-        if (!imgRef.current) {
-            return;
-        }
-
-        imgRef.current.src = '/api/modules/karaoke/fallback-image';
-    };
+    const song = session.song;
 
     return <Stack direction="row" gap={2}>
-        <img ref={imgRef} onError={onImgError} src={`/api/modules/karaoke/medias/${song.filename}/cover.jpg`} alt={song.filename} style={{ maxHeight: '6em', objectFit: 'contain' }} />
+        <SongCoverImage song={song} />
+
         <Stack direction="column" flex={1}>
-            <Typography variant="body1">{song.title.length > 0 ? song.title : song.filename}</Typography>
+            <Typography variant="body1">{song.title}</Typography>
             <Typography variant="body1" fontSize=".9em" color="GrayText">{song.artist}</Typography>
             {
-                song.sung_by && song.sung_by.length > 0 &&
-                <Typography variant="body1" fontSize="1em" color="GrayText">{t('karaoke.sung_by')} {song.sung_by}</Typography>
+                session.sung_by && session.sung_by.length > 0 &&
+                <Typography variant="body1" fontSize="1em" color="GrayText">{t('karaoke.sung_by')} {session.sung_by}</Typography>
             }
         </Stack>
     </Stack>

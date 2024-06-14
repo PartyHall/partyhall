@@ -1,17 +1,18 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import Webcam from "react-webcam";
+import { Stack, Typography } from "@mui/material";
+
+import CDGPlayer from "./cdgplayer";
+import VideoPlayer from "./videoplayer";
+import OsdSong from "./osd_song";
+import { b64ImageToBlob } from "../../../utils/files";
+import { songTitle } from "../../../utils/songs";
 import LockedModal from "../../../components/locked_modal";
 import { useBoothSocket } from "../../../hooks/boothSocket";
 
 import '../../../assets/css/photobooth.scss';
 import '../../../assets/css/karaoke.scss';
-import { b64ImageToBlob } from "../../../utils/files";
-import CDGPlayer from "./cdgplayer";
-import VideoPlayer from "./videoplayer";
-import { Stack, Typography } from "@mui/material";
-import OsdSong from "./osd_song";
-import { useTranslation } from "react-i18next";
-import { songTitle } from "../../../utils/songs";
 
 type LastPicture = {
     url: string;
@@ -26,9 +27,9 @@ export default function Photobooth() {
     const [flash, setFlash] = useState<boolean>(false);
     const [lastPicture, setLastPicture] = useState<LastPicture|null>(null);
 
-    const module = appState.modules.photobooth;
-    const modulek = appState.modules.karaoke;
-    const resolution = module.webcam_resolution;
+    const module_photobooth = appState.modules.photobooth;
+    const module_karaoke = appState.modules.karaoke;
+    const resolution = module_photobooth.webcam_resolution;
 
     const takePicture = async (unattended: boolean) => {
         if (!webcamRef || !webcamRef.current) {
@@ -74,7 +75,7 @@ export default function Photobooth() {
                 return;
             }
 
-            setTimer(module.default_timer)
+            setTimer(module_photobooth.default_timer)
             return
         }
 
@@ -112,51 +113,59 @@ export default function Photobooth() {
         />
 
         {
-            modulek.currentSong && modulek.preplayTimer == 0 &&
+            module_karaoke.currentSong && module_karaoke.preplayTimer == 0 &&
             <>
                 {
-                    modulek.currentSong.format.toLowerCase() === 'cdg' &&
+                    module_karaoke.currentSong.song.format.toLowerCase() === 'cdg' &&
                     <CDGPlayer
                         cdgAlpha={.8}
                         cdgSize={window.innerHeight / 2}
                         width={window.innerWidth/2}
                         height={window.innerHeight / 2}
-                        isPlaying={modulek.started}
-                        song={modulek.currentSong}
-                        onEnd={() => sendMessage('karaoke/PLAYING_ENDED')}
+                        isPlaying={module_karaoke.started}
+                        song={module_karaoke.currentSong.song}
+                        onEnd={() => sendMessage('karaoke/PLAYING_ENDED', module_karaoke.currentSong.id)}
                         onError={() => {}}
                         onLoad={() => {}}
                         onPlay={() => {}}
-                        onStatus={(x: any) => sendMessage('karaoke/PLAYING_STATUS', {'current': x.position, 'total': x.total})}
+                        onStatus={(x: any) => sendMessage('karaoke/PLAYING_STATUS', {
+                            'session_id': module_karaoke.currentSong.id,
+                            'current': x.position,
+                            'total': x.total,
+                        })}
                     /> 
                 }
                 {
-                    modulek.currentSong.format.toLowerCase() !== 'cdg' && <VideoPlayer
-                        isPlaying={modulek.started}
-                        song={modulek.currentSong}
-                        onEnd={() => sendMessage('karaoke/PLAYING_ENDED')}
-                        onStatus={(x: any) => sendMessage('karaoke/PLAYING_STATUS', {'current': x.position, 'total': x.total})}
+                    module_karaoke.currentSong.song.format.toLowerCase() !== 'cdg' && <VideoPlayer
+                        isPlaying={module_karaoke.started}
+                        song={module_karaoke.currentSong.song}
+                        onEnd={() => sendMessage('karaoke/PLAYING_ENDED', module_karaoke.currentSong.id)}
+                        onStatus={(x: any) => sendMessage('karaoke/PLAYING_STATUS', {
+                            'session_id': module_karaoke.currentSong.id,
+                            'current': x.position,
+                            'total': x.total,
+                        })}
                     />
                 }
             </>
         }
         {
-            modulek.currentSong && modulek.preplayTimer > 0 &&
+            module_karaoke.currentSong && module_karaoke.preplayTimer > 0 &&
             <Stack display="column" className="karaoke__no_song">
                 <Typography variant="h1">{t('karaoke.now_playing')}:</Typography>
-                <Typography variant="h2">{songTitle(modulek.currentSong)}</Typography>
-                <Typography variant="h3">{modulek.preplayTimer}</Typography>
+                <Typography variant="h2">{songTitle(module_karaoke.currentSong.song)}</Typography>
+                <Typography variant="h3">{module_karaoke.preplayTimer}</Typography>
                 {
-                    modulek.currentSong.sung_by && modulek.currentSong.sung_by.length > 0 &&
-                    <Typography variant="h2">{t('karaoke.sung_by')} {modulek.currentSong.sung_by}</Typography>
+                    module_karaoke.currentSong.sung_by && module_karaoke.currentSong.sung_by.length > 0 &&
+                    <Typography variant="h2">{t('karaoke.sung_by')} {module_karaoke.currentSong.sung_by}</Typography>
                 }
             </Stack>
         }
         {
-            modulek.queue.length > 0 &&
+            module_karaoke.queue.length > 0 &&
             <Stack className="karaoke__next_song" gap={1}>
                 <Typography variant="h3">{t('karaoke.next_up')}:</Typography>
-                <OsdSong song={modulek.queue[0]} />
+                <OsdSong session={module_karaoke.queue[0]} />
             </Stack>
         }
 

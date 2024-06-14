@@ -3,18 +3,26 @@ package module_karaoke
 import (
 	"time"
 
-	"github.com/partyhall/partyhall/dto"
+	"github.com/partyhall/partyhall/logs"
+	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/remote"
 )
 
 type Actions struct{}
 
-func (a Actions) StartSong(song dto.SongDto) {
+func (a Actions) StartSong(song SongSession) {
 	INSTANCE.CurrentSong = &song
 	INSTANCE.PreplayTimer = CONFIG.PrePlayTimer
 	INSTANCE.Started = true
 	INSTANCE.UpdateFrontendSettings()
 	remote.BroadcastState()
+
+	now := models.Timestamp(time.Now())
+	INSTANCE.CurrentSong.StartedAt = &now
+	_, err := ormUpsertSession(0, song)
+	if err != nil {
+		logs.Errorf("Failed to upsert song session %v: %v", INSTANCE.CurrentSong.Id, err)
+	}
 
 	go func() {
 		for INSTANCE.PreplayTimer > 0 {

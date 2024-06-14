@@ -11,6 +11,7 @@ docs/
 
 .vscode
 ansible/inventory.yaml
+ansible/inventory.dev.yaml
 
 ansible/files/karaoke/*
 !ansible/files/karaoke/.gitkeep

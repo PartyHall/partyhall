@@ -53,16 +53,27 @@ type PhotoboothModule = {
 
 export type KaraokeSong = {
     id: number;
-    filename: string;
+    uuid: string;
+    spotify_id?: string;
     artist: string;
     title: string;
+    hotspot?: string;
     format: string;
-    sung_by: string;
+
+    has_cover: boolean;
+    has_vocals: boolean;
+    has_full: boolean;
 };
 
+export type KaraokeSongSession = {
+    id: number;
+    song: KaraokeSong;
+    sung_by: string;
+}
+
 type KaraokeModule = {
-    currentSong: KaraokeSong;
-    queue: KaraokeSong[];
+    currentSong: KaraokeSongSession;
+    queue: KaraokeSongSession[];
     started: boolean;
     preplayTimer: number;
 };

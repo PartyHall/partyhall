@@ -1,39 +1,26 @@
 package module_karaoke
 
 import (
-	"github.com/partyhall/partyhall/models"
+	"time"
+
+	"github.com/jmoiron/sqlx"
 	"github.com/partyhall/partyhall/orm"
 )
 
-func ormSearchSong(song string) ([]models.Song, error) {
+func ormListSongs(query string, offset int, limit int) ([]PhkSong, error) {
 	rows, err := orm.GET.DB.Queryx(`
-		SELECT id, filename, COALESCE(artist, '') artist, COALESCE(title, '') title, format
-		FROM song
-		LIMIT 20
-	`, song)
-
-	if err != nil {
-		return nil, err
-	}
-
-	songs := []models.Song{}
-
-	for rows.Next() {
-		var song models.Song
-		err = rows.StructScan(&song)
-		if err != nil {
-			return nil, err
-		}
-
-		songs = append(songs, song)
-	}
-
-	return songs, nil
-}
-
-func ormListSongs(query string, offset int, limit int) ([]models.Song, error) {
-	rows, err := orm.GET.DB.Queryx(`
-		SELECT id, filename, COALESCE(artist, '') artist, COALESCE(title, '') title, format
+		SELECT
+			id,
+			uuid,
+			spotify_id,
+			artist,
+			title,
+			hotspot,
+			format,
+			has_cover,
+			has_vocals,
+			has_full,
+			filename
 		FROM song
 		WHERE LENGTH($1) == 0
 		OR (
@@ -50,10 +37,10 @@ func ormListSongs(query string, offset int, limit int) ([]models.Song, error) {
 		return nil, err
 	}
 
-	songs := []models.Song{}
+	songs := []PhkSong{}
 
 	for rows.Next() {
-		var song models.Song
+		var song PhkSong
 		err = rows.StructScan(&song)
 		if err != nil {
 			return nil, err
@@ -65,18 +52,29 @@ func ormListSongs(query string, offset int, limit int) ([]models.Song, error) {
 	return songs, nil
 }
 
-func ormLoadSongByFilename(filename string) (*models.Song, error) {
+func ormFindOneSongBy(condition string, expectedValue any) (*PhkSong, error) {
 	row := orm.GET.DB.QueryRowx(`
-		SELECT id, filename, COALESCE(artist, '') artist, COALESCE(title, '') title, format
+		SELECT
+			id,
+			uuid,
+			spotify_id,
+			artist,
+			title,
+			hotspot,
+			format,
+			has_cover,
+			has_vocals,
+			has_full,
+			filename
 		FROM song
-		WHERE filename = $1
-	`, filename)
+		WHERE 
+	`+condition, expectedValue)
 
 	if row.Err() != nil {
 		return nil, row.Err()
 	}
 
-	var song models.Song
+	var song PhkSong
 	err := row.StructScan(&song)
 	if err != nil {
 		return nil, err
@@ -85,19 +83,39 @@ func ormLoadSongByFilename(filename string) (*models.Song, error) {
 	return &song, nil
 }
 
-func ormCreateSong(filename, artist, title, format string) (*models.Song, error) {
-	row := orm.GET.DB.QueryRowx(`
-		INSERT INTO song (filename, artist, title, format)
-		VALUES ($1, $2, $3, $4)
-		RETURNING id, filename, artist, title, format
-	`, filename, artist, title, format)
+func ormLoadSongByFilename(filename string) (*PhkSong, error) {
+	return ormFindOneSongBy("filename = $1", filename)
+}
+
+func ormLoadSongByUuid(uuid string) (*PhkSong, error) {
+	return ormFindOneSongBy("uuid = $1", uuid)
+}
+
+func ormCreateSong(song PhkSong) (*PhkSong, error) {
+	row := orm.GET.DB.QueryRowx(
+		`
+			INSERT INTO song (uuid, spotify_id, artist, title, hotspot, format, has_cover, has_vocals, has_full, filename)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+			RETURNING id, uuid, spotify_id, artist, title, hotspot, format, has_cover, has_vocals, has_full, filename
+		`,
+		song.Uuid,
+		song.SpotifyID,
+		song.Artist,
+		song.Title,
+		song.Hotspot,
+		song.Format,
+		song.HasCover,
+		song.HasVocals,
+		song.HasFull,
+		song.Filename,
+	)
 
 	if row.Err() != nil {
 		return nil, row.Err()
 	}
 
-	var song models.Song
 	err := row.StructScan(&song)
+
 	if err != nil {
 		return nil, err
 	}
@@ -105,17 +123,17 @@ func ormCreateSong(filename, artist, title, format string) (*models.Song, error)
 	return &song, nil
 }
 
-func ormDeleteSong(filename string) {
-	orm.GET.DB.Exec(`DELETE FROM song WHERE filename = $1`, filename)
+func ormDeleteSong(uuid string) {
+	orm.GET.DB.Exec(`DELETE FROM song WHERE uuid = $1`, uuid)
 }
 
-func ormFetchSongFilenames() ([]string, error) {
-	rows, err := orm.GET.DB.Query(`SELECT filename FROM song`)
+func ormFetchSongUUIDs() ([]string, error) {
+	rows, err := orm.GET.DB.Query(`SELECT uuid FROM song`)
 	if err != nil {
 		return nil, err
 	}
 
-	names := []string{}
+	uuids := []string{}
 
 	for rows.Next() {
 		var name string
@@ -124,14 +142,10 @@ func ormFetchSongFilenames() ([]string, error) {
 			return nil, err
 		}
 
-		names = append(names, name)
+		uuids = append(uuids, name)
 	}
 
-	return names, nil
-}
-
-func ormCountSongPlayed(filename string) {
-	orm.GET.DB.Exec(`UPDATE song SET play_count = play_count + 1 WHERE filename = $1`, filename)
+	return uuids, nil
 }
 
 func ormCountSongs(query string) (int, error) {
@@ -153,4 +167,56 @@ func ormCountSongs(query string) (int, error) {
 	err := row.Scan(&count)
 
 	return count, err
+}
+
+/**
+ * @TODO: This probably should not be an upsert but a create and a update separated
+ * as eventId is not required when updating
+ */
+func ormUpsertSession(eventId int, session SongSession) (*SongSession, error) {
+	var row *sqlx.Row
+
+	if session.Id == 0 {
+		currTime := time.Now().Unix()
+
+		row = orm.GET.DB.QueryRowx(`
+			INSERT INTO song_session (
+				song_id,
+				event_id,
+				sung_by,
+				added_at
+			) VALUES (
+				$1,
+				$2,
+				$3,
+				$4
+			)
+			RETURNING id, event_id, sung_by, added_at
+		`, session.Song.Id, eventId, session.SungBy, currTime)
+	} else {
+		row = orm.GET.DB.QueryRowx(
+			`
+				UPDATE song_session SET
+					added_at = $1,
+					started_at = $2,
+					ended_at = $3,
+					cancelled_at = $4
+				WHERE id = $5
+				RETURNING id, event_id, sung_by, added_at
+			`,
+			session.AddedAt,
+			session.StartedAt,
+			session.EndedAt,
+			session.CancelledAt,
+			session.Id,
+		)
+	}
+
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+
+	err := row.StructScan(&session)
+
+	return &session, err
 }

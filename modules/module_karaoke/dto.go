@@ -1,9 +1,5 @@
 package module_karaoke
 
-import (
-	"github.com/partyhall/partyhall/models"
-)
-
 type DtoSongCreate struct {
 	Title     string `form:"title" validate:"required"`
 	Artist    string `form:"artist" validate:"required"`
@@ -24,12 +20,11 @@ type DtoSongGet struct {
 	Filename string `json:"filename"`
 }
 
-func songGet(dbSong *models.Song) DtoSongGet {
+func songGet(dbSong *PhkSong) DtoSongGet {
 	return DtoSongGet{
-		Id:       dbSong.Id,
-		Title:    dbSong.Title,
-		Artist:   dbSong.Artist,
-		Format:   dbSong.Format,
-		Filename: dbSong.Filename,
+		Id:     dbSong.Id,
+		Title:  dbSong.Title,
+		Artist: dbSong.Artist,
+		Format: dbSong.Format,
 	}
 }

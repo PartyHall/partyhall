@@ -5,12 +5,14 @@ import (
 	"net/http"
 	"os"
 	"slices"
+	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/labstack/echo/v4"
 	"github.com/partyhall/easyws"
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/middlewares"
+	"github.com/partyhall/partyhall/remote"
 	"github.com/partyhall/partyhall/services"
 	"github.com/partyhall/partyhall/utils"
 	"gopkg.in/yaml.v2"
@@ -74,6 +76,37 @@ func (m ModuleKaraoke) LoadConfig(filename string) error {
 }
 
 func (m ModuleKaraoke) PreInitialize() error {
+	remote.RegisterOnJoin("karaoke", func(socketType string, s *easyws.Socket) {
+		if socketType == utils.SOCKET_TYPE_BOOTH {
+			if CONFIG.UnattendedInterval == 0 {
+				logs.Warn("No unattended delay set for karaoke so no per-song timelapse will be made!")
+
+				return
+			}
+
+			unattendedInterval := time.Duration(CONFIG.UnattendedInterval) * time.Second
+			lastTime := time.Now()
+
+			// This way of doing it should also be applied to
+			// the photobooth module
+			go func() {
+				for s.Open {
+					time.Sleep(1 * time.Second)
+					if INSTANCE.CurrentSong == nil || !INSTANCE.Started {
+						continue
+					}
+
+					currentTime := time.Now()
+
+					if currentTime.Sub(lastTime) >= unattendedInterval {
+						logs.Info("Unattended karaoke picture")
+						s.Send("UNATTENDED_KARAOKE_PICTURE", nil)
+						lastTime = currentTime
+					}
+				}
+			}()
+		}
+	})
 	return nil
 }
 

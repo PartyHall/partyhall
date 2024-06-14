@@ -11,10 +11,6 @@ import (
 	"github.com/partyhall/partyhall/services"
 )
 
-/**
-@TODO: When a song it stopped manually it should be adifferent event
-**/
-
 type PlaySongHandler struct{}
 
 func (h PlaySongHandler) GetType() string {

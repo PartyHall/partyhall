@@ -8,14 +8,51 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"sort"
 
 	"github.com/labstack/echo/v4"
+	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/services"
 	"github.com/partyhall/partyhall/utils"
 )
 
 var songFilenameCache = map[string]string{}
+
+func getModuleEventDir() (string, error) {
+	evt := services.GET.CurrentState.CurrentEvent
+	eventId := -1
+
+	if evt != nil {
+		eventId = *evt
+	}
+
+	basePath, err := utils.GetEventFolder(eventId)
+	if err != nil {
+		return "", err
+	}
+
+	fullPath := filepath.Join(basePath, "karaoke")
+	err = os.MkdirAll(fullPath, os.ModePerm)
+
+	return fullPath, err
+}
+
+func getModuleDir() (string, error) {
+	fullPath := filepath.Join(config.GET.RootPath, "karaoke")
+	err := os.MkdirAll(fullPath, os.ModePerm)
+
+	return fullPath, err
+}
+
+func getModuleFile(filename string) (string, error) {
+	baseDir, err := getModuleDir()
+	if err != nil {
+		return baseDir, err
+	}
+
+	return filepath.Join(baseDir, filename), nil
+}
 
 func getBestImage(images []services.SpotifyImage) (bestImage *services.SpotifyImage) {
 	// Sort images by resolution (descending order)
@@ -54,7 +91,12 @@ func streamFileFromZip(filename string, mimetype string) func(echo.Context) erro
 			songFilenameCache[songUuid] = song.Filename
 		}
 
-		zipFile, err := os.Open(utils.GetPath("karaoke", songFilename))
+		filepath, err := getModuleFile(songFilename)
+		if err != nil {
+			return c.String(http.StatusInternalServerError, "Failed to get the song file: "+err.Error())
+		}
+
+		zipFile, err := os.Open(filepath)
 		if err != nil {
 			return c.String(http.StatusInternalServerError, "Failed to open the song file: "+err.Error())
 		}

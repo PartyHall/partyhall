@@ -17,7 +17,7 @@ func (a Action) StartUnattended(s *easyws.Socket) {
 
 	go func() {
 		for s.Open {
-			time.Sleep(time.Duration(CONFIG.UnattendedInterval) * time.Minute)
+			time.Sleep(time.Duration(CONFIG.UnattendedInterval) * time.Second)
 			logs.Info("Unattended picture")
 			s.Send("UNATTENDED_PICTURE", nil)
 		}

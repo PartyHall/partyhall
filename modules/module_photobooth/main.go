@@ -8,6 +8,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/partyhall/easyws"
 	"github.com/partyhall/partyhall/logs"
+	"github.com/partyhall/partyhall/middlewares"
 	"github.com/partyhall/partyhall/remote"
 	"github.com/partyhall/partyhall/services"
 	"github.com/partyhall/partyhall/utils"
@@ -27,7 +28,7 @@ type ModulePhotobooth struct {
 }
 
 func (m ModulePhotobooth) GetModuleName() string {
-	return "Photoobooth"
+	return "Photobooth"
 }
 
 func (m ModulePhotobooth) LoadConfig(filename string) error {
@@ -95,5 +96,5 @@ func (m ModulePhotobooth) UpdateFrontendSettings() {
 }
 
 func (m ModulePhotobooth) RegisterApiRoutes(g *echo.Group) {
-
+	g.POST("/picture", takePictureRoute, middlewares.BoothOnlyMiddleware)
 }

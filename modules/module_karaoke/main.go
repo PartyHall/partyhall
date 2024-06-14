@@ -4,13 +4,11 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"path/filepath"
 	"slices"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/labstack/echo/v4"
 	"github.com/partyhall/easyws"
-	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/middlewares"
 	"github.com/partyhall/partyhall/services"
@@ -92,7 +90,10 @@ func (m ModuleKaraoke) Initialize() error {
 // It also removes from the DB songs that do no longer have cdg+mp3 files
 func (m ModuleKaraoke) ScanSongs() error {
 	logs.Info("[Karaoke] Scanning the songs")
-	baseDir := filepath.Join(config.GET.RootPath, "karaoke")
+	baseDir, err := getModuleDir()
+	if err != nil {
+		return err
+	}
 
 	//#region Load folder songs UUIDs
 	entries, err := os.ReadDir(baseDir)
@@ -109,7 +110,8 @@ func (m ModuleKaraoke) ScanSongs() error {
 			continue
 		}
 
-		song, err := LoadPhkSong(filepath.Join(baseDir, file.Name()))
+		songFile, _ := getModuleFile(file.Name())
+		song, err := LoadPhkSong(songFile)
 		if err != nil {
 			fmt.Printf("Failed to read file %s: %s\n", file.Name(), err)
 			continue

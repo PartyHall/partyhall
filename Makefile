@@ -11,6 +11,7 @@ reset-db:
 	rm -rf 0_DATA/partyhall.db
 	sqlite3 0_DATA/partyhall.db < sql/init.sql
 	sqlite3 0_DATA/partyhall.db < sql/fixtures.sql
+	go run . user initialize --username admin --password admin --name Admin
 
 take-picture:
 	docker compose exec mosquitto mosquitto_pub -h 127.0.0.1 -t partyhall/button_press -m "partyhall/photobooth/take_picture"

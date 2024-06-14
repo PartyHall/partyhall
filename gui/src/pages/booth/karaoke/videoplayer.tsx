@@ -40,8 +40,9 @@ export default function VideoPlayer({isPlaying, song, onEnd, onStatus}: Props) {
         }
     }, [isPlaying]);
 
+    // @TODO: Also load the vocals / full and sync it if available
     return <video 
-        src={'/api/modules/karaoke/medias/' + song.filename + '/song.' + song.format}
+        src={'/api/modules/karaoke/song/' + song.uuid + '/instrumental-webm'}
         autoPlay
         onEnded={onEnd}
         controls

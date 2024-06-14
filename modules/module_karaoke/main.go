@@ -1,18 +1,16 @@
 package module_karaoke
 
 import (
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
 	"slices"
-	"strings"
-	"time"
 
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"github.com/labstack/echo/v4"
 	"github.com/partyhall/easyws"
 	"github.com/partyhall/partyhall/config"
-	"github.com/partyhall/partyhall/dto"
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/middlewares"
 	"github.com/partyhall/partyhall/services"
@@ -26,11 +24,6 @@ var (
 	}
 
 	CONFIG = Config{}
-
-	ALLOWED_EXT_LIST = []string{
-		"mp4",
-		"webm",
-	}
 )
 
 /**
@@ -41,8 +34,8 @@ var (
 type ModuleKaraoke struct {
 	Actions Actions
 
-	CurrentSong  *dto.SongDto
-	Queue        []dto.SongDto
+	CurrentSong  *SongSession
+	Queue        []SongSession
 	Started      bool
 	PreplayTimer int
 
@@ -87,12 +80,9 @@ func (m ModuleKaraoke) PreInitialize() error {
 }
 
 func (m ModuleKaraoke) Initialize() error {
-	go func() {
-		for {
-			m.ScanSongs()
-			time.Sleep(5 * time.Minute)
-		}
-	}()
+	if err := m.ScanSongs(); err != nil {
+		fmt.Println(err)
+	}
 
 	return nil
 }
@@ -103,114 +93,64 @@ func (m ModuleKaraoke) Initialize() error {
 func (m ModuleKaraoke) ScanSongs() error {
 	logs.Info("[Karaoke] Scanning the songs")
 	baseDir := filepath.Join(config.GET.RootPath, "karaoke")
+
+	//#region Load folder songs UUIDs
 	entries, err := os.ReadDir(baseDir)
 	if err != nil {
 		logs.Error("Failed to read songs directory!", err)
 		return err
 	}
 
-	dbSongs, err := ormFetchSongFilenames()
+	folderSongs := map[string]*PhkSong{}
+	folderSongsIds := []string{}
+
+	for _, file := range entries {
+		if file.IsDir() {
+			continue
+		}
+
+		song, err := LoadPhkSong(filepath.Join(baseDir, file.Name()))
+		if err != nil {
+			fmt.Printf("Failed to read file %s: %s\n", file.Name(), err)
+			continue
+		}
+
+		folderSongsIds = append(folderSongsIds, song.Uuid.String())
+		folderSongs[file.Name()] = song
+	}
+	//#endregion
+
+	dbSongs, err := ormFetchSongUUIDs()
 	if err != nil {
 		logs.Error("Failed to fetch songs from DB: ", err)
 		return err
 	}
-	folderSongs := []string{}
-
-	if err != nil {
-		logs.Error("Failed to fetch songs in DB, skipping the scanning process")
-		return err
-	}
-
-	//#region Purge invalid songs
-	// @TODO: In case of video
-	// Check whether the DB song has the correct extension to consider it valid
-	for _, entry := range entries {
-		songName := entry.Name()
-		basePath := filepath.Join(baseDir, songName)
-
-		if fi, err := os.Stat(basePath); err == nil && !fi.IsDir() {
-			continue
-		}
-
-		isSongValid := false
-
-		hasCdg := utils.FileExists(filepath.Join(basePath, "song.cdg"))
-		hasMp3 := utils.FileExists(filepath.Join(basePath, "song.mp3"))
-		foundExt := utils.FileExistsForAnyExt(filepath.Join(basePath, "song"), ALLOWED_EXT_LIST)
-
-		if len(foundExt) > 0 || (hasMp3 && hasCdg) {
-			isSongValid = true
-		}
-
-		if _, err := os.Stat(filepath.Join(basePath, "cover.jpg")); isSongValid && os.IsNotExist(err) {
-			logs.Warn("No cover found for song " + songName)
-		}
-
-		if !isSongValid {
-			logs.Error("Invalid song detected: " + songName + ". Removing it.")
-
-			// Removing the song
-			os.RemoveAll(basePath)
-			ormDeleteSong(songName)
-		} else {
-			folderSongs = append(folderSongs, songName)
-		}
-	}
-	//#endregion
 
 	//#region Removing songs that are in database but not in folders
-	for _, songName := range dbSongs {
-		if slices.Contains(folderSongs, songName) {
+	for _, songId := range dbSongs {
+		if slices.Contains(folderSongsIds, songId) {
 			continue
 		}
 
-		logs.Error("Song " + songName + " no longer available, removing it from the database.")
-		ormDeleteSong(songName)
+		logs.Error("Song " + songId + " no longer available, removing it from the database.")
+		ormDeleteSong(songId)
 	}
 	//#endregion
 
-	//#region Finally, adding songs that are not in the DB yet
-	for _, songName := range folderSongs {
-		if slices.Contains(dbSongs, songName) {
+	//#region Then adding songs that are not in the DB yet
+	for filename, song := range folderSongs {
+		if slices.Contains(dbSongs, song.Uuid.String()) {
 			continue
 		}
 
-		artist := ""
-		title := ""
-		format := ""
-
-		infoFile := filepath.Join(baseDir, songName, "info.txt")
-		data, err := os.ReadFile(infoFile)
+		song.Filename = filename
+		s, err := ormCreateSong(*song)
 		if err != nil {
-			logs.Warn("Song " + songName + " doesn't have info.txt. Fill the info manually!")
-		} else {
-			dataStr := strings.Split(string(data), "\n")
-			if len(dataStr) < 3 {
-				logs.Warn("Song " + songName + " have invalid info.txt. Fill the info manually!")
-			} else {
-				artist = dataStr[0]
-				title = dataStr[1]
-				format = dataStr[2]
-			}
+			logs.Error("Failed to create song "+song.Artist+" - "+song.Title+": ", err)
+			continue
 		}
 
-		if len(format) == 0 {
-			// Wtf ?
-			foundCdg := false
-			foundVideo := false
-
-			if !foundCdg && !foundVideo {
-				logs.Error("Failed to create song " + songName + ", the folder should contain either a cdg or a video")
-				continue
-			}
-		}
-
-		_, err = ormCreateSong(songName, artist, title, format)
-		if err != nil {
-			logs.Error("Failed to create song "+songName+": ", err)
-		} else {
-			logs.Info("Song " + songName + " created.")
-		}
+		logs.Info(fmt.Sprintf("Song %s - %s created (ID %v).", song.Artist, song.Title, s.Id))
 	}
 	//#endregion
 
@@ -226,6 +166,7 @@ func (m ModuleKaraoke) GetMqttHandlers() map[string]mqtt.MessageHandler {
 func (m ModuleKaraoke) GetWebsocketHandlers() []easyws.MessageHandler {
 	return []easyws.MessageHandler{
 		PlaySongHandler{},
+		QueueAndPlayHandler{},
 		PlayingStatusHandler{},
 		PlayingEndedHandler{},
 		AddToQueueHandler{},
@@ -239,7 +180,7 @@ func (m ModuleKaraoke) GetWebsocketHandlers() []easyws.MessageHandler {
 func (m ModuleKaraoke) UpdateFrontendSettings() {
 	queue := m.Queue
 	if queue == nil {
-		queue = []dto.SongDto{}
+		queue = []SongSession{}
 	}
 
 	services.GET.ModuleSettings["karaoke"] = map[string]interface{}{
@@ -261,5 +202,10 @@ func (m ModuleKaraoke) RegisterApiRoutes(g *echo.Group) {
 		return c.Blob(http.StatusOK, "", services.KARAOKE_FALLBACK_IMAGE)
 	})
 
-	g.Static("/medias", utils.GetPath("karaoke"))
+	g.GET("/song/:uuid/cover", streamFileFromZip("cover.jpg", "image/jpeg"))
+	g.GET("/song/:uuid/instrumental-mp3", streamFileFromZip("instrumental.mp3", "audio/mpeg"))
+	g.GET("/song/:uuid/full-mp3", streamFileFromZip("full.mp3", "audio/mpeg"))
+	g.GET("/song/:uuid/instrumental-webm", streamFileFromZip("instrumental.webm", "video/webm"))
+	g.GET("/song/:uuid/vocals-mp3", streamFileFromZip("vocals.mp3", "audio/mpeg"))
+	g.GET("/song/:uuid/cdg", streamFileFromZip("lyrics.cdg", "application/octet-stream"))
 }

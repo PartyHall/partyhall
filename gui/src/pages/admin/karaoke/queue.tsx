@@ -1,8 +1,10 @@
-import { Card, CardContent, LinearProgress, List, Slider, Stack, Typography } from "@mui/material";
-import { useAdminSocket } from "../../../hooks/adminSocket"
-import Song from "./song";
+import { Card, CardContent, List, Slider, Stack, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+
+import { useAdminSocket } from "../../../hooks/adminSocket"
+
+import Song from "./song";
 
 const secondsToDisplay = (seconds: number) => {
     if (seconds < 0) {
@@ -10,17 +12,17 @@ const secondsToDisplay = (seconds: number) => {
     }
 
     const remainingSeconds = Math.floor(seconds) % 60;
-    const remainingMinutes = Math.floor(seconds/60);
+    const remainingMinutes = Math.floor(seconds / 60);
 
     return `${remainingMinutes}`.padStart(2, '0') + ':' + `${remainingSeconds}`.padStart(2, '0');
 };
 
 export default function KaraokeQueue() {
-    const {t} = useTranslation();
+    const { t } = useTranslation();
     const [currentPosition, setCurrentPosition] = useState<number>(0);
     const [duration, setDuration] = useState<number>(-1);
 
-    const {appState, lastMessage} = useAdminSocket();
+    const { appState, lastMessage } = useAdminSocket();
     const module = appState.modules.karaoke;
 
     useEffect(() => {
@@ -36,10 +38,10 @@ export default function KaraokeQueue() {
                 <CardContent>
                     <Stack gap={3}>
                         <Typography variant="h4" textAlign="center" fontSize="1.3em">{t('karaoke.current')}</Typography>
-                        <Song song={module.currentSong} type="QUEUE" mb={0} />
+                        <Song song={module.currentSong.song} session={module.currentSong} type="QUEUE" mb={0} />
                         <Stack direction="row" gap={3}>
                             <Typography variant={"body1"}>{secondsToDisplay(currentPosition)}</Typography>
-                            <Slider disabled min={0} max={duration} value={currentPosition}/>
+                            <Slider disabled min={0} max={duration} value={currentPosition} />
                             <Typography variant={"body1"}>{secondsToDisplay(duration)}</Typography>
                         </Stack>
                     </Stack>
@@ -50,10 +52,11 @@ export default function KaraokeQueue() {
         <Typography variant="h4" fontSize="1.3em" textAlign="center">{t('karaoke.queue')}</Typography>
         {module.queue.length == 0 && <Typography variant="body1">{t('karaoke.empty_queue')}</Typography>}
         <List>
-            { module.queue.map((x, idx) => <Song 
+            {module.queue.map((x, idx) => <Song
                 key={x.id}
-                song={x}
-                type="QUEUE" 
+                song={x.song}
+                session={x}
+                type="QUEUE"
                 isFirst={idx === 0}
                 isLast={idx === module.queue.length - 1}
             />)

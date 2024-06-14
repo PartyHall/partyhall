@@ -6,6 +6,7 @@
 DROP TABLE IF EXISTS exported_event;
 DROP TABLE IF EXISTS image;
 DROP TABLE IF EXISTS event;
+DROP TABLE IF EXISTS song_session;
 DROP TABLE IF EXISTS song;
 
 DROP TABLE IF EXISTS refresh_token;
@@ -38,11 +39,29 @@ CREATE TABLE exported_event (
 
 CREATE TABLE song (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    filename VARCHAR(512) NOT NULL UNIQUE,
+    uuid VARCHAR(255) NOT NULL UNIQUE, -- @TODO: Make it correct
+    spotify_id VARCHAR(255),
     artist VARCHAR(512) NULL,
     title VARCHAR(512) NULL,
+    hotspot VARCHAR(512) NULL,
     format VARCHAR(32) NOT NULL DEFAULT 'cdg',
-    play_count INTEGER NOT NULL DEFAULT 0
+
+    has_cover BOOL NOT NULL DEFAULT FALSE,
+    has_vocals BOOL NOT NULL DEFAULT FALSE,
+    has_full BOOL NOT NULL DEFAULT FALSE,
+
+    filename VARCHAR(512) NOT NULL UNIQUE
+);
+
+CREATE TABLE song_session (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    song_id INTEGER NOT NULL REFERENCES song(id),
+    event_id INTEGER NOT NULL REFERENCES event(id),
+    sung_by VARCHAR(255) NOT NULL,
+    added_at datetime NULL DEFAULT NULL,
+    started_at datetime NULL DEFAULT NULL,
+    ended_at datetime NULL DEFAULT NULL,
+    cancelled_at datetime NULL DEFAULT NULL
 );
 
 CREATE TABLE app_state (

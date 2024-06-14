@@ -37,7 +37,7 @@ services:
       # retries: 3
 
   frontend:
-    image: node:lts
+    image: 'node:lts'
     init: true
     volumes: ['./gui:/app']
     working_dir: '/app'

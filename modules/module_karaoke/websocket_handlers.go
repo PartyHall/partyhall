@@ -1,13 +1,19 @@
 package module_karaoke
 
 import (
+	"time"
+
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/partyhall/easyws"
-	"github.com/partyhall/partyhall/dto"
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/remote"
+	"github.com/partyhall/partyhall/services"
 )
+
+/**
+@TODO: When a song it stopped manually it should be adifferent event
+**/
 
 type PlaySongHandler struct{}
 
@@ -15,36 +21,51 @@ func (h PlaySongHandler) GetType() string {
 	return "karaoke/PLAY"
 }
 
+// PLAY = Session ID OK
 func (h PlaySongHandler) Do(s *easyws.Socket, payload interface{}) {
-	song, err := ormLoadSongByFilename(payload.(string))
-	if err != nil {
-		logs.Error("Failed to load song: ", err)
+	sessionIdFloat, ok := payload.(float64)
+	if !ok {
+		logs.Error("Failed to play song: Session ID could not be parsed")
 		return
 	}
 
-	if INSTANCE.Queue != nil {
-		toRemoveSong := -1
-		for i, queueSong := range INSTANCE.Queue {
-			if queueSong.Id == song.Id {
-				toRemoveSong = i
+	sessionId := int(sessionIdFloat)
+
+	var songSession *SongSession = nil
+	toRemoveSong := -1
+
+	if INSTANCE.CurrentSong != nil && INSTANCE.CurrentSong.Id == sessionId {
+		songSession = INSTANCE.CurrentSong
+	} else if INSTANCE.Queue != nil {
+		for idx, session := range INSTANCE.Queue {
+			if session.Id == sessionId {
+				songSession = &session
+				toRemoveSong = idx
 				break
 			}
 		}
-		if toRemoveSong >= 0 {
-			INSTANCE.Queue = append(INSTANCE.Queue[:toRemoveSong], INSTANCE.Queue[toRemoveSong+1:]...)
+	}
+
+	if INSTANCE.CurrentSong != nil {
+		now := models.Timestamp(time.Now())
+		INSTANCE.CurrentSong.CancelledAt = &now
+		_, err := ormUpsertSession(0, *INSTANCE.CurrentSong)
+		if err != nil {
+			logs.Errorf("Failed to cancel previous song (%v): %v", INSTANCE.CurrentSong.Id, err)
 		}
 	}
 
-	singer := ""
-	if s.User != nil {
-		user := s.User.(*jwt.Token).Claims.(*models.JwtCustomClaims)
-		singer = user.Name
+	if songSession == nil {
+		logs.Errorf("Failed to play song: Session %v is not in the queue!", sessionId)
+		return
 	}
 
-	INSTANCE.Actions.StartSong(dto.SongDto{
-		Song:   song,
-		SungBy: singer,
-	})
+	if toRemoveSong >= 0 {
+
+		INSTANCE.Queue = append(INSTANCE.Queue[:toRemoveSong], INSTANCE.Queue[toRemoveSong+1:]...)
+	}
+
+	INSTANCE.Actions.StartSong(*songSession)
 }
 
 type PlayingStatusHandler struct{}
@@ -53,6 +74,7 @@ func (h PlayingStatusHandler) GetType() string {
 	return "karaoke/PLAYING_STATUS"
 }
 
+// PLAYING_STATUS: Session ID OK
 func (h PlayingStatusHandler) Do(s *easyws.Socket, payload interface{}) {
 	remote.BroadcastAdmin("karaoke/PLAYING_STATUS", payload)
 }
@@ -63,8 +85,17 @@ func (h PlayingEndedHandler) GetType() string {
 	return "karaoke/PLAYING_ENDED"
 }
 
+// PLAYING_ENDED: Session ID OK
 func (h PlayingEndedHandler) Do(s *easyws.Socket, payload interface{}) {
-	ormCountSongPlayed(INSTANCE.CurrentSong.Filename)
+	if INSTANCE.CurrentSong != nil {
+		now := models.Timestamp(time.Now())
+		INSTANCE.CurrentSong.EndedAt = &now
+		_, err := ormUpsertSession(0, *INSTANCE.CurrentSong)
+		if err != nil {
+			logs.Errorf("Failed to upsert song session %v: %v", INSTANCE.CurrentSong.Id, err)
+		}
+	}
+
 	INSTANCE.Actions.StartNextSong()
 }
 
@@ -74,12 +105,13 @@ func (h AddToQueueHandler) GetType() string {
 	return "karaoke/ADD_TO_QUEUE"
 }
 
+// ADD_TO_QUEUE: Song UUID OK
 func (h AddToQueueHandler) Do(s *easyws.Socket, payload interface{}) {
 	if INSTANCE.Queue == nil {
-		INSTANCE.Queue = []dto.SongDto{}
+		INSTANCE.Queue = []SongSession{}
 	}
 
-	song, err := ormLoadSongByFilename(payload.(string))
+	song, err := ormLoadSongByUuid(payload.(string))
 	if err != nil {
 		logs.Error("Failed to load song: ", err)
 		return
@@ -87,7 +119,7 @@ func (h AddToQueueHandler) Do(s *easyws.Socket, payload interface{}) {
 
 	// No need to have the same song twice
 	for _, queueSong := range INSTANCE.Queue {
-		if queueSong.Id == song.Id {
+		if queueSong.Song.Id == song.Id {
 			return
 		}
 	}
@@ -98,12 +130,58 @@ func (h AddToQueueHandler) Do(s *easyws.Socket, payload interface{}) {
 		singer = user.Name
 	}
 
-	INSTANCE.Queue = append(INSTANCE.Queue, dto.SongDto{
-		Song:   song,
+	eventId := 0
+	if services.GET.CurrentState.CurrentEvent != nil {
+		eventId = *services.GET.CurrentState.CurrentEvent
+	}
+
+	session, err := ormUpsertSession(eventId, SongSession{
+		Song:   *song,
 		SungBy: singer,
 	})
+	if err != nil {
+		logs.Errorf("Failed to upsert session: %v", err)
+	}
+
+	INSTANCE.Queue = append(INSTANCE.Queue, *session)
 	INSTANCE.UpdateFrontendSettings()
 	remote.BroadcastState()
+}
+
+type QueueAndPlayHandler struct{}
+
+func (h QueueAndPlayHandler) GetType() string {
+	return "karaoke/QUEUE_AND_PLAY"
+}
+
+// QUEUE_AND_PLAY: Song UUID
+func (h QueueAndPlayHandler) Do(s *easyws.Socket, payload interface{}) {
+	song, err := ormLoadSongByUuid(payload.(string))
+	if err != nil {
+		logs.Error("Failed to load song: ", err)
+		return
+	}
+
+	singer := ""
+	if s.User != nil {
+		user := s.User.(*jwt.Token).Claims.(*models.JwtCustomClaims)
+		singer = user.Name
+	}
+
+	eventId := 0
+	if services.GET.CurrentState.CurrentEvent != nil {
+		eventId = *services.GET.CurrentState.CurrentEvent
+	}
+
+	session, err := ormUpsertSession(eventId, SongSession{
+		Song:   *song,
+		SungBy: singer,
+	})
+	if err != nil {
+		logs.Errorf("Failed to upsert session: %v", err)
+	}
+
+	INSTANCE.Actions.StartSong(*session)
 }
 
 type DelFromQueueHandler struct{}
@@ -112,29 +190,50 @@ func (h DelFromQueueHandler) GetType() string {
 	return "karaoke/DEL_FROM_QUEUE"
 }
 
+// DEL_FROM_QUEUE: Session ID OK
 func (h DelFromQueueHandler) Do(s *easyws.Socket, payload interface{}) {
 	if INSTANCE.Queue == nil {
-		INSTANCE.Queue = []dto.SongDto{}
+		INSTANCE.Queue = []SongSession{}
 	}
 
-	filename := payload.(string)
+	sessionIdFloat, ok := payload.(float64)
+	if !ok {
+		logs.Error("Failed to play song: Session ID could not be parsed")
+		return
+	}
 
-	if INSTANCE.CurrentSong != nil && INSTANCE.CurrentSong.Filename == filename {
-		INSTANCE.Actions.StartNextSong()
+	sessionId := int(sessionIdFloat)
+
+	var session *SongSession = nil
+	toRemoveSong := -1
+
+	if INSTANCE.CurrentSong != nil && sessionId == INSTANCE.CurrentSong.Id {
+		session = INSTANCE.CurrentSong
 	} else {
-		toRemoveSong := -1
 		for i, queueSong := range INSTANCE.Queue {
-			if queueSong.Filename == filename {
+			if queueSong.Id == sessionId {
 				toRemoveSong = i
+				session = &queueSong
 				break
 			}
 		}
+	}
 
-		if toRemoveSong >= 0 {
-			INSTANCE.Queue = append(INSTANCE.Queue[:toRemoveSong], INSTANCE.Queue[toRemoveSong+1:]...)
-			INSTANCE.UpdateFrontendSettings()
-			remote.BroadcastState()
+	if session != nil {
+		now := models.Timestamp(time.Now())
+		session.CancelledAt = &now
+		_, err := ormUpsertSession(0, *session)
+		if err != nil {
+			logs.Errorf("Failed to save the song cancellation for session %v: %v", session.Id, err)
 		}
+	}
+
+	if INSTANCE.CurrentSong != nil && INSTANCE.CurrentSong.Id == sessionId {
+		INSTANCE.Actions.StartNextSong()
+	} else if toRemoveSong >= 0 {
+		INSTANCE.Queue = append(INSTANCE.Queue[:toRemoveSong], INSTANCE.Queue[toRemoveSong+1:]...)
+		INSTANCE.UpdateFrontendSettings()
+		remote.BroadcastState()
 	}
 }
 
@@ -144,6 +243,7 @@ func (h PauseHandler) GetType() string {
 	return "karaoke/PAUSE"
 }
 
+// PAUSE: Session ID
 func (h PauseHandler) Do(s *easyws.Socket, payload interface{}) {
 	if INSTANCE.CurrentSong == nil {
 		return
@@ -154,13 +254,13 @@ func (h PauseHandler) Do(s *easyws.Socket, payload interface{}) {
 	remote.BroadcastState()
 }
 
-func findSongPosition(filename string) int {
+func findSongPosition(sessionId int) int {
 	if INSTANCE.Queue == nil {
 		return -1
 	}
 
 	for x, s := range INSTANCE.Queue {
-		if s.Filename == filename {
+		if s.Id == sessionId {
 			return x
 		}
 	}
@@ -174,8 +274,17 @@ func (h QueueMoveUp) GetType() string {
 	return "karaoke/QUEUE_MOVE_UP"
 }
 
+// QUEUE_MOVE_UP: Session ID OK
 func (h QueueMoveUp) Do(s *easyws.Socket, payload interface{}) {
-	idx := findSongPosition(payload.(string))
+	sessionIdFloat, ok := payload.(float64)
+	if !ok {
+		logs.Error("Failed to play song: Session ID could not be parsed")
+		return
+	}
+
+	sessionId := int(sessionIdFloat)
+
+	idx := findSongPosition(sessionId)
 
 	if idx > 0 {
 		tmp := INSTANCE.Queue[idx-1]
@@ -193,8 +302,17 @@ func (h QueueMoveDown) GetType() string {
 	return "karaoke/QUEUE_MOVE_DOWN"
 }
 
+// QUEUE_MOVE_DOWN: Session ID OK
 func (h QueueMoveDown) Do(s *easyws.Socket, payload interface{}) {
-	idx := findSongPosition(payload.(string))
+	sessionIdFloat, ok := payload.(float64)
+	if !ok {
+		logs.Error("Failed to play song: Session ID could not be parsed")
+		return
+	}
+
+	sessionId := int(sessionIdFloat)
+
+	idx := findSongPosition(sessionId)
 
 	if idx < len(INSTANCE.Queue)-1 {
 		tmp := INSTANCE.Queue[idx+1]

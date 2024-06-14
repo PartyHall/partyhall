@@ -1,10 +1,21 @@
 package module_karaoke
 
 import (
+	"archive/zip"
+	"bytes"
+	"encoding/json"
+	"errors"
+	"io"
+	"net/http"
+	"os"
 	"sort"
 
+	"github.com/labstack/echo/v4"
 	"github.com/partyhall/partyhall/services"
+	"github.com/partyhall/partyhall/utils"
 )
+
+var songFilenameCache = map[string]string{}
 
 func getBestImage(images []services.SpotifyImage) (bestImage *services.SpotifyImage) {
 	// Sort images by resolution (descending order)
@@ -28,4 +39,99 @@ func getBestImage(images []services.SpotifyImage) (bestImage *services.SpotifyIm
 
 	// Return an empty image if the input array is empty
 	return nil
+}
+
+func streamFileFromZip(filename string, mimetype string) func(echo.Context) error {
+	return func(c echo.Context) error {
+		songUuid := c.Param("uuid")
+		songFilename, found := songFilenameCache[songUuid]
+		if !found {
+			song, err := ormLoadSongByUuid(songUuid)
+			if err != nil {
+				return c.String(http.StatusNotFound, "Song not found: "+err.Error())
+			}
+
+			songFilenameCache[songUuid] = song.Filename
+		}
+
+		zipFile, err := os.Open(utils.GetPath("karaoke", songFilename))
+		if err != nil {
+			return c.String(http.StatusInternalServerError, "Failed to open the song file: "+err.Error())
+		}
+		defer zipFile.Close()
+
+		fileInfo, err := zipFile.Stat()
+		if err != nil {
+			return c.String(http.StatusInternalServerError, "Failed to get the song file size: "+err.Error())
+		}
+
+		zipReader, err := zip.NewReader(zipFile, fileInfo.Size())
+		if err != nil {
+			return c.String(http.StatusInternalServerError, "Failed to read the song file: "+err.Error())
+		}
+
+		for _, file := range zipReader.File {
+			if file.Name == filename {
+				fileReader, err := file.Open()
+				if err != nil {
+					return c.String(http.StatusInternalServerError, "Failed to open file in the song: "+err.Error())
+				}
+
+				defer fileReader.Close()
+
+				c.Response().Header().Set(echo.HeaderContentType, mimetype)
+				c.Response().WriteHeader(http.StatusOK)
+				_, err = io.Copy(c.Response().Writer, fileReader)
+				if err != nil {
+					return c.String(http.StatusInternalServerError, "Failed to stream file: "+err.Error())
+				}
+				return nil
+			}
+		}
+
+		return c.String(http.StatusNotFound, "File not found in the song file")
+	}
+}
+
+func LoadPhkSong(path string) (*PhkSong, error) {
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		return nil, err
+	}
+
+	phk := PhkSong{}
+
+	reader, err := zip.OpenReader(path)
+	if err != nil {
+		return nil, err
+	}
+
+	defer reader.Close()
+
+	found := false
+	for _, file := range reader.File {
+		if file.Name == "song.json" {
+			found = true
+
+			rc, err := file.Open()
+			if err != nil {
+				return nil, errors.New("failed to read PHK Song file: " + err.Error())
+			}
+
+			buf := new(bytes.Buffer)
+			buf.ReadFrom(rc)
+
+			err = json.Unmarshal(buf.Bytes(), &phk)
+			if err != nil {
+				return nil, errors.New("failed to read PHK Song file: " + err.Error())
+			}
+
+			rc.Close()
+		}
+	}
+
+	if !found {
+		return nil, errors.New("failed to read PHK Song file: No song.json found")
+	}
+
+	return &phk, nil
 }

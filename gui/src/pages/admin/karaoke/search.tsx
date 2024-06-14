@@ -11,7 +11,6 @@ import { useTranslation } from "react-i18next";
 import { debounce } from "lodash";
 
 export default function KaraokeSearch() {
-    const [wasSearch, setWasSearch] = useState<boolean>(false);
     const {t} = useTranslation();
     const {api} = useApi();
 

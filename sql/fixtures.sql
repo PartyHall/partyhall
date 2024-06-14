@@ -6,11 +6,3 @@ VALUES
 
 INSERT INTO app_state(id, hwid, token, current_event)
 VALUES (1, '73d05017-d8ee-4de8-8229-b8edf452202f', '73d05017-d8ee-4de8-8229-b8edf452202f', 1);
-
-INSERT INTO song (id, filename, artist, title)
-VALUES
-    (1, 'abba_angel_eyes', 'ABBA', 'Angel Eyes'),
-    (2, 'aha_take_on_me', 'a-ha', 'Take on me'),
-    (3, 'noirdesir_lhomme_presse', 'Noir Désir', 'L''homme pressé'),
-    (4, 'somesongthatdoesntexists', NULL, NULL)
-;

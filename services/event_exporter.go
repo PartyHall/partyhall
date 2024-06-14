@@ -35,7 +35,7 @@ func NewEventExporter(event *models.Event) EventExporter {
 
 func (ee EventExporter) setEventExporting(exp bool) error {
 	ee.event.Exporting = exp
-	err := orm.GET.Events.Save(ee.event)
+	err := orm.GET.Events.SaveEvent(ee.event)
 	if err != nil {
 		logs.Error("Failed to set the exporting state")
 		return err
@@ -68,6 +68,10 @@ func (ee EventExporter) BuildFfmpegCommand(params RecapParams) *exec.Cmd {
 	return cmd
 }
 
+/**
+ * This will be rewritten in the Partyhall server
+ * Don't waste too much time on this
+ **/
 func (ee EventExporter) Export() (*models.ExportedEvent, error) {
 	if ee.event.Exporting {
 		return nil, errors.New("can't export an event that is already exporting")
@@ -79,16 +83,16 @@ func (ee EventExporter) Export() (*models.ExportedEvent, error) {
 
 	exportTime := time.Now()
 
-	basepath := fmt.Sprintf("images/%v/exports/", ee.event.Id)
+	basepath := fmt.Sprintf("events/%v/exports", ee.event.Id)
 	err := utils.MakeOrCreateFolder(basepath)
 	if err != nil {
 		return nil, errors.Join(err, ee.setEventExporting(false))
 	}
 
-	basefilepath := exportTime.Format("20060201-150405") + ".zip"
-	filepath := utils.GetPath(basepath + basefilepath)
+	filename := exportTime.Format("20060201-150405") + ".zip"
+	fullpath := utils.GetPath(basepath, filename)
 
-	archive, err := os.Create(filepath)
+	archive, err := os.Create(fullpath)
 	if err != nil {
 		return nil, errors.Join(err, ee.setEventExporting(false))
 	}
@@ -104,7 +108,7 @@ func (ee EventExporter) Export() (*models.ExportedEvent, error) {
 	}
 
 	for _, i := range images {
-		imagePath := utils.GetPath(fmt.Sprintf("images/%v/pictures/%v.jpg", ee.event.Id, i.Id))
+		imagePath := utils.GetPath(fmt.Sprintf("events/%v/photobooth/pictures/%v.jpg", ee.event.Id, i.Id))
 		if _, err := os.Stat(imagePath); os.IsNotExist(err) {
 			logs.Errorf("Failed to locate image %v from event %v\n", i.Id, ee.event.Id)
 			continue
@@ -132,7 +136,7 @@ func (ee EventExporter) Export() (*models.ExportedEvent, error) {
 	//#endregion
 
 	//#region Exporting unattended images
-	unattendedRoot := utils.GetPath(fmt.Sprintf("images/%v/unattended/", ee.event.Id))
+	unattendedRoot := utils.GetPath(fmt.Sprintf("events/%v/photobooth/unattended/", ee.event.Id))
 	if _, err := os.Stat(unattendedRoot); !os.IsNotExist(err) {
 		outvid := unattendedRoot + "/000_recap.mp4"
 		if _, err := os.Stat(outvid); !os.IsNotExist(err) {
@@ -208,7 +212,7 @@ func (ee EventExporter) Export() (*models.ExportedEvent, error) {
 	}
 
 	// Insert the built
-	exportedEvent, err := orm.GET.Events.InsertExportedEvent(ee.event, basefilepath)
+	exportedEvent, err := orm.GET.Events.InsertExportedEvent(ee.event, filename)
 	if err != nil {
 		return nil, err
 	}

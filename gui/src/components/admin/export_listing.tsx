@@ -53,6 +53,7 @@ export default function ExportListing() {
                 throw t('exports.failed_to_download');
             }
 
+            /** @TODO: send the Content-Disposition maybe 😂 */
             const filename = resp.headers.get('Content-Disposition')?.split('filename=')[1] ?? 'partyhall.zip';
             const data = await resp.blob();
             const anchor = document.createElement('a');

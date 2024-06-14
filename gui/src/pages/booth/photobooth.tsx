@@ -35,7 +35,7 @@ export default function Photobooth() {
             form.append('event', ''+appState?.app_state?.current_event?.id)
 
             try {
-                const resp = await fetch('/api/picture', {
+                const resp = await fetch('/api/modules/photobooth/picture', {
                     method: 'POST',
                     body: form,
                 });

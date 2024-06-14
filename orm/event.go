@@ -103,7 +103,7 @@ func (e *Events) CreateEvent(eventDto *dto.EventPost) (*models.Event, error) {
 	return &event, nil
 }
 
-func (e *Events) Update(eventId int, event *dto.EventPut) (*models.Event, error) {
+func (e *Events) UpdateEvent(eventId int, event *dto.EventPut) (*models.Event, error) {
 	row := e.db.QueryRowx(`
 		UPDATE event
 		SET name = ?, date = ?, author = ?, location = ?
@@ -124,7 +124,7 @@ func (e *Events) Update(eventId int, event *dto.EventPut) (*models.Event, error)
 	return &dbEvent, nil
 }
 
-func (e *Events) Save(event *models.Event) error {
+func (e *Events) SaveEvent(event *models.Event) error {
 	var date int64 = (time.Time(event.Date)).Unix()
 
 	var last_export *int64 = nil
@@ -193,7 +193,7 @@ func (e *Events) GetImage(id int64) (*models.Image, error) {
 	return &pct, err
 }
 
-func (e *Events) InsertImage(eventId int, unattended bool) (*models.Image, error) {
+func (e *Events) InsertImage(eventId *int, unattended bool) (*models.Image, error) {
 	currTime := time.Now().Unix()
 
 	row := e.db.QueryRowx(`

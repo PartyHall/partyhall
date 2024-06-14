@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -12,6 +13,20 @@ func GetPath(path ...string) string {
 	path = append([]string{ROOT_PATH}, path...)
 
 	return filepath.Join(path...)
+}
+
+func GetEventFolder(eventId int) (string, error) {
+	path := GetPath("events", fmt.Sprintf("%v", eventId))
+	if eventId < 0 {
+		path = GetPath("events", "NO_EVENT")
+	}
+
+	err := os.MkdirAll(path, os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
+	return path, nil
 }
 
 func MakeOrCreateFolder(path string) error {

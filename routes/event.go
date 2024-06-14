@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 
 	"github.com/labstack/echo/v4"
@@ -64,7 +65,7 @@ func eventPut(c echo.Context) error {
 		return err
 	}
 
-	dbEvent, err := orm.GET.Events.Update(eventId, event)
+	dbEvent, err := orm.GET.Events.UpdateEvent(eventId, event)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, "Failed to update event: "+err.Error())
 	}
@@ -117,7 +118,13 @@ func eventExportsDownload(c echo.Context) error {
 		return c.NoContent(http.StatusNotFound)
 	}
 
-	path := utils.GetPath("images", fmt.Sprintf("%v", exportedEvent.EventId), "exports", exportedEvent.Filename)
+	eventFolder, err := utils.GetEventFolder(int(exportedEvent.EventId))
+	if err != nil {
+		logs.Error(err)
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	path := filepath.Join(eventFolder, "exports", exportedEvent.Filename)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return c.NoContent(http.StatusNotFound)
 	}

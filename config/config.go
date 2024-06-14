@@ -3,7 +3,6 @@ package config
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/partyhall/partyhall/utils"
@@ -57,25 +56,6 @@ type Config struct {
 	GuestsAllowed bool `yaml:"guests_allowed"`
 
 	Modules []string
-}
-
-func (c *Config) GetImageFolder(eventId int, unattended bool) (string, error) {
-	subfolder := "pictures"
-	if unattended {
-		subfolder = "unattended"
-	}
-
-	folderName := fmt.Sprintf("%v", eventId)
-	if eventId < 0 {
-		folderName = "NO_EVENT"
-	}
-
-	path := filepath.Join(c.RootPath, "images", folderName, subfolder)
-	err := os.MkdirAll(path, os.ModePerm)
-	if err != nil {
-		return "", err
-	}
-	return path, nil
 }
 
 func Load() error {

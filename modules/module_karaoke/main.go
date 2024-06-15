@@ -243,4 +243,6 @@ func (m ModuleKaraoke) RegisterApiRoutes(g *echo.Group) {
 	g.GET("/song/:uuid/instrumental-webm", streamFileFromZip("instrumental.webm", "video/webm"))
 	g.GET("/song/:uuid/vocals-mp3", streamFileFromZip("vocals.mp3", "audio/mpeg"))
 	g.GET("/song/:uuid/cdg", streamFileFromZip("lyrics.cdg", "application/octet-stream"))
+
+	g.POST("/picture", takePictureRoute, middlewares.BoothOnlyMiddleware)
 }

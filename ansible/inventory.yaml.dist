@@ -27,6 +27,7 @@ all:
       # Karaoke module
       partyhall_karaoke_amt_songs_per_page: 20
       partyhall_karaoke_pre_play_timer: 5
+      partyhall_karaoke_unattended_interval: 5 # Set to 0 to disable, for a 3min30 song, it averages at 3.6 pictures per second in the final timelapse
 
       # Spotify creds to fetch the covers
       partyhall_spotify_client_id: ''

@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/orm"
 )
 
@@ -21,7 +22,7 @@ func ormListSongs(query string, offset int, limit int) ([]PhkSong, error) {
 			has_vocals,
 			has_full,
 			filename
-		FROM song
+		FROM karaoke_song
 		WHERE LENGTH($1) == 0
 		OR (
 			LOWER(filename) LIKE CONCAT('%', LOWER($1), '%')
@@ -66,7 +67,7 @@ func ormFindOneSongBy(condition string, expectedValue any) (*PhkSong, error) {
 			has_vocals,
 			has_full,
 			filename
-		FROM song
+		FROM karaoke_song
 		WHERE 
 	`+condition, expectedValue)
 
@@ -94,7 +95,7 @@ func ormLoadSongByUuid(uuid string) (*PhkSong, error) {
 func ormCreateSong(song PhkSong) (*PhkSong, error) {
 	row := orm.GET.DB.QueryRowx(
 		`
-			INSERT INTO song (uuid, spotify_id, artist, title, hotspot, format, has_cover, has_vocals, has_full, filename)
+			INSERT INTO karaoke_song (uuid, spotify_id, artist, title, hotspot, format, has_cover, has_vocals, has_full, filename)
 			VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
 			RETURNING id, uuid, spotify_id, artist, title, hotspot, format, has_cover, has_vocals, has_full, filename
 		`,
@@ -124,11 +125,11 @@ func ormCreateSong(song PhkSong) (*PhkSong, error) {
 }
 
 func ormDeleteSong(uuid string) {
-	orm.GET.DB.Exec(`DELETE FROM song WHERE uuid = $1`, uuid)
+	orm.GET.DB.Exec(`DELETE FROM karaoke_song WHERE uuid = $1`, uuid)
 }
 
 func ormFetchSongUUIDs() ([]string, error) {
-	rows, err := orm.GET.DB.Query(`SELECT uuid FROM song`)
+	rows, err := orm.GET.DB.Query(`SELECT uuid FROM karaoke_song`)
 	if err != nil {
 		return nil, err
 	}
@@ -151,7 +152,7 @@ func ormFetchSongUUIDs() ([]string, error) {
 func ormCountSongs(query string) (int, error) {
 	row := orm.GET.DB.QueryRow(`
 		SELECT COUNT(*)
-		FROM song
+		FROM karaoke_song
 		WHERE LENGTH($1) == 0
 		OR (
 			LOWER(filename) LIKE CONCAT('%', LOWER($1), '%')
@@ -180,7 +181,7 @@ func ormUpsertSession(eventId int, session SongSession) (*SongSession, error) {
 		currTime := time.Now().Unix()
 
 		row = orm.GET.DB.QueryRowx(`
-			INSERT INTO song_session (
+			INSERT INTO karaoke_song_session (
 				song_id,
 				event_id,
 				sung_by,
@@ -196,7 +197,7 @@ func ormUpsertSession(eventId int, session SongSession) (*SongSession, error) {
 	} else {
 		row = orm.GET.DB.QueryRowx(
 			`
-				UPDATE song_session SET
+				UPDATE karaoke_song_session SET
 					added_at = $1,
 					started_at = $2,
 					ended_at = $3,
@@ -219,4 +220,26 @@ func ormUpsertSession(eventId int, session SongSession) (*SongSession, error) {
 	err := row.StructScan(&session)
 
 	return &session, err
+}
+
+func ormSaveUnattendedPicture(session SongSession) (*SongImage, error) {
+	row := orm.GET.DB.QueryRowx(`
+		INSERT INTO karaoke_image(
+			song_session_id,
+			created_at
+		) VALUES (
+			$1,
+			$2
+		)
+		RETURNING id, song_session_id, created_at
+	`, session.Id, models.Timestamp(time.Now()))
+
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+
+	var img SongImage
+	err := row.StructScan(&img)
+
+	return &img, err
 }

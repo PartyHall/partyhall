@@ -6,8 +6,9 @@
 DROP TABLE IF EXISTS exported_event;
 DROP TABLE IF EXISTS image;
 DROP TABLE IF EXISTS event;
-DROP TABLE IF EXISTS song_session;
-DROP TABLE IF EXISTS song;
+DROP TABLE IF EXISTS karaoke_image;
+DROP TABLE IF EXISTS karaoke_song_session;
+DROP TABLE IF EXISTS karaoke_song;
 
 DROP TABLE IF EXISTS refresh_token;
 DROP TABLE IF EXISTS ph_user;
@@ -37,7 +38,7 @@ CREATE TABLE exported_event (
     date datetime NOT NULL
 );
 
-CREATE TABLE song (
+CREATE TABLE karaoke_song (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     uuid VARCHAR(255) NOT NULL UNIQUE, -- @TODO: Make it correct
     spotify_id VARCHAR(255),
@@ -53,15 +54,21 @@ CREATE TABLE song (
     filename VARCHAR(512) NOT NULL UNIQUE
 );
 
-CREATE TABLE song_session (
+CREATE TABLE karaoke_song_session (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    song_id INTEGER NOT NULL REFERENCES song(id),
+    song_id INTEGER NOT NULL REFERENCES karaoke_song(id),
     event_id INTEGER NOT NULL REFERENCES event(id),
     sung_by VARCHAR(255) NOT NULL,
     added_at datetime NULL DEFAULT NULL,
     started_at datetime NULL DEFAULT NULL,
     ended_at datetime NULL DEFAULT NULL,
     cancelled_at datetime NULL DEFAULT NULL
+);
+
+CREATE TABLE karaoke_image (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    song_session_id INTEGER NOT NULL REFERENCES karaoke_song_session(id),
+    created_at datetime NOT NULL
 );
 
 CREATE TABLE app_state (

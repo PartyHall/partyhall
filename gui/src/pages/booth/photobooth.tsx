@@ -106,6 +106,8 @@ export default function Photobooth() {
         { flash && <div className="timer flash"></div> }
         { appState.current_mode === 'DISABLED' && <LockedModal /> }
 
+        <div className={`storyGuidelines`}></div>
+
         {
             lastPicture && <div className="picture_frame" style={lastPicture.loaded ? {} : {display: 'none'}}>
                 <img src={lastPicture.url} onLoad={() => setLastPicture({...lastPicture, loaded: true})} alt="Last picture" />

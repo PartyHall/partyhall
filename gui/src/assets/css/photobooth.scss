@@ -29,6 +29,27 @@
             background-color: rgba(white, .5);
         }
     }
+
+    .storyGuidelines {
+        position: absolute;
+        top: 0;
+        left: 50%;
+        height: 100%;
+        width: auto;
+        aspect-ratio: 9/16;
+        transform: translateX(-50%);
+
+        display: flex;
+
+        border: 3px dotted gray;
+        border-top: none;
+        border-bottom: none;
+
+        // font-size: 10em;
+        font-size: 40vh;
+        justify-content: center;
+        align-items: center;
+    }
 }
 
 .picture_frame {

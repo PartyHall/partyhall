@@ -1,7 +1,13 @@
-run:
+up:
 	mkdir -p gui/dist
 	touch gui/dist/random_data # Make go fckng happy
 	docker compose up -d
+
+up-front:
+	mkdir -p gui/dist
+	touch gui/dist/random_data # Make go fckng happy
+	docker compose up -d mosquitto
+	docker compose up -d frontend
 
 create-db:
 	rm -rf 0_DATA/partyhall.db

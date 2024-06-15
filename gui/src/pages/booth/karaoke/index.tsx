@@ -31,7 +31,7 @@ export default function Photobooth() {
     const module_karaoke = appState.modules.karaoke;
     const resolution = module_photobooth.webcam_resolution;
 
-    const takePicture = async (unattended: boolean) => {
+    const takePicture = async (unattended: boolean, karaoke: boolean) => {
         if (!webcamRef || !webcamRef.current) {
             return;
         }
@@ -41,11 +41,15 @@ export default function Photobooth() {
             let form = new FormData();
 
             form.append('image', b64ImageToBlob(imageSrc));
-            form.append('unattended', unattended ? 'true' : 'false')
-            form.append('event', ''+appState?.app_state?.current_event?.id)
+            if (!karaoke) {
+                form.append('unattended', unattended ? 'true' : 'false')
+                form.append('event', ''+appState?.app_state?.current_event?.id)
+            }
+
+            const endpoint = `/api/modules/${karaoke ? 'karaoke' : 'photobooth'}/picture`;
 
             try {
-                const resp = await fetch('/api/picture', {
+                const resp = await fetch(endpoint, {
                     method: 'POST',
                     body: form,
                 });
@@ -80,7 +84,11 @@ export default function Photobooth() {
         }
 
         if (lastMessage.type == 'UNATTENDED_PICTURE') {
-            takePicture(true);
+            takePicture(true, false);
+        }
+
+        if (lastMessage.type == 'UNATTENDED_KARAOKE_PICTURE') {
+            takePicture(true, true);
         }
     }, [lastMessage]);
 
@@ -94,7 +102,7 @@ export default function Photobooth() {
         if (timer == 0) {
             setFlash(true);
             setTimeout(() => {
-                takePicture(false);
+                takePicture(false, false);
                 setFlash(false);
                 setTimer(-1);
             }, 500);

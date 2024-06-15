@@ -30,7 +30,7 @@ func (s PhkSong) String() string {
 
 type SongSession struct {
 	Id   int     `json:"id" db:"id"`
-	Song PhkSong `json:"song" db:"song"`
+	Song PhkSong `json:"song" db:"song_id"`
 
 	EventID int `json:"-" db:"event_id"`
 
@@ -39,4 +39,10 @@ type SongSession struct {
 	StartedAt   *models.Timestamp `json:"started_at" db:"started_at"`
 	EndedAt     *models.Timestamp `json:"ended_at" db:"ended_at"`
 	CancelledAt *models.Timestamp `json:"cancelled_at" db:"cancelled_at"`
+}
+
+type SongImage struct {
+	Id            int               `json:"id" db:"id"`
+	SongSessionId int               `json:"song_session_id" db:"song_session_id"`
+	CreatedAt     *models.Timestamp `json:"created_at" db:"created_at"`
 }

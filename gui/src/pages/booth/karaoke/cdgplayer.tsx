@@ -160,8 +160,6 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
             this.audio.current.src = '/api/modules/karaoke/song/' + this.props.song.uuid + '/instrumental-mp3';
             this.audio.current.load();
 
-            // @TODO: load vocals / full and sync them with the first audio, if they're available
-
             // HTML Audio are not perfectly in sync this could lead to issues
             // If this happens, need to implement this
             // https://stackoverflow.com/questions/54509959/how-do-i-play-audio-files-synchronously-in-javascript

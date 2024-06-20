@@ -44,7 +44,7 @@ export const ENGLISH = {
         settings: "Global",
         photobooth: "Photobooth",
         karaoke: "Karaoke",
-        volume: "Volume",
+        volume: "Main volume",
         device: "Device",
         no_devices: "No audio devices detected"
     },
@@ -117,6 +117,12 @@ export const ENGLISH = {
             title: "Stop the music",
             content: "Are you sure you want to remove the current song ({{name}}) ?",
             remove: "Stop",
+        },
+        volume: {
+            title: "Volume",
+            instrumental: "Instrumental",
+            vocals: "Voices",
+            full: "Full"
         }
     },
     photobooth: {

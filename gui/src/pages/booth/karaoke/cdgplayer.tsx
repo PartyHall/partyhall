@@ -17,6 +17,9 @@ interface CDGPlayerProps {
     cdgAlpha: number;
     cdgSize: number;
     isPlaying: boolean;
+    volumeInstru: number;
+    volumeVocals: number;
+    volumeFull: number;
     song: KaraokeSong;
     width: number;
     height: number;
@@ -29,6 +32,9 @@ interface CDGPlayerProps {
 
 class CDGPlayer extends React.Component<CDGPlayerProps> {
     audio = React.createRef<HTMLAudioElement>();
+    vocals = React.createRef<HTMLAudioElement>();
+    full = React.createRef<HTMLAudioElement>();
+
     canvas = React.createRef<HTMLCanvasElement>();
     canvasCtx: any = null;
     cdg = null;
@@ -117,6 +123,23 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
                     onTimeUpdate={this.handleTimeUpdate}
                     ref={this.audio}
                 />
+
+                {
+                    this.props.song.has_vocals &&
+                    <audio
+                        preload='auto'
+                        onCanPlayThrough={this.updateIsPlaying}
+                        ref={this.vocals}
+                    />
+                }
+                {
+                    !this.props.song.has_vocals && this.props.song.has_full &&
+                    <audio
+                        preload='auto'
+                        onCanPlayThrough={this.updateIsPlaying}
+                        ref={this.full}
+                    />
+                }
             </div>
         )
     }
@@ -138,6 +161,21 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
             this.audio.current.load();
 
             // @TODO: load vocals / full and sync them with the first audio, if they're available
+
+            // HTML Audio are not perfectly in sync this could lead to issues
+            // If this happens, need to implement this
+            // https://stackoverflow.com/questions/54509959/how-do-i-play-audio-files-synchronously-in-javascript
+            // After some test it looks like YEAH THIS WILL BE REQUIRED
+            // No clue how we'll do this in video mode...
+            if (this.vocals.current && this.props.song.has_vocals) {
+                this.vocals.current.src = '/api/modules/karaoke/song/' + this.props.song.uuid + '/vocals-mp3';
+                this.vocals.current?.load();
+            }
+
+            if (this.full.current && !this.props.song.has_vocals && this.props.song.has_full) {
+                this.full.current.src = '/api/modules/karaoke/song/' + this.props.song.uuid + '/full-mp3';
+                this.full.current?.load();
+            }
         } catch (err: any) {
             this.props.onError(err.message);
         }
@@ -148,6 +186,14 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
             if (this.audio.current) {
                 try {
                     this.audio.current.play();
+
+                    if (this.vocals.current) {
+                        this.vocals.current.play();
+                    }
+
+                    if (this.full.current) {
+                        this.full.current.play();
+                    }
                 } catch (err: any) {
                     this.props.onError(err.message);
                 }
@@ -156,6 +202,14 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
             if (this.audio.current) {
                 try {
                     this.audio.current.pause();
+
+                    if (this.vocals.current) {
+                        this.vocals.current.pause();
+                    }
+
+                    if (this.full.current) {
+                        this.full.current.pause();
+                    }
                 } catch (err: any) {
                     this.props.onError(err.message);
                 }
@@ -184,6 +238,17 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
     handleTimeUpdate = () => {
         if (!this.audio.current) {
             return;
+        }
+        
+        // Thats ugly to do this there but heh
+        this.audio.current.volume = this.props.volumeInstru;
+
+        if (this.vocals.current) {
+            this.vocals.current.volume = this.props.volumeVocals;
+        }
+
+        if (this.full.current) {
+            this.full.current.volume = this.props.volumeFull;
         }
 
         this.props.onStatus({

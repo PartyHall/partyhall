@@ -33,7 +33,11 @@ type Module interface {
 func LoadModules() error {
 	MODULES = map[string]Module{
 		"photobooth": module_photobooth.ModulePhotobooth{},
-		"karaoke":    module_karaoke.ModuleKaraoke{},
+		"karaoke": module_karaoke.ModuleKaraoke{
+			VolumeInstru: 1,
+			VolumeVocals: .2,
+			VolumeFull:   .2,
+		},
 	}
 
 	var loadedModules = 0
@@ -80,6 +84,8 @@ func InitializeModules() {
 		if err != nil {
 			panic(err)
 		}
+
+		module.UpdateFrontendSettings()
 	}
 }
 

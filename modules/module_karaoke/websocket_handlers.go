@@ -1,6 +1,7 @@
 package module_karaoke
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -318,4 +319,76 @@ func (h QueueMoveDown) Do(s *easyws.Socket, payload interface{}) {
 		INSTANCE.UpdateFrontendSettings()
 		remote.BroadcastState()
 	}
+}
+
+type SetVolumeVocals struct{}
+
+func (h SetVolumeVocals) GetType() string {
+	return "karaoke/VOLUME_VOCALS"
+}
+
+func (h SetVolumeVocals) Do(s *easyws.Socket, payload interface{}) {
+	vol, ok := payload.(float64)
+	if !ok {
+		fmt.Println("bad value:", payload)
+		return
+	}
+
+	if vol < 0 {
+		vol = 0
+	} else if vol > 1 {
+		vol = 1
+	}
+
+	INSTANCE.VolumeVocals = vol
+	INSTANCE.UpdateFrontendSettings()
+	remote.BroadcastState()
+}
+
+type SetVolumeInstru struct{}
+
+func (h SetVolumeInstru) GetType() string {
+	return "karaoke/VOLUME_INSTRU"
+}
+
+func (h SetVolumeInstru) Do(s *easyws.Socket, payload interface{}) {
+	vol, ok := payload.(float64)
+	if !ok {
+		fmt.Println("bad value:", payload)
+		return
+	}
+
+	if vol < 0 {
+		vol = 0
+	} else if vol > 1 {
+		vol = 1
+	}
+
+	INSTANCE.VolumeInstru = vol
+	INSTANCE.UpdateFrontendSettings()
+	remote.BroadcastState()
+}
+
+type SetVolumeFull struct{}
+
+func (h SetVolumeFull) GetType() string {
+	return "karaoke/VOLUME_FULL"
+}
+
+func (h SetVolumeFull) Do(s *easyws.Socket, payload interface{}) {
+	vol, ok := payload.(float64)
+	if !ok {
+		fmt.Println("bad value:", ok)
+		return
+	}
+
+	if vol < 0 {
+		vol = 0
+	} else if vol > 1 {
+		vol = 1
+	}
+
+	INSTANCE.VolumeFull = vol
+	INSTANCE.UpdateFrontendSettings()
+	remote.BroadcastState()
 }

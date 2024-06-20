@@ -1,10 +1,16 @@
-import { useRef } from "react";
 import { Stack, Typography } from "@mui/material";
 
 import { KaraokeSong, KaraokeSongSession } from "../../../../types/appstate";
 import { useTranslation } from "react-i18next";
 import { SOCKET_MODE_DEBUG } from "../../../../hooks/useApi";
+
 import SongCoverImage from "./song_img";
+
+import {
+    Piano as InstruIcon,
+    RecordVoiceOver as VocalsIcon,
+    MusicVideo as FullIcon,
+} from '@mui/icons-material';
 
 export default function SongImageAndTitle({song, session}: {song: KaraokeSong, session?: KaraokeSongSession}) {
     const {t} = useTranslation();
@@ -29,6 +35,11 @@ export default function SongImageAndTitle({song, session}: {song: KaraokeSong, s
                     }
                 </Typography>
             }
+            <Stack direction="row" gap={1}>
+                <InstruIcon />
+                <VocalsIcon color={song.has_vocals ? "action" : "disabled"} />
+                <FullIcon color={song.has_full ? "action" : "disabled"} />
+            </Stack>
         </Stack>
     </>
 }

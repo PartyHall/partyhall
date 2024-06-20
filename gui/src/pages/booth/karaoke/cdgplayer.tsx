@@ -33,6 +33,8 @@ interface CDGPlayerProps {
 class CDGPlayer extends React.Component<CDGPlayerProps> {
     audio = React.createRef<HTMLAudioElement>();
     vocals = React.createRef<HTMLAudioElement>();
+    full = React.createRef<HTMLAudioElement>();
+
     canvas = React.createRef<HTMLCanvasElement>();
     canvasCtx: any = null;
     cdg = null;
@@ -130,6 +132,14 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
                         ref={this.vocals}
                     />
                 }
+                {
+                    !this.props.song.has_vocals && this.props.song.has_full &&
+                    <audio
+                        preload='auto'
+                        onCanPlayThrough={this.updateIsPlaying}
+                        ref={this.full}
+                    />
+                }
             </div>
         )
     }
@@ -161,6 +171,11 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
                 this.vocals.current.src = '/api/modules/karaoke/song/' + this.props.song.uuid + '/vocals-mp3';
                 this.vocals.current?.load();
             }
+
+            if (this.full.current && !this.props.song.has_vocals && this.props.song.has_full) {
+                this.full.current.src = '/api/modules/karaoke/song/' + this.props.song.uuid + '/full-mp3';
+                this.full.current?.load();
+            }
         } catch (err: any) {
             this.props.onError(err.message);
         }
@@ -175,6 +190,10 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
                     if (this.vocals.current) {
                         this.vocals.current.play();
                     }
+
+                    if (this.full.current) {
+                        this.full.current.play();
+                    }
                 } catch (err: any) {
                     this.props.onError(err.message);
                 }
@@ -186,6 +205,10 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
 
                     if (this.vocals.current) {
                         this.vocals.current.pause();
+                    }
+
+                    if (this.full.current) {
+                        this.full.current.pause();
                     }
                 } catch (err: any) {
                     this.props.onError(err.message);
@@ -222,6 +245,10 @@ class CDGPlayer extends React.Component<CDGPlayerProps> {
 
         if (this.vocals.current) {
             this.vocals.current.volume = this.props.volumeVocals;
+        }
+
+        if (this.full.current) {
+            this.full.current.volume = this.props.volumeFull;
         }
 
         this.props.onStatus({

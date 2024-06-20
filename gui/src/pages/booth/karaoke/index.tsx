@@ -157,6 +157,9 @@ export default function Photobooth() {
                             'current': x.position,
                             'total': x.total,
                         })}
+                        volumeInstru={module_karaoke.volumeInstru}
+                        volumeVocals={module_karaoke.volumeVocals}
+                        volumeFull={module_karaoke.volumeFull}
                     />
                 }
             </>

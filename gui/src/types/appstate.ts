@@ -76,6 +76,10 @@ type KaraokeModule = {
     queue: KaraokeSongSession[];
     started: boolean;
     preplayTimer: number;
+
+    volumeInstru: number;
+    volumeVocals: number;
+    volumeFull: number;
 };
 
 export type AppState = {

@@ -29,6 +29,7 @@ export default function Photobooth() {
 
     const module_photobooth = appState.modules.photobooth;
     const module_karaoke = appState.modules.karaoke;
+
     const resolution = module_photobooth.webcam_resolution;
 
     const takePicture = async (unattended: boolean, karaoke: boolean) => {
@@ -141,6 +142,9 @@ export default function Photobooth() {
                             'current': x.position,
                             'total': x.total,
                         })}
+                        volumeInstru={module_karaoke.volumeInstru}
+                        volumeVocals={module_karaoke.volumeVocals}
+                        volumeFull={module_karaoke.volumeFull}
                     /> 
                 }
                 {

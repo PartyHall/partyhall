@@ -44,7 +44,7 @@ export const FRENCH = {
         settings: "Global",
         photobooth: "Photomaton",
         karaoke: "Karaoké",
-        volume: "Volume",
+        volume: "Volume principal",
         device: "Carte son",
         no_devices: "Aucune carte son détectée"
     },
@@ -115,6 +115,12 @@ export const FRENCH = {
             title: "Stopper la musique",
             content: "Êtes-vous sur de vouloir stopper la musique en cours ({{name}}) ?",
             remove: "Stopper",
+        },
+        volume: {
+            title: "Volume",
+            instrumental: "Instrumental",
+            vocals: "Voix",
+            full: "Complet"
         }
     },
     photobooth: {

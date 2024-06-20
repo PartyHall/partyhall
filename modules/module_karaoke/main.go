@@ -43,6 +43,10 @@ type ModuleKaraoke struct {
 	// E.g. you click on play a song and want to play it alone, it won't play the rest of the queue
 	// E.g. you want to add multiple song to the queue before starting, it won't start right away
 	IsQueuePlaying bool
+
+	VolumeInstru float64
+	VolumeVocals float64
+	VolumeFull   float64
 }
 
 func (m ModuleKaraoke) GetModuleName() string {
@@ -107,6 +111,7 @@ func (m ModuleKaraoke) PreInitialize() error {
 			}()
 		}
 	})
+
 	return nil
 }
 
@@ -209,6 +214,9 @@ func (m ModuleKaraoke) GetWebsocketHandlers() []easyws.MessageHandler {
 		PauseHandler{},
 		QueueMoveUp{},
 		QueueMoveDown{},
+		SetVolumeInstru{},
+		SetVolumeVocals{},
+		SetVolumeFull{},
 	}
 }
 
@@ -223,6 +231,9 @@ func (m ModuleKaraoke) UpdateFrontendSettings() {
 		"queue":        queue,
 		"started":      m.Started,
 		"preplayTimer": m.PreplayTimer,
+		"volumeInstru": m.VolumeInstru,
+		"volumeVocals": m.VolumeVocals,
+		"volumeFull":   m.VolumeFull,
 	}
 }
 

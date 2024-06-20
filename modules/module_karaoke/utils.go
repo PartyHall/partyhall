@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"sync"
 
 	"github.com/labstack/echo/v4"
 	"github.com/partyhall/partyhall/config"
@@ -17,6 +18,7 @@ import (
 	"github.com/partyhall/partyhall/utils"
 )
 
+var mutexSongCache sync.Mutex
 var songFilenameCache = map[string]string{}
 
 func getModuleEventDir() (string, error) {
@@ -81,6 +83,10 @@ func getBestImage(images []services.SpotifyImage) (bestImage *services.SpotifyIm
 func streamFileFromZip(filename string, mimetype string) func(echo.Context) error {
 	return func(c echo.Context) error {
 		songUuid := c.Param("uuid")
+
+		// The mutex is required as when you search you're doing a lot of call simultaneously
+		// since you're showing the cover from the file
+		mutexSongCache.Lock()
 		songFilename, found := songFilenameCache[songUuid]
 		if !found {
 			song, err := ormLoadSongByUuid(songUuid)
@@ -90,6 +96,7 @@ func streamFileFromZip(filename string, mimetype string) func(echo.Context) erro
 
 			songFilenameCache[songUuid] = song.Filename
 		}
+		mutexSongCache.Unlock()
 
 		filepath, err := getModuleFile(songFilename)
 		if err != nil {

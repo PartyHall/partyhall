@@ -187,6 +187,7 @@ export default function Photobooth() {
         { timer >= 0 && <div className={`timer`}>{timer > 0 && timer}</div> }
         { flash && <div className="timer flash"></div> }
         { appState.current_mode === 'DISABLED' && <LockedModal /> }
+        <div className={`storyGuidelines`}></div>
 
         {
             lastPicture && <div className="picture_frame" style={lastPicture.loaded ? {} : {display: 'none'}}>

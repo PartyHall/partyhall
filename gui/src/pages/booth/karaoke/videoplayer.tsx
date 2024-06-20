@@ -1,6 +1,5 @@
-import { DetailedHTMLProps, ReactEventHandler, VideoHTMLAttributes, useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { KaraokeSong } from "../../../types/appstate";
-import { Stack } from "@mui/material";
 
 type Props = {
     isPlaying: boolean;
@@ -78,7 +77,6 @@ export default function VideoPlayer({isPlaying, song, onEnd, onStatus, volumeFul
             song.has_vocals &&
             <audio
                 preload='auto'
-                // onCanPlayThrough={this.updateIsPlaying}
                 src={'/api/modules/karaoke/song/' + song.uuid + '/vocals-mp3'}
                 // Fuck typescript
                 //@ts-ignore
@@ -89,9 +87,7 @@ export default function VideoPlayer({isPlaying, song, onEnd, onStatus, volumeFul
             song.has_full && !song.has_vocals &&
             <audio
                 preload='auto'
-                // onCanPlayThrough={this.updateIsPlaying}
                 src={'/api/modules/karaoke/song/' + song.uuid + '/full-mp3'}
-                controls
                 // Fuck typescript
                 //@ts-ignore
                 ref={fullRef}
@@ -100,7 +96,6 @@ export default function VideoPlayer({isPlaying, song, onEnd, onStatus, volumeFul
         <video 
             src={'/api/modules/karaoke/song/' + song.uuid + '/instrumental-webm'}
             onEnded={onEnd}
-            // onCanPlayThrough={this.}
             controls
             // Fuck typescript
             //@ts-ignore

@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import { useAdminSocket } from "../../../hooks/adminSocket"
 
 import Song from "./song";
-import _ from "lodash";
 
 const secondsToDisplay = (seconds: number) => {
     if (seconds < 0) {

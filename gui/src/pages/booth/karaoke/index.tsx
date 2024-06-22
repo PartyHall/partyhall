@@ -178,9 +178,11 @@ export default function Photobooth() {
         }
         {
             module_karaoke.queue.length > 0 &&
-            <Stack className="karaoke__next_song" gap={1}>
-                <Typography variant="h3">{t('karaoke.next_up')}:</Typography>
-                <OsdSong session={module_karaoke.queue[0]} />
+            <Stack className="karaoke__next_song">
+                <Stack className="karaoke__next_song__inner" gap={1}>
+                    <Typography variant="h3">{t('karaoke.next_up')}:</Typography>
+                    <OsdSong session={module_karaoke.queue[0]} />
+                </Stack>
             </Stack>
         }
 

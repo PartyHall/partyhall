@@ -2,6 +2,7 @@
 - import_playbook: setup-init.yaml
 - import_playbook: setup-mosquitto.yaml
 - import_playbook: setup-partyhall.yaml
+- import_playbook: upload-songs.yaml
 - import_playbook: setup-spotify.yaml
 - import_playbook: setup-nginx.yaml
 # - import_playbook: setup-hotspot.yaml

@@ -21,12 +21,12 @@ import (
 var mutexSongCache sync.Mutex
 var songFilenameCache = map[string]string{}
 
-func getModuleEventDir() (string, error) {
-	evt := services.GET.CurrentState.CurrentEvent
-	eventId := -1
-
-	if evt != nil {
-		eventId = *evt
+func getModuleEventDir(eventId int) (string, error) {
+	if eventId < 0 {
+		evt := services.GET.CurrentState.CurrentEvent
+		if evt != nil {
+			eventId = *evt
+		}
 	}
 
 	basePath, err := utils.GetEventFolder(eventId)
@@ -78,6 +78,28 @@ func getBestImage(images []services.SpotifyImage) (bestImage *services.SpotifyIm
 
 	// Return an empty image if the input array is empty
 	return nil
+}
+
+func readFileInZip(zipPath, filename string) ([]byte, error) {
+	r, err := zip.OpenReader(zipPath)
+	if err != nil {
+		return nil, err
+	}
+	defer r.Close()
+
+	for _, f := range r.File {
+		if f.Name == filename {
+			rc, err := f.Open()
+			if err != nil {
+				return nil, err
+			}
+			defer rc.Close()
+
+			return io.ReadAll(rc)
+		}
+	}
+
+	return nil, errors.New("file not found in the zip")
 }
 
 func streamFileFromZip(filename string, mimetype string) func(echo.Context) error {

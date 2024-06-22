@@ -24,6 +24,7 @@ var (
 	WEBAPP_FS              *fs.FS
 	DB_SCRIPTS_FS          embed.FS
 	KARAOKE_FALLBACK_IMAGE []byte
+	LOGO_IMAGE             []byte
 )
 
 var GET *Provider

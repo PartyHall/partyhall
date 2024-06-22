@@ -2,6 +2,7 @@ package module_karaoke
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/guregu/null/v5"
@@ -39,6 +40,27 @@ type SongSession struct {
 	StartedAt   *models.Timestamp `json:"started_at" db:"started_at"`
 	EndedAt     *models.Timestamp `json:"ended_at" db:"ended_at"`
 	CancelledAt *models.Timestamp `json:"cancelled_at" db:"cancelled_at"`
+}
+
+func (s SongSession) AsExportMetadata() map[string]any {
+	metadata := map[string]any{
+		"uuid":     s.Song.Uuid,
+		"artist":   s.Song.Artist,
+		"title":    s.Song.Title,
+		"hotspot":  s.Song.Hotspot,
+		"sung_by":  s.SungBy,
+		"added_at": time.Time(*s.AddedAt).Format("2006-01-02 15:04:05"),
+	}
+
+	if s.StartedAt != nil {
+		metadata["sung_at"] = time.Time(*s.StartedAt).Format("2006-01-02 15:04:05")
+	}
+
+	if s.CancelledAt != nil {
+		metadata["cancelled_at"] = time.Time(*s.CancelledAt).Format("2006-01-02 15:04:05")
+	}
+
+	return metadata
 }
 
 type SongImage struct {

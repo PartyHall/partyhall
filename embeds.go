@@ -18,6 +18,9 @@ var dbScripts embed.FS
 //go:embed karaokefallback.jpg
 var karaokeFallbackImage []byte
 
+//go:embed logo.png
+var logoImage []byte
+
 const DEBUG = true
 
 func init() {
@@ -32,4 +35,5 @@ func init() {
 
 	services.DB_SCRIPTS_FS = dbScripts
 	services.KARAOKE_FALLBACK_IMAGE = karaokeFallbackImage
+	services.LOGO_IMAGE = logoImage
 }

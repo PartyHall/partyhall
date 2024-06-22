@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/orm"
 )
@@ -242,4 +243,87 @@ func ormSaveUnattendedPicture(session SongSession) (*SongImage, error) {
 	err := row.StructScan(&img)
 
 	return &img, err
+}
+
+/**
+ * @TODO: This method of finding played song is not great
+ * The correct way would be to store the duration of the song in DB when importing
+ * Then storing the amount of second played (the time progress update) so tha
+ * if we pause the song there is no issue
+ * And we can also take the songs that are like "skipped while there was less than 30s left"
+ **/
+func ormLoadCompleteSessions(eventId int) ([]SongSession, error) {
+	rows, err := orm.GET.DB.Queryx(`
+		SELECT 
+			kss.id AS id,
+			ks.id AS 'song_id.id',
+			ks.uuid AS 'song_id.uuid',
+			ks.spotify_id AS 'song_id.spotify_id',
+			ks.artist AS 'song_id.artist',
+			ks.title AS 'song_id.title',
+			ks.hotspot AS 'song_id.hotspot',
+			ks.format AS 'song_id.format',
+			ks.has_cover AS 'song_id.has_cover',
+			ks.has_vocals AS 'song_id.has_vocals',
+			ks.has_full AS 'song_id.has_full',
+			ks.filename AS 'song_id.filename',
+			kss.event_id AS event_id,
+			kss.sung_by AS sung_by,
+			kss.added_at AS added_at,
+			kss.started_at AS started_at,
+			kss.ended_at AS ended_at,
+			kss.cancelled_at AS cancelled_at
+		FROM karaoke_song_session kss
+		JOIN karaoke_song ks ON ks.id = kss.song_id
+		WHERE event_id = $1 AND started_at is not NULL
+		  AND (
+			ended_at IS NOT NULL
+			OR (
+				cancelled_at IS NOT NULL
+				AND strftime('%s', cancelled_at) - strftime('%s', started_at) > 120
+			)
+		)
+	`, eventId)
+
+	if err != nil {
+		return nil, err
+	}
+
+	sessions := []SongSession{}
+	for rows.Next() {
+		s := SongSession{}
+		err := rows.StructScan(&s)
+		if err != nil {
+			return nil, err
+		}
+
+		sessions = append(sessions, s)
+	}
+
+	return sessions, nil
+}
+
+func ormCountSkippedSongs(eventId int) int {
+	row := orm.GET.DB.QueryRowx(`
+		SELECT COUNT(*)
+		FROM karaoke_song_session
+		WHERE event_id = $1
+		  AND cancelled_at IS NOT NULL
+	`, eventId)
+
+	if row.Err() != nil {
+		logs.Error("Failed to count amt skipped songs: ", row.Err())
+
+		return -1
+	}
+
+	var x int
+	err := row.Scan(&x)
+	if err != nil {
+		logs.Error("Failed to count amt skipped songs: ", err)
+
+		return -1
+	}
+
+	return x
 }

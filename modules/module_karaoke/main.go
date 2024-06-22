@@ -12,6 +12,7 @@ import (
 	"github.com/partyhall/easyws"
 	"github.com/partyhall/partyhall/logs"
 	"github.com/partyhall/partyhall/middlewares"
+	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/remote"
 	"github.com/partyhall/partyhall/services"
 	"github.com/partyhall/partyhall/utils"
@@ -256,4 +257,11 @@ func (m ModuleKaraoke) RegisterApiRoutes(g *echo.Group) {
 	g.GET("/song/:uuid/cdg", streamFileFromZip("lyrics.cdg", "application/octet-stream"))
 
 	g.POST("/picture", takePictureRoute, middlewares.BoothOnlyMiddleware)
+}
+
+func (m ModuleKaraoke) NewExporter(basePath string, event *models.Event) utils.Exporter {
+	return Exporter{
+		basePath: basePath,
+		event:    event,
+	}
 }

@@ -2,14 +2,12 @@ package services
 
 import (
 	"archive/zip"
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"os"
-	"os/exec"
-	"strings"
+	"path/filepath"
 	"time"
 
 	"github.com/partyhall/partyhall/logs"
@@ -17,6 +15,8 @@ import (
 	"github.com/partyhall/partyhall/orm"
 	"github.com/partyhall/partyhall/utils"
 )
+
+var RequestModuleExport func(string, *models.Event) (map[string]any, error)
 
 /**
  * @TODO: Each module should process its own export
@@ -44,30 +44,6 @@ func (ee EventExporter) setEventExporting(exp bool) error {
 	return nil
 }
 
-type RecapParams struct {
-	PictureFolder  string
-	OutputFilename string
-	Framerate      int
-}
-
-func (ee EventExporter) BuildFfmpegCommand(params RecapParams) *exec.Cmd {
-	args := []string{"ffmpeg"}
-
-	args = append(args, "-framerate", fmt.Sprintf("%v", params.Framerate))
-	args = append(args, "-pattern_type", "glob")
-	args = append(args, "-i", "'*.jpg'")
-	args = append(args, "-c:v", "libx264")
-
-	args = append(args, params.OutputFilename)
-
-	cmd := exec.Command("bash", "-c", strings.Join(args, " "))
-	cmd.Dir = params.PictureFolder
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-
-	return cmd
-}
-
 /**
  * This will be rewritten in the Partyhall server
  * Don't waste too much time on this
@@ -77,132 +53,57 @@ func (ee EventExporter) Export() (*models.ExportedEvent, error) {
 		return nil, errors.New("can't export an event that is already exporting")
 	}
 
+	exportTime := time.Now()
+
 	if err := ee.setEventExporting(true); err != nil {
 		return nil, err
 	}
 
-	exportTime := time.Now()
+	tempPath, err := os.MkdirTemp("", "phexport")
+	if err != nil {
+		return nil, err
+	}
+
+	metadata, err := RequestModuleExport(tempPath, ee.event)
+	if err != nil {
+		fmt.Println("Failed to fully export stuff: ", err)
+	}
+
+	//#region Adding a json file with some data about the event
+	data := map[string]interface{}{
+		"id":       ee.event.Id,
+		"name":     ee.event.Name,
+		"author":   ee.event.Author,
+		"date":     ee.event.Date,
+		"location": ee.event.Location,
+	}
+
+	for k, v := range metadata {
+		data[k] = v
+	}
+
+	jsonData, _ := json.MarshalIndent(data, "", "  ")
+	err = os.WriteFile(filepath.Join(tempPath, "infos.json"), jsonData, os.ModePerm)
+	if err != nil {
+		logs.Errorf("Failed to copy the info json for the event %v in the zip file: %v\n", ee.event.Id, err)
+		return nil, errors.Join(err, ee.setEventExporting(false))
+	}
+	//#endregion
 
 	basepath := fmt.Sprintf("events/%v/exports", ee.event.Id)
-	err := utils.MakeOrCreateFolder(basepath)
+	err = utils.MakeOrCreateFolder(basepath)
 	if err != nil {
 		return nil, errors.Join(err, ee.setEventExporting(false))
 	}
 
 	filename := exportTime.Format("20060201-150405") + ".zip"
 	fullpath := utils.GetPath(basepath, filename)
-
-	archive, err := os.Create(fullpath)
+	err = zipDir(tempPath, fullpath)
 	if err != nil {
-		return nil, errors.Join(err, ee.setEventExporting(false))
+		ee.setEventExporting(false)
+
+		return nil, err
 	}
-	defer archive.Close()
-
-	zipWriter := zip.NewWriter(archive)
-	defer zipWriter.Close()
-
-	//#region Exporting non-unattended images
-	images, err := orm.GET.Events.GetImages(ee.event, false)
-	if err != nil {
-		return nil, errors.Join(err, ee.setEventExporting(false))
-	}
-
-	for _, i := range images {
-		imagePath := utils.GetPath(fmt.Sprintf("events/%v/photobooth/pictures/%v.jpg", ee.event.Id, i.Id))
-		if _, err := os.Stat(imagePath); os.IsNotExist(err) {
-			logs.Errorf("Failed to locate image %v from event %v\n", i.Id, ee.event.Id)
-			continue
-		}
-
-		fr, err := os.Open(imagePath)
-		if err != nil {
-			logs.Errorf("Failed to open the image %v for the event %v: %v\n", i.Id, ee.event.Id, err)
-			continue
-		}
-
-		fw, err := zipWriter.Create((time.Time(i.Date)).Format("20060201-150405") + ".jpg")
-		if err != nil {
-			logs.Errorf("Failed to create the image %v for the event %v in the zip file: %v\n", i.Id, ee.event.Id, err)
-			continue
-		}
-
-		if _, err := io.Copy(fw, fr); err != nil {
-			logs.Errorf("Failed to copy the image %v for the event %v in the zip file: %v\n", i.Id, ee.event.Id, err)
-			continue
-		}
-
-		fr.Close()
-	}
-	//#endregion
-
-	//#region Exporting unattended images
-	unattendedRoot := utils.GetPath(fmt.Sprintf("events/%v/photobooth/unattended/", ee.event.Id))
-	if _, err := os.Stat(unattendedRoot); !os.IsNotExist(err) {
-		outvid := unattendedRoot + "/000_recap.mp4"
-		if _, err := os.Stat(outvid); !os.IsNotExist(err) {
-			os.Remove(outvid)
-		}
-
-		cmd := ee.BuildFfmpegCommand(RecapParams{
-			PictureFolder:  unattendedRoot,
-			OutputFilename: "000_recap.mp4",
-			Framerate:      6,
-		})
-		err = cmd.Run()
-		if err != nil {
-			return nil, errors.Join(err, ee.setEventExporting(false))
-		}
-
-		fr, err := os.Open(outvid)
-		if err != nil {
-			logs.Errorf("Failed to open the recap video for the event %v: %v\n", ee.event.Id, err)
-			return nil, errors.Join(err, ee.setEventExporting(false))
-		}
-
-		fw, err := zipWriter.Create("000_recap.mp4")
-		if err != nil {
-			logs.Errorf("Failed to create the recap video for the event %v in the zip file: %v\n", ee.event.Id, err)
-			return nil, errors.Join(err, ee.setEventExporting(false))
-		}
-
-		if _, err := io.Copy(fw, fr); err != nil {
-			logs.Errorf("Failed to copy the recap video for the event %v in the zip file: %v\n", ee.event.Id, err)
-			return nil, errors.Join(err, ee.setEventExporting(false))
-		}
-
-		fr.Close()
-
-		if _, err := os.Stat(outvid); !os.IsNotExist(err) {
-			os.Remove(outvid)
-		}
-	} else {
-		logs.Warn("Unattended folder doesn't exists, skipping...")
-	}
-	//#region
-
-	//#region Adding a json file with some data about the event
-	data := map[string]interface{}{
-		"id":                    ee.event.Id,
-		"name":                  ee.event.Name,
-		"author":                ee.event.Author,
-		"date":                  ee.event.Date,
-		"location":              ee.event.Location,
-		"amt_images_handtaken":  ee.event.AmtImagesHandtaken,
-		"amt_images_unattended": ee.event.AmtImagesUnattended,
-	}
-	jsonData, _ := json.MarshalIndent(data, "", "  ")
-
-	fw, err := zipWriter.Create("001_infos.json")
-	if err != nil {
-		logs.Errorf("Failed to add the info json")
-		return nil, errors.Join(err, ee.setEventExporting(false))
-	}
-
-	if _, err := io.Copy(fw, bytes.NewReader(jsonData)); err != nil {
-		logs.Errorf("Failed to copy the info json for the event %v in the zip file: %v\n", ee.event.Id, err)
-		return nil, errors.Join(err, ee.setEventExporting(false))
-	}
-	//#endregion
 
 	exportTimestamp := models.Timestamp(exportTime)
 	ee.event.LastExport = &exportTimestamp
@@ -218,4 +119,59 @@ func (ee EventExporter) Export() (*models.ExportedEvent, error) {
 	}
 
 	return exportedEvent, nil
+}
+
+func zipDir(sourceDir, destZip string) error {
+	zipFile, err := os.Create(destZip)
+	if err != nil {
+		return err
+	}
+	defer zipFile.Close()
+
+	zipWriter := zip.NewWriter(zipFile)
+	defer zipWriter.Close()
+
+	err = filepath.Walk(sourceDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Obtenir le chemin relatif pour conserver la structure des dossiers dans l'archive ZIP
+		relativePath, err := filepath.Rel(sourceDir, path)
+		if err != nil {
+			return err
+		}
+
+		// Ignorer le répertoire source lui-même
+		if relativePath == "." {
+			return nil
+		}
+
+		if info.IsDir() {
+			_, err = zipWriter.Create(relativePath + "/")
+			if err != nil {
+				return err
+			}
+		} else {
+			file, err := os.Open(path)
+			if err != nil {
+				return err
+			}
+			defer file.Close()
+
+			writer, err := zipWriter.Create(relativePath)
+			if err != nil {
+				return err
+			}
+
+			_, err = io.Copy(writer, file)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	return err
 }

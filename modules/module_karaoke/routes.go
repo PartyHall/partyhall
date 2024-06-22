@@ -33,7 +33,7 @@ func takePictureRoute(c echo.Context) error {
 	}
 	defer src.Close()
 
-	basePath, err := getModuleEventDir()
+	basePath, err := getModuleEventDir(-1)
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed to get event module dir: "+err.Error())
 	}

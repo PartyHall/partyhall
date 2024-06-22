@@ -53,13 +53,12 @@
         }
     }
 
-    &__next_song {
+    &__next_song__inner {
         position: absolute;
         bottom: .5em;
         background-color: rgba(black, .8);
-        width: 100%;
         align-items: center;
-        padding: .5em 0 .5em 0;
+        padding: .5em 2em .5em 2em;
 
         h3 {
             font-size: 2em;

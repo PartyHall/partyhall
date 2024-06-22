@@ -12,6 +12,7 @@
         recurse: yes
 
     - name: 'Copying the songs to the appliance'
-      copy:
+      synchronize:
         src: 'files/karaoke/' # Keep the / !! Copies the content of the folder rather than the folder itself
         dest: '/home/{{ansible_user}}/data/karaoke/'
+        mode: 'push'

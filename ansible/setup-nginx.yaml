@@ -1,0 +1,23 @@
+---
+- hosts: 'all'
+  become: yes
+  tags: ['nginx']
+
+  tasks:
+    - name: 'Install nginx'
+      apt:
+        name: ['nginx']
+
+    - name: 'Adding the nginx config'
+      become: yes
+      template:
+        src: 'templates/nginx.conf.j2'
+        dest: '/etc/nginx/nginx.conf'
+        mode: '0644'
+
+    - name: 'Enabling the service'
+      systemd:
+        name: 'nginx'
+        daemon_reload: yes
+        state: 'restarted'
+        enabled: yes

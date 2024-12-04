@@ -1,0 +1,61 @@
+---
+- hosts: all
+  tags: [xorg]
+
+  vars:
+    firefox_profiles:
+      default:
+        extensions: []
+        preferences:
+          privacy.webrtc.legacyGlobalIndicator: false  # Disable the small "webcam indicator" on top of the window
+          media.navigator.permission.disabled: true    # Let all website access webcam without permissions
+          media.autoplay.default: '0' # Allow autoplay for karaoke
+          browser.sessionsore.resume_from_crash: false
+          browser.startup.homepage_override.mstone: 'ignore'
+          browser.messaging-system.whatsNewPanel.enabled: false
+
+  tasks:
+    - name: 'Setting up xorg'
+      become: yes
+      apt:
+        name: [ 'lightdm', 'unclutter', 'xorg', 'i3', 'dmenu', 'pavucontrol', 'suckless-tools', 'lxterminal', 'fonts-dejavu-core', 'fonts-dejavu-extra' ]
+    
+    - name: 'Enable lightdm autologin'
+      become: yes
+      lineinfile:
+        path: '/etc/lightdm/lightdm.conf'
+        regexp: ".*autologin-user\\s*=\\s*($|{{ansible_user}})"
+        line: 'autologin-user = {{ ansible_user }}'
+
+    - name: 'Use i3 as WM'
+      copy:
+          dest: '/home/{{ ansible_user }}/.xsession'
+          owner: '{{ ansible_user }}'
+          group: '{{ ansible_user }}'
+          mode: '0644'
+          content: |
+              exec i3
+
+    - name: 'Setting up firefox'
+      include_role:
+        name: 'staticdev.firefox'
+
+    - name: 'Creating the i3 dir'
+      file:
+        path: '/home/{{ ansible_user }}/.config/i3'
+        state: 'directory'
+        mode: '0774'
+
+    - name: 'Adding the i3config'
+      copy:
+        src: 'files/i3'
+        dest: '/home/{{ ansible_user }}/.config/i3/config'
+        mode: '0774'
+
+    - name: 'Enabling the DM service'
+      become: yes
+      systemd:
+        name: 'lightdm'
+        daemon_reload: yes
+        enabled: yes
+        state: 'restarted'

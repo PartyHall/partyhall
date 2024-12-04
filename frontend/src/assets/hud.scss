@@ -1,0 +1,31 @@
+#hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 999;
+
+    width: 100%;
+    color: var(--fg-blue);
+    text-shadow: var(--fg-blue-shadow);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+
+    & > div {
+        background-color: var(--bg-elevated-1-translucent);
+        padding: 0.5em;
+    }
+}
+
+.karaokeBox {
+    font-size: 1.2em;
+    background: var(--bg-elevated-1-translucent);
+    backdrop-filter: blur(4px);
+
+    border: 1px solid var(--bg);
+    box-shadow: var(--bg-shadow);
+
+    padding: 1em;
+    border-radius: 0.75em;
+}

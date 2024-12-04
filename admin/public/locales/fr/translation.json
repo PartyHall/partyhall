@@ -1,0 +1,134 @@
+{
+    "generic": {
+        "mode": "Mode",
+        "modes": {
+            "photobooth": "Photomaton",
+            "disabled": "Désactivé"
+        },
+        "menu": {
+            "home": "Accueil",
+            "events": "Évènements",
+            "photobooth": "Photomaton",
+            "karaoke": "Karaoké",
+            "logs": "Logs"
+        },
+        "event_title": "{{eventName}} par {{eventAuthor}}",
+        "id": "ID",
+        "name": "Nom",
+        "author": "Auteur",
+        "date": "Date",
+        "location": "Lieux",
+        "actions": {
+            "noun": "Actions",
+            "new": "Nouveau",
+            "edit": "Editer",
+            "use": "Utiliser",
+            "delete": "Supprimer",
+            "ok": "OK",
+            "cancel": "Annuler",
+            "save": "Sauvegarder",
+            "create": "Créer",
+            "search": "Rechercher",
+            "resume": "Lire",
+            "pause": "Pause"
+        }
+    },
+    "login": {
+        "username": "Pseudo",
+        "password": "MDP",
+        "anonymous": "Anonyme",
+        "admin": "Admin",
+        "connect": "Connexion",
+        "username_required": "Le pseudo est requis",
+        "password_required": "Le mot de passe est requis",
+        "notification_failed_login": {
+            "title": "Échec de la connexion",
+            "description": "Voir la console pour plus d'infos",
+            "bad_login": "Pseudo/mot de passe invalide"
+        }
+    },
+    "home": {
+        "about_you": {
+            "title": "Mon compte",
+            "your_display_name": "Pseudo affiché"
+        },
+        "actions": {
+            "title": "Actions",
+            "ph_version": "Version PartyHall",
+            "ph_commit": "Commit PartyHall",
+            "appliance_time": "Heure de l'appareil",
+            "sync": {
+                "title": "Synchro",
+                "idle": "Attente...",
+                "in_progress": "En cours..."
+            },
+            "force_sync": "Forcer la synchro",
+            "logout": "Déconnexion",
+            "show_debug": "Afficher le debug",
+            "shutdown": "Éteindre"
+        }
+    },
+    "events": {
+        "title": "Évènements",
+        "events_count": "{{amt}} évènements",
+        "columns": {
+            "id": "ID"
+        },
+        "select_event": {
+            "title": "Sélectionner cet évènement",
+            "description": "Cet appareil va maintenant utiliser cet évènement"
+        },
+        "delete_event": {
+            "title": "Supprimer cet évènement",
+            "description": "Vous allez supprimer {{name}}"
+        },
+        "editor": {
+            "edit_title": "Edition de {{name}}",
+            "create_title": "Création d'un évènement",
+            "create_on_pn": "Créer sur PartyNexus"
+        }
+    },
+    "photobooth": {
+        "title": "Photomaton",
+        "amt_manually_taken": "Photos prises manuellement",
+        "amt_unattended": "Photos prises automatiquement",
+        "remote_take_picture": "Prendre une photo",
+        "success_notification": {
+            "title": "Prise de photo",
+            "description": "Une photo à été prise à distance"
+        }
+    },
+    "karaoke": {
+        "tabs": {
+            "search": "Recherche",
+            "queue": "File d'attente"
+        },
+        "no_songs_found": "Pas de musiques trouvée !",
+        "no_songs_in_queue": "Pas de musiques en file d'attente",
+        "in_queue": "À suivre",
+        "amt_songs": "{{amt}} musiques",
+        "instrumental": "Instrumentale",
+        "vocals": "Voix",
+        "full_song": "Musique complète",
+        "volume": "Volume",
+        "voices": "Voix",
+        "cover_alt": "Cover de {{title}}",
+        "tooltip_play_directly": "Lire directement",
+        "confirm_play_directly": "Lancer cette musique va stopper la musique en cours, êtes-vous sûr ?",
+        "tooltip_add_to_queue": "Ajouter à la file d'attente",
+        "confirm_cancel": "Vous allez supprimer cette musique",
+        "notification_added_queue": {
+            "title": "Musique ajoutée à la file",
+            "description": "La musique {{title}} a été ajoutée à la file d'attente"
+        },
+        "notification_remove_queue": {
+            "title": "Musique supprimée de la file",
+            "description": "La musique {{title}} a été supprimée de la file d'attente"
+        },
+        "notification_queue_fail": {
+            "title": "Échec de l'ajout/suppression de la musique",
+            "description": "Voir la console pour plus d'infos"
+        },
+        "singer": "Chanteur"
+    }
+}

@@ -1,0 +1,27 @@
+.countdown {
+    font-size: 3em;
+}
+
+.flash {
+    background-color: #ffffffaf !important;
+}
+
+.lastPicture {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background-color: var(--bg-translucent);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    img {
+        object-fit: contain;
+        width: 80%;
+        height: 80%;
+    }
+}

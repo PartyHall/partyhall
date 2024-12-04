@@ -1,0 +1,42 @@
+# Address to listen to
+listening_addr: '0.0.0.0:8039'
+
+# The path in which every partyhall-related data should be stored
+root_path: '/home/{{ ansible_user }}/partyhall'
+
+# Send the time every seconds
+# Useful to disable in dev
+send_time: true
+
+# MQTT settings
+mqtt_addr: '127.0.0.1:1883'
+
+# Let guest login with limited permissions
+# Useful for the Karaoke
+guests_allowed: true
+
+# PartyNexus credentials
+nexus_url: '{{ partyhall_nexus_url }}'
+hardware_id: '{{ partyhall_nexus_hardware_id }}'
+api_key: '{{ partyhall_nexus_api_key }}'
+
+# Hardware handler config
+# This set how the appliance should talk with the arduino
+hardware_handler:
+  baud_rate: 57600 # The speed that is set in the arduino code
+  mappings: # This maps each button to a MQTT topic to be sent
+    BTN_0: 'take_picture' # e.g. pressing button 0 will send a message on the topic partyhall/take_picture
+    BTN_1: 'display_debug'
+    BTN_2: 'shutdown'
+
+settings:
+    photobooth:
+        countdown: 3 # Amount of seconds to countdown before taking a picture
+        resolution: # The resolution of your webcam
+            width: {{ partyhall_photobooth_webcam_width }}
+            height: {{ partyhall_photobooth_webcam_height }}
+        # Unattended are the pictures taken automatically
+        # for the timelapse
+        unattended:
+            enabled: {{ 'true' if partyhall_photobooth_unattended else 'false' }}
+            interval: {{ partyhall_photobooth_unattended_interval }}

@@ -1,0 +1,134 @@
+{
+    "generic": {
+        "mode": "Mode",
+        "modes": {
+            "photobooth": "Photobooth",
+            "disabled": "Disabled"
+        },
+        "menu": {
+            "home": "Home",
+            "events": "Events",
+            "photobooth": "Photobooth",
+            "karaoke": "Karaoke",
+            "logs": "Logs"
+        },
+        "event_title": "{{eventName}} by {{eventAuthor}}",
+        "id": "ID",
+        "name": "Name",
+        "author": "Author",
+        "date": "Date",
+        "location": "Location",
+        "actions": {
+            "noun": "Actions",
+            "new": "New",
+            "edit": "Edit",
+            "use": "Use",
+            "delete": "Delete",
+            "ok": "OK",
+            "cancel": "Cancel",
+            "save": "Save",
+            "create": "Create",
+            "search": "Search",
+            "resume": "Resume",
+            "pause": "Pause"
+        }
+    },
+    "login": {
+        "username": "Username",
+        "password": "Password",
+        "anonymous": "Anonymous",
+        "admin": "Admin",
+        "connect": "Login",
+        "username_required": "Username is required",
+        "password_required": "Password is required",
+        "notification_failed_login": {
+            "title": "Failed to login",
+            "description": "See console for more infos",
+            "bad_login": "Invalid username/password"
+        }
+    },
+    "home": {
+        "about_you": {
+            "title": "About you",
+            "your_display_name": "Your displayed name"
+        },
+        "actions": {
+            "title": "Actions",
+            "ph_version": "PartyHall version",
+            "ph_commit": "PartyHall commit",
+            "appliance_time": "Appliance time",
+            "sync": {
+                "title": "Sync",
+                "idle": "Idle...",
+                "in_progress": "In progress..."
+            },
+            "force_sync": "Force sync",
+            "logout": "Logout",
+            "show_debug": "Show debug",
+            "shutdown": "Shutdown"
+        }
+    },
+    "events": {
+        "title": "Events",
+        "events_count": "{{amt}} events",
+        "columns": {
+            "id": "ID"
+        },
+        "select_event": {
+            "title": "Select this event",
+            "description": "The appliance will now use this event"
+        },
+        "delete_event": {
+            "title": "Delete this event",
+            "description": "You are going to remove {{name}}"
+        },
+        "editor": {
+            "edit_title": "Editing {{name}}",
+            "create_title": "Creating an event",
+            "create_on_pn": "Create on PartyNexus"
+        }
+    },
+    "photobooth": {
+        "title": "Photobooth",
+        "amt_manually_taken": "Amount of pictures manually taken",
+        "amt_unattended": "Amount of pictures unattended",
+        "remote_take_picture": "Remote take picture",
+        "success_notification": {
+            "title": "Remote picture",
+            "description": "The request to take a picture has been sent"
+        }
+    },
+    "karaoke": {
+        "tabs": {
+            "search": "Search",
+            "queue": "Queue"
+        },
+        "no_songs_found": "No songs found!",
+        "no_songs_in_queue": "No songs in queue!",
+        "in_queue": "Next up",
+        "amt_songs": "{{amt}} songs",
+        "instrumental": "Instrumental",
+        "vocals": "Vocals",
+        "full_song": "Full song",
+        "volume": "Volume",
+        "voices": "Voices",
+        "cover_alt": "Cover of {{title}}",
+        "tooltip_play_directly": "Play directly",
+        "confirm_play_directly": "Playing this song will skip the currently played one. Are you sure?",
+        "tooltip_add_to_queue": "Add to queue",
+        "confirm_cancel": "Are you sure you want to remove this song?",
+        "notification_added_queue": {
+            "title": "Song added to queue",
+            "description": "Added {{title}} to the queue"
+        },
+        "notification_remove_queue": {
+            "title": "Song removed from the queue",
+            "description": "Removed {{title}} from the queue"
+        },
+        "notification_queue_fail": {
+            "title": "Failed to add/remove song in the queue",
+            "description": "See console for more infos"
+        },
+        "singer": "Singer"
+    }
+}

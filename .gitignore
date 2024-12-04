@@ -1,0 +1,8 @@
+0_DATA/
+backend/tmp
+backend/frontend
+env
+sdk/dist
+*.tsbuildinfo
+ansible/inventory.yaml
+/build

@@ -1,0 +1,32 @@
+.SongCard {
+    max-width: 500px;
+
+    &__Title {
+        font-size: 1.2em;
+    }
+
+    &__Format,
+    &__Singer {
+        color: #777;
+    }
+
+    &__Cover {
+        width: 92px;
+        height: 92px;
+        object-fit: contain;
+    }
+
+    &__Tracks {
+        margin-top: 0.75em;
+    }
+
+    &__Timecode {
+        width: 7ch;
+        text-align: center;
+    }
+
+    &__Slider {
+        flex: 1;
+        margin-left: 1.5em;
+    }
+}

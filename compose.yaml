@@ -1,0 +1,77 @@
+services:
+  mosquitto:
+    image: 'eclipse-mosquitto:latest'
+    ports:
+      - '1883:1883'
+      - '9001:9001'
+    volumes:
+      - './docker/dev/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf'
+      - './0_DATA/mosquitto/data:/mosquitto/data'
+      - './0_DATA/mosquitto/logs:/mosquitto/log'
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "1883"]
+      interval: '10s'
+      timeout: '10s'
+      retries: 6
+  # app:
+  #   image: 'partyhall:dev'
+  #   build:
+  #     context: .
+  #     dockerfile: './docker/dev/Dockerfile'
+  #   working_dir: '/app'
+  #   environment:
+  #     PARTYHALL_ENV: 'dev'
+  #   volumes:
+  #     - './0_DATA/gopkg:/go/pkg'
+  #     - './backend:/app'
+  #     - './0_DATA/partyhall.yaml:/etc/partyhall.yaml'
+  #     - './0_DATA/data:/root/data'
+  #   extra_hosts:
+  #     - 'host.docker.internal:host-gateway'
+  #   healthcheck:
+  #     test: ["CMD", "curl", "--silent", "--fail", "http://localhost:8080/api/status"]
+  #     interval: '30s'
+  #     start_period: '15s'
+  #     retries: 5
+  #   depends_on:
+  #     mosquitto:
+  #       condition: 'service_healthy'
+  #   ports:
+  #     - '127.0.0.1:8745:8080'
+  #     - '127.0.0.1:2345:2345'
+
+  frontend:
+    image: 'node:lts'
+    init: true
+    working_dir: '/app'
+    env_file: ['./env']
+    command: ['bash', '-c', '[ ! -d node_modules ] && npm install; npm run dev -- --host']
+    volumes:
+      - './sdk:/sdk'
+      - './frontend:/app'
+    user: "${UID:-1000}:${GID:-1000}"
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    ports:
+      - '127.0.0.1:5173:5173'
+    # depends_on:
+    #   app:
+    #     condition: 'service_healthy'
+
+  admin:
+    image: 'node:lts'
+    init: true
+    working_dir: '/app'
+    env_file: ['./env']
+    command: ['bash', '-c', '[ ! -d node_modules ] && npm install; npm run dev -- --host']
+    volumes:
+      - './sdk:/sdk'
+      - './admin:/app'
+    user: "${UID:-1000}:${GID:-1000}"
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    ports:
+      - '127.0.0.1:5174:5173'
+    # depends_on:
+    #   app:
+    #     condition: 'service_healthy'

@@ -1,0 +1,39 @@
+name: 'Bug report'
+description: 'If you got an issue with PartyHall'
+labels: ['bug']
+body:
+  - type: 'input'
+    attributes:
+      label: 'PartyHall version'
+      placeholder: 'Latest'
+    validations:
+      required: true
+
+  - type: 'input'
+    attributes:
+      label: 'Architecture'
+      placeholder: 'x86_64'
+    validations:
+      required: true
+
+  - type: 'textarea'
+    attributes:
+      label: 'Steps to reproduce'
+      placeholder: 'Tell us the steps required to trigger your bug.'
+    validations:
+      required: true
+
+  - type: 'textarea'
+    attributes:
+      label: 'Expected Behavior'
+      description: 'If you want to include screenshots, paste them into the markdown editor below.'
+      placeholder: 'What were you expecting?'
+    validations:
+      required: false
+
+  - type: 'textarea'
+    attributes:
+      label: 'Actual Behavior'
+      placeholder: 'What happened instead?'
+    validations:
+      required: true

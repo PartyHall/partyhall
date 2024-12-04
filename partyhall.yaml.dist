@@ -1,0 +1,40 @@
+# Address to listen to
+listening_addr: '0.0.0.0:8080'
+
+# The path in which every partyhall-related data should be stored
+root_path: '/root/data'
+
+# Send the time every seconds
+# Useful to disable in dev
+send_time: true
+
+# MQTT settings
+mqtt_addr: 'mosquitto:1883'
+
+# Let guest login with limited permissions
+# Useful for the Karaoke
+guests_allowed: true
+
+# PartyNexus credentials
+nexus_url: '' # Dev URL: http://host.docker.internal
+hardware_id: '' # Dev HWID: b094786e-5158-4ceb-861b-28cb45b2a2c3
+api_key: '' # Dev Api key: my-api-token
+
+# Hardware handler config
+# This set how the appliance should talk with the arduino
+hardware_handler:
+  baud_rate: 57600 # The speed that is set in the arduino code
+  mappings: # This maps each button to a MQTT topic to be sent
+    BTN_0: 'take_picture' # e.g. pressing button 0 will send a message on the topic partyhall/take_picture
+    BTN_1: 'display_debug'
+    BTN_2: 'shutdown'
+
+settings:
+    photobooth:
+        countdown: 3 # Amount of seconds to countdown before taking a picture
+        resolution: # The resolution of your webcam
+            width: 1280
+            height: 720
+        unattended:
+            enabled: true
+            interval: 30 # Amount of seconds between every unattended shots

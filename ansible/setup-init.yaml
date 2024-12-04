@@ -1,0 +1,89 @@
+---
+- hosts: 'all'
+  become: yes
+  tags: ['init']
+
+  roles:
+    - 'geerlingguy.ntp'
+
+  tasks:
+    - name: 'Updating the system setup'
+      apt:
+        update_cache: yes
+        upgrade: yes
+        cache_valid_time: 86400
+      environment:
+        DEBIAN_FRONTEND: 'noninteractive'
+
+    - name: 'Install some softwares'
+      apt:
+        name: ['zip', 'unzip', 'sqlite3', 'vim', 'sudo', 'ffmpeg', 'pipewire-audio', 'pulseaudio-utils', 'plymouth', 'plymouth-themes']
+
+    - name: 'Make users passwordless for sudo in group wheel'
+      lineinfile:
+        path: '/etc/sudoers'
+        state: 'present'
+        regexp: '^%wheel'
+        line: '%wheel ALL=(ALL) NOPASSWD: ALL'
+        validate: '/usr/sbin/visudo -cf %s'
+
+    - name: 'Ensure group wheel exists'
+      group:
+        name: 'wheel'
+        state: 'present'
+
+    - name: 'Add the user to the sudo group'
+      user:
+        name: '{{ ansible_user }}'
+        groups: 'wheel'
+        append: yes
+
+    - name: 'Enabling the PipeWire services'
+      become_user: '{{ ansible_user }}'
+      systemd:
+        name: 'wireplumber'
+        daemon_reload: yes
+        state: 'restarted'
+        enabled: yes
+        scope: 'user'
+
+    - name: 'Disabling grub boot menu'
+      copy:
+        content: |
+          set timeout_style=hidden
+          set timeout=0
+        dest: '/boot/grub/custom.cfg'
+
+    - name: 'Copying the theme'
+      copy:
+        src: 'files/plymouth_theme/' # The final slash is important! It means copy the folder content not to a subfolder
+        dest: '/usr/share/plymouth/themes/simple-image'
+
+    - name: 'Setting up grub resolution'
+      lineinfile:
+        path: '/etc/default/grub'
+        line: 'GRUB_GFXMODE={{ grub_resolution }}'
+        insertafter: '^#?GRUB_CMDLINE_LINUX='
+        regexp: '^#?GRUB_GFXMODE='
+
+    - name: 'Setting up grub cmdline'
+      lineinfile:
+        path: '/etc/default/grub'
+        regexp: '^GRUB_CMDLINE_LINUX_DEFAULT='
+        line: 'GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"'
+
+    - name: 'Setting up grub gfxpayload'
+      lineinfile:
+        path: '/etc/default/grub'
+        regexp: '^GRUB_GFXPAYLOAD_LINUX='
+        line: 'GRUB_GFXPAYLOAD_LINUX=keep'
+
+    - name: 'Setting the plymouth theme'
+      command: 'plymouth-set-default-theme -R simple-image'
+      environment:
+        PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/sbin:/bin'
+
+    - name: 'Updating the grub config'
+      command: 'update-grub'
+      environment:
+        PATH: '/usr/local/sbin:/usr/local/bin:/usr/sbin:/sbin:/bin'

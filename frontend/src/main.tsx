@@ -17,8 +17,8 @@ const JWT_TOKEN =
 
 Cookies.set('mercureAuthorization', JWT_TOKEN, {
     sameSite: 'lax',
-    secure: true,
-});
+    secure: true
+})
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>

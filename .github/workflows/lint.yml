@@ -1,0 +1,107 @@
+name: Lint Check
+
+on:
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  lint:
+    name: Run Linters
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # Caches gérés séparément pour chaque projet
+      - name: Cache SDK dependencies
+        uses: actions/cache@v3
+        with:
+          path: sdk/node_modules
+          key: sdk-${{ runner.os }}-node-${{ hashFiles('sdk/package-lock.json') }}
+          restore-keys: |
+            sdk-${{ runner.os }}-node-
+
+      - name: Cache Admin dependencies
+        uses: actions/cache@v3
+        with:
+          path: admin/node_modules
+          key: admin-${{ runner.os }}-node-${{ hashFiles('admin/package-lock.json') }}
+          restore-keys: |
+            admin-${{ runner.os }}-node-
+
+      - name: Cache Frontend dependencies
+        uses: actions/cache@v3
+        with:
+          path: frontend/node_modules
+          key: frontend-${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            frontend-${{ runner.os }}-node-
+
+      # Installation des dépendances avec vérification d'erreurs
+      - name: Install SDK dependencies
+        run: |
+          cd sdk
+          if ! npm ci; then
+            echo "Failed to install SDK dependencies"
+            exit 1
+          fi
+
+      - name: Install Admin dependencies
+        run: |
+          cd admin
+          if ! npm ci; then
+            echo "Failed to install Admin dependencies"
+            exit 1
+          fi
+
+      - name: Install Frontend dependencies
+        run: |
+          cd frontend
+          if ! npm ci; then
+            echo "Failed to install Frontend dependencies"
+            exit 1
+          fi
+
+      # Vérifications avec gestion d'erreurs explicite
+      - name: Check SDK
+        run: |
+          cd sdk
+          echo "Running Prettier check on SDK..."
+          if ! npx prettier --check .; then
+            echo "SDK Prettier check failed"
+            exit 1
+          fi
+
+      - name: Check Admin
+        run: |
+          cd admin
+          echo "Running Prettier check on Admin..."
+          if ! npx prettier --check .; then
+            echo "Admin Prettier check failed"
+            exit 1
+          fi
+          echo "Running ESLint on Admin..."
+          if ! npm run lint; then
+            echo "Admin ESLint check failed"
+            exit 1
+          fi
+
+      - name: Check Frontend
+        run: |
+          cd frontend
+          echo "Running Prettier check on Frontend..."
+          if ! npx prettier --check .; then
+            echo "Frontend Prettier check failed"
+            exit 1
+          fi
+          echo "Running ESLint on Frontend..."
+          if ! npm run lint; then
+            echo "Frontend ESLint check failed"
+            exit 1
+          fi

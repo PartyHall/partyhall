@@ -6,3 +6,4 @@ sdk/dist
 *.tsbuildinfo
 ansible/inventory.yaml
 /build
+*/.vite

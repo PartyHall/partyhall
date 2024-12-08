@@ -235,6 +235,7 @@ func init() {
 	userCmd.AddCommand(getInitializeUserCmd())
 
 	devCmd.AddCommand(generateJwtCmd)
+	devCmd.AddCommand(testCmd)
 
 	rootCmd.AddCommand(userCmd)
 	rootCmd.AddCommand(hwHandlerCmd)

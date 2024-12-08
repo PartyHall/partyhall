@@ -57,6 +57,8 @@ func RegisterWebappRoutes(router *gin.RouterGroup) {
 	settings.POST("/debug", routeSetDebug)
 	settings.POST("/force-sync", routeForceSync)
 
+	settings.GET("/audio-devices", routeGetAudioDevices)
+
 	nexusRoutes := r.Group("/nexus", middlewares.HasEventLoaded(), middlewares.Authorized("ADMIN"))
 	nexusRoutes.POST("/sync", routeSync)
 	nexusRoutes.POST("/events/:id", routeCreateOnNexus)

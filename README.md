@@ -1,9 +1,17 @@
 # PartyHall
 
-## TODOs
-- When logout, mercure shits itself and spam connect attempts
+## WIP
 - Config PulseAudio / Pipewire (+ tester avec l'evo4)
 - Maitriser le volume des micros dans PH + volume sonore global de Firefox
+
+=> Some work done in the pipewire package
+=> Need to add routes to settings to set the audio interface (both input & output)
+=> + change the volume of output (microphone) and output (global => Karaoke mic + spotify + karaoke songs)
+=> + Install the pipewire config in ansible (the file is already present in ansible/files/pipewire_karaoke.conf)
+=> + Configure pipewire properly (add zamgate + zamcomp / amplify properly)
+
+## TODOs
+- When logout, mercure shits itself and spam connect attempts
 - Fixer la carte mère de merde (Ou la remplacer avec celle d'antoine)
 
 ## VSCode config

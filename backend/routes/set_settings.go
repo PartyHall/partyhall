@@ -14,6 +14,7 @@ import (
 	"github.com/partyhall/partyhall/log"
 	"github.com/partyhall/partyhall/mercure_client"
 	"github.com/partyhall/partyhall/nexus"
+	"github.com/partyhall/partyhall/pipewire"
 	"github.com/partyhall/partyhall/services"
 	"github.com/partyhall/partyhall/state"
 )
@@ -119,6 +120,18 @@ func routeSetDebug(c *gin.Context) {
 	}
 
 	c.Status(http.StatusOK)
+}
+
+func routeGetAudioDevices(c *gin.Context) {
+	devices, err := pipewire.GetDevices()
+	if err != nil {
+		api_errors.BAD_REQUEST.WithExtra(map[string]any{
+			"err": err,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, devices)
 }
 
 func routeForceSync(c *gin.Context) {

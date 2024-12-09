@@ -1,49 +1,18 @@
 # PartyHall
 
-## WIP
-- Config PulseAudio / Pipewire (+ tester avec l'evo4)
-- Maitriser le volume des micros dans PH + volume sonore global de Firefox
+PartyHall is the appliance software, that does the bulk of the features.
 
-=> Some work done in the pipewire package
-=> Need to add routes to settings to set the audio interface (both input & output)
-=> + change the volume of output (microphone) and output (global => Karaoke mic + spotify + karaoke songs)
-=> + Install the pipewire config in ansible (the file is already present in ansible/files/pipewire_karaoke.conf)
-=> + Configure pipewire properly (add zamgate + zamcomp / amplify properly)
+## Getting Started
 
-## TODOs
-- When logout, mercure shits itself and spam connect attempts
-- Fixer la carte mère de merde (Ou la remplacer avec celle d'antoine)
+PartyHall is available through an ansible playbook to be run on a stock debian setup.
 
-## VSCode config
+To get started, you should visit our [documentation](https://partyhall.github.io/).
 
-CA MARCHE PAS
+Note that the whole software has been rewritten in v0.8 and is no longer compatible at all with previous versions.
 
-https://dev.to/andreidascalu/setup-go-with-vscode-in-docker-for-debugging-24ch
+## Links
 
-```
-{
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Delve into Docker",
-            "type": "go",
-            "request": "attach",
-            "mode": "remote",
-            "substitutePath": [
-                {
-                    "from": "<full absolute path to project>",
-                    "to": "/app/",
-                },
-            ],
-            "port": 2345,
-            "host": "127.0.0.1",
-            "showLog": true,
-            "apiVersion": 2,
-            "trace": "verbose"
-        }
-    ]
-}
-```
+- [Website / Docs](https://partyhall.github.io/)
+- [Main software](https://github.com/partyhall/partyhall)
+- [PartyNexus](https://github.com/partyhall/partynexus)
+- [Docs repository](https://github.com/partyhall/docs)

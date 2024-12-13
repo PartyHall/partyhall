@@ -1,5 +1,6 @@
-import { Flex, Slider, Tooltip, Typography } from 'antd';
+import { Tooltip, Typography } from 'antd';
 import { ReactNode } from 'react';
+import TextSlider from '../text_slider';
 import { VolumeType } from '@partyhall/sdk';
 import { useAuth } from '../../hooks/auth';
 
@@ -34,17 +35,19 @@ export default function VolumeSlider(props: Props) {
         setKaraoke(data);
     };
 
-    return (
-        <Flex align="center">
-            <Tooltip title={props.tooltip}>{props.icon}</Tooltip>
-            <Slider
-                value={volume}
-                onChange={(x) => setVolume(x)}
-                className="SongCard__Slider"
-            />
+    return <TextSlider
+        leftText={
+            <div className='SongCard__Timecode'>
+                <Tooltip title={props.tooltip}>{props.icon}</Tooltip>
+            </div>
+        }
+        rightText={
             <Typography.Text className="SongCard__Timecode">
                 {volume}%
             </Typography.Text>
-        </Flex>
-    );
+        }
+        value={volume}
+        onChange={x => setVolume(x)}
+        className='SongCard__Slider'
+    />;
 }

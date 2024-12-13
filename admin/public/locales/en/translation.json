@@ -52,6 +52,13 @@
             "title": "About you",
             "your_display_name": "Your displayed name"
         },
+        "sound_settings": {
+            "title": "Sound settings",
+            "input_device": "Microphone",
+            "output_device": "Speakers",
+            "volume_input": "Microphones volume",
+            "volume_output": "Speakers volume"
+        },
         "actions": {
             "title": "Actions",
             "ph_version": "PartyHall version",

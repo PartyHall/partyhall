@@ -1,5 +1,5 @@
 import '../../assets/css/song_card.scss';
-import { Button, Card, Flex, Slider, Tooltip, Typography } from 'antd';
+import { Button, Card, Flex, Tooltip, Typography } from 'antd';
 import {
     IconPlayerPause,
     IconPlayerPlay,
@@ -7,6 +7,7 @@ import {
     IconVolume,
 } from '@tabler/icons-react';
 import Image from '../image';
+import TextSlider from '../text_slider';
 import VolumeSlider from './volume_slider';
 import { useAuth } from '../../hooks/auth';
 import { useTranslation } from 'react-i18next';
@@ -79,30 +80,32 @@ export default function CurrentCard() {
                     </Flex>
                 </Flex>
 
-                <Flex align="center">
-                    <Typography.Text className="SongCard__Timecode">
-                        {formatSeconds(karaoke.timecode)}
-                    </Typography.Text>
-                    <Slider
-                        value={karaoke.timecode}
-                        max={karaoke.current.song.duration}
-                        className="SongCard__Slider"
-                        disabled
-                    />
-                    <Typography.Text className="SongCard__Timecode">
-                        {formatSeconds(karaoke.current.song.duration)}
-                    </Typography.Text>
-                </Flex>
+                <TextSlider
+                    leftText={
+                        <Typography.Text className="SongCard__Timecode">
+                            {formatSeconds(karaoke.timecode)}
+                        </Typography.Text>
+                    }
+                    rightText={
+                        <Typography.Text className="SongCard__Timecode">
+                            {formatSeconds(karaoke.current.song.duration)}
+                        </Typography.Text>
+                    }
+                    value={karaoke.timecode}
+                    max={karaoke.current.song.duration}
+                    className="SongCard__Slider"
+                    disabled
+                />
 
                 <VolumeSlider
                     type="instrumental"
-                    icon={<IconVolume />}
+                    icon={<IconVolume size={20} />}
                     tooltip={t('volume')}
                 />
                 {karaoke.current.song.has_vocals && (
                     <VolumeSlider
                         type="vocals"
-                        icon={<IconRecordMail />}
+                        icon={<IconRecordMail size={20} />}
                         tooltip={t('voices')}
                     />
                 )}

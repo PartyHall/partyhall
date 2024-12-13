@@ -1,4 +1,5 @@
 import { PhEvent, SDK } from './index';
+import { AudioDevices } from './models/audio';
 
 export default class Settings {
     sdk: SDK;
@@ -7,7 +8,7 @@ export default class Settings {
         this.sdk = sdk;
     }
 
-    public async setMode(mode: string) {
+    public async setMode(mode: string): Promise<void> {
         await this.sdk.post(`/api/webapp/settings/mode/${mode}`);
     }
 
@@ -18,7 +19,14 @@ export default class Settings {
         return PhEvent.fromJson(data);
     }
 
-    public async showDebug() {
+    public async showDebug(): Promise<void> {
         await this.sdk.post('/api/webapp/settings/debug');
+    }
+
+    public async getAudioDevices(): Promise<AudioDevices|null> {
+        const resp = await this.sdk.get('/api/webapp/settings/audio-devices');
+        const data = await resp.json();
+
+        return AudioDevices.fromJson(data);
     }
 }

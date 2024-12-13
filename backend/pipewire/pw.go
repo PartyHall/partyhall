@@ -74,6 +74,9 @@ func GetVolume(d *Device) error {
 /**
  * Devices should also have the different ports they have
  * so that the link method can work
+ *
+ * Note: Yeah we iterate quite a bit on the list of PipewireObjects
+ * but meh
  */
 func GetDevices() (*Devices, error) {
 	cmd := exec.Command("pw-dump")
@@ -87,30 +90,15 @@ func GetDevices() (*Devices, error) {
 		return nil, err
 	}
 
-	portsByNode := make(map[int][]Port)
-	for _, obj := range objects {
-		props := obj.Info.Props
-		if props == nil {
-			continue
-		}
+	portsByNode := findPortsByNode(objects)
 
-		if _, ok := props["port.direction"].(string); ok {
-			nodeID, ok := props["node.id"].(float64)
-			if !ok {
-				continue
-			}
-
-			port, err := parsePort(obj)
-			if err != nil {
-				continue
-			}
-
-			portsByNode[int(nodeID)] = append(portsByNode[int(nodeID)], *port)
-		}
-	}
+	defaultSink, defaultSource := findDefaults(objects)
 
 	var karaokeSourceDevice *Device = nil
 	var karaokeSinkDevice *Device = nil
+
+	var defaultSourceDevice *Device = nil
+	var defaultSinkDevice *Device = nil
 
 	var sources, sinks []Device
 	for _, obj := range objects {
@@ -145,8 +133,16 @@ func GetDevices() (*Devices, error) {
 		} else if device.Name == "Karaoke_Input" {
 			karaokeSinkDevice = &device
 		} else if class == "Audio/Source" {
+			if name == defaultSource {
+				defaultSourceDevice = &device
+			}
+
 			sources = append(sources, device)
 		} else if class == "Audio/Sink" {
+			if name == defaultSink {
+				defaultSinkDevice = &device
+			}
+
 			sinks = append(sinks, device)
 		}
 	}
@@ -155,36 +151,20 @@ func GetDevices() (*Devices, error) {
 		return nil, errors.New("pipewire is not setup properly! No KaraokeLoopback interface")
 	}
 
-	var links []Link
-	for _, obj := range objects {
-		props := obj.Info.Props
-		if props == nil {
-			continue
-		}
-
-		if _, ok := props["link.input.port"].(float64); !ok {
-			continue
-		}
-
-		link, err := parseLink(obj)
-		if err != nil {
-			log.Error("Failed to parse link", "error", err)
-			continue
-		}
-
-		isInputLink := link.InputNodeId == karaokeSinkDevice.ID || link.InputNodeId == karaokeSourceDevice.ID
-		isOutputLink := link.OutputNodeId == karaokeSinkDevice.ID || link.OutputNodeId == karaokeSourceDevice.ID
-
-		// Only include links that connect to either the karaoke source or sink
-		if isInputLink || isOutputLink {
-			links = append(links, *link)
-		}
-	}
+	links := findLinks(
+		objects,
+		karaokeSinkDevice.ID,
+		karaokeSourceDevice.ID,
+	)
 
 	return &Devices{
-		Sources: sources,
-		Sinks:   sinks,
-		Links:   links,
+		KaraokeSource: *karaokeSourceDevice,
+		KaraokeSink:   *karaokeSinkDevice,
+		DefaultSource: defaultSourceDevice,
+		DefaultSink:   defaultSinkDevice,
+		Sources:       sources,
+		Sinks:         sinks,
+		Links:         links,
 	}, nil
 }
 
@@ -201,6 +181,22 @@ func SetVolume(d *Device, vol float64) error {
 	}
 
 	d.Volume = vol
+
+	return nil
+}
+
+func SetDefaultDevices(source int, sink int) error {
+	for _, i := range []int{source, sink} {
+		err := exec.Command(
+			"wpctl",
+			"set-default",
+			fmt.Sprintf("%v", i),
+		).Run()
+
+		if err != nil {
+			return err
+		}
+	}
 
 	return nil
 }

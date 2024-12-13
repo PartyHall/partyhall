@@ -62,14 +62,28 @@ func (d Device) String() string {
 }
 
 type Devices struct {
-	Sources []Device `json:"sources"`
-	Sinks   []Device `json:"sinks"`
-	Links   []Link   `json:"links"`
+	KaraokeSource Device   `json:"karaoke_source"`
+	KaraokeSink   Device   `json:"karaoke_sink"`
+	DefaultSource *Device  `json:"default_source"`
+	DefaultSink   *Device  `json:"default_sink"`
+	Sources       []Device `json:"sources"`
+	Sinks         []Device `json:"sinks"`
+	Links         []Link   `json:"links"`
+}
+
+type PipeWireMetadata struct {
+	Subject int    `json:"subject"`
+	Key     string `json:"key"`
+	Type    string `json:"type"`
+	Value   any    `json:"value"`
 }
 
 type PipeWireObject struct {
-	ID   int `json:"id"`
-	Info struct {
+	ID       int                    `json:"id"`
+	Type     string                 `json:"type"`
+	Metadata []PipeWireMetadata     `json:"metadata"`
+	Props    map[string]interface{} `json:"props"`
+	Info     struct {
 		Props  map[string]interface{} `json:"props"`
 		Params struct {
 			Props []map[string]interface{} `json:"Props"`

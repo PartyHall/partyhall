@@ -132,22 +132,26 @@ a {
 }
 
 .red {
-    color: var(--fg-red);
+    color: var(--fg-red) !important;
     text-shadow: var(--fg-red-shadow);
 }
 
 .yellow {
-    color: var(--fg-yellow);
+    color: var(--fg-yellow) !important;
     text-shadow: var(--fg-yellow-shadow);
 }
 
 .green {
-    color: var(--fg-green);
+    color: var(--fg-green) !important;
     text-shadow: var(--fg-green-shadow);
 }
 
 .fullwidth {
     width: 100%;
+}
+
+.flex1 {
+    flex: 1;
 }
 
 .fullheight {
@@ -156,4 +160,8 @@ a {
 
 .overflowAuto {
     overflow-y: auto;
+}
+
+.no-margin {
+    margin: 0 !important;
 }

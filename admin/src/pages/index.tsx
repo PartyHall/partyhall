@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { useMercure } from '../hooks/mercure';
 import { useSettings } from '../hooks/settings';
 import { useTranslation } from 'react-i18next';
+import SoundCard from '../components/sound_card';
 
 export default function Index() {
     const { t } = useTranslation('', { keyPrefix: 'home' });
@@ -49,6 +50,8 @@ export default function Index() {
             </Card>
 
             {event && <EventCard event={event} />}
+
+            <SoundCard />
 
             <Card title={t('actions.title')}>
                 <Flex vertical gap={'.25em'}>

@@ -1,21 +1,11 @@
 import { PhEvent, SDK } from '@partyhall/sdk';
-import {
-    ReactNode,
-    createContext,
-    useContext,
-    useEffect,
-    useRef,
-    useState,
-} from 'react';
+import { ReactNode, createContext, useContext, useEffect, useRef, useState } from 'react';
 import { DateTime } from 'luxon';
 import { notification } from 'antd';
 import { useAuth } from './auth';
 
 type EventListenerCallback = (data: any) => void;
-type EventListenerFn = (
-    eventType: string,
-    callback: EventListenerCallback
-) => void;
+type EventListenerFn = (eventType: string, callback: EventListenerCallback) => void;
 
 type MercureProps = {
     isInitialized: boolean;
@@ -55,9 +45,7 @@ export default function MercureProvider({
     const [notif, ctxHolder] = notification.useNotification();
 
     const eventSource = useRef<EventSource>();
-    const listenersRef = useRef<{ event: string; callback: EventListener }[]>(
-        []
-    );
+    const listenersRef = useRef<{ event: string; callback: EventListener }[]>([]);
 
     const createEventSource = () => {
         const urlObj = new URL(url);
@@ -82,8 +70,7 @@ export default function MercureProvider({
 
             notif.error({
                 message: 'Connection lost!',
-                description:
-                    'The connection to Mercure was lost. You might miss some updates.',
+                description: 'The connection to Mercure was lost. You might miss some updates.',
             });
         };
 
@@ -108,9 +95,7 @@ export default function MercureProvider({
 
         es.addEventListener('/mode', (x) => setMode(JSON.parse(x.data).mode));
 
-        es.addEventListener('/sync-progress', (x) =>
-            setSyncInProgress(JSON.parse(x.data).syncInProgress)
-        );
+        es.addEventListener('/sync-progress', (x) => setSyncInProgress(JSON.parse(x.data).syncInProgress));
 
         es.addEventListener('/snackbar', (x) => {
             // @TODO: Handle better
@@ -156,8 +141,7 @@ export default function MercureProvider({
         }
 
         listenersRef.current = listenersRef.current.filter(
-            (listener) =>
-                !(listener.event === event && listener.callback === callback)
+            (listener) => !(listener.event === event && listener.callback === callback)
         );
     };
 

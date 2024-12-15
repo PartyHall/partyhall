@@ -9,14 +9,7 @@ export class PhTokenUser {
     name: string | null;
     roles: string[];
 
-    constructor(
-        issuedAt: DateTime,
-        expiresAt: DateTime,
-        id: string,
-        username: string,
-        name: string,
-        roles: string[]
-    ) {
+    constructor(issuedAt: DateTime, expiresAt: DateTime, id: string, username: string, name: string, roles: string[]) {
         this.issuedAt = issuedAt;
         this.expiresAt = expiresAt;
         this.id = id;
@@ -57,10 +50,7 @@ export class PhTokenUser {
                     .atob(base64)
                     .split('')
                     .map(function (c) {
-                        return (
-                            '%' +
-                            ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-                        );
+                        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
                     })
                     .join('')
             )

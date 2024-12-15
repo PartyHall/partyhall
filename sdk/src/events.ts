@@ -20,9 +20,7 @@ export default class Global {
         return event;
     }
 
-    public async getCollection(
-        page: number | null
-    ): Promise<Collection<PhEvent>> {
+    public async getCollection(page: number | null): Promise<Collection<PhEvent>> {
         if (!page) {
             page = 1;
         }
@@ -53,10 +51,7 @@ export default class Global {
     }
 
     public async update(event: PhEvent) {
-        const resp = await this.sdk.put(
-            `/api/webapp/events/${event.id}`,
-            event.asJson()
-        );
+        const resp = await this.sdk.put(`/api/webapp/events/${event.id}`, event.asJson());
         const data = await resp.json();
 
         return PhEvent.fromJson(data);

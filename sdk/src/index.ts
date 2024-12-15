@@ -9,10 +9,7 @@ import Photobooth from './photobooth';
 import { SdkError } from './models/sdk_error';
 import Settings from './settings';
 
-export type StoreToken = (
-    token: string | null,
-    refreshToken: string | null
-) => void;
+export type StoreToken = (token: string | null, refreshToken: string | null) => void;
 export type OnExpired = () => void;
 
 export class SDK {
@@ -33,11 +30,7 @@ export class SDK {
     public nexus: Nexus;
     public settings: Settings;
 
-    public constructor(
-        token: string | null,
-        refreshToken: string | null,
-        storeToken?: StoreToken
-    ) {
+    public constructor(token: string | null, refreshToken: string | null, storeToken?: StoreToken) {
         this.token = token;
         this.refreshToken = refreshToken;
 
@@ -174,9 +167,7 @@ export class SDK {
         this.autoRefresh();
     }
 
-    setStoreToken(
-        storeToken: (token: string | null, refreshToken: string | null) => void
-    ) {
+    setStoreToken(storeToken: (token: string | null, refreshToken: string | null) => void) {
         this.storeToken = storeToken;
     }
 
@@ -197,10 +188,7 @@ export class SDK {
 
         const now = DateTime.now();
 
-        const diffSeconds = this.tokenUser.expiresAt.diff(
-            now,
-            'seconds'
-        ).seconds;
+        const diffSeconds = this.tokenUser.expiresAt.diff(now, 'seconds').seconds;
 
         if (diffSeconds < 30) {
             try {

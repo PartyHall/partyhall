@@ -50,14 +50,32 @@
         mode: '0644'
       loop: ['partyhall', 'hardware_handler']
 
-    - name: 'Enabling the services'
+    - name: 'Creating the pipewire config dirs'
+      become: yes
+      file:
+        path: '/home/{{ ansible_user }}/.config/pipewire/pipewire.conf.d'
+        state: 'directory'
+        mode: '0777'
+
+    - name: 'Copy the pipewire config'
+      become: yes
+      file:
+        src: 'files/pipewire_karaoke.conf'
+        dest: '/home/{{ ansible_user }}/.config/pipewire/pipewire.conf.d/90-karaoke.conf'
+        mode: '0644'
+
+    - name: 'Enabling & restarting the services'
       systemd:
         name: '{{item}}'
         daemon_reload: yes
         state: 'restarted'
         enabled: yes
         scope: 'user'
-      loop: ['partyhall', 'hardware_handler']
+      loop:
+        - 'partyhall'
+        - 'hardware_handler'
+        - 'pipewire'
+        - 'pipewire-pulse'
 
     - name: 'Initializing with the admin account'
       command: 'partyhall user create-admin --username "{{partyhall_admin_username}}" --password "{{partyhall_admin_password}}" --name "{{partyhall_admin_fullname}}"'

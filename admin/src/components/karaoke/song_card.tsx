@@ -1,13 +1,7 @@
 import '../../assets/css/song_card.scss';
 
 import { Button, Card, Flex, Popconfirm, Tooltip, Typography } from 'antd';
-import {
-    IconCirclePlus,
-    IconMicrophone,
-    IconPiano,
-    IconPlayerPlay,
-    IconVinyl,
-} from '@tabler/icons-react';
+import { IconCirclePlus, IconMicrophone, IconPiano, IconPlayerPlay, IconVinyl } from '@tabler/icons-react';
 import Image from '../image';
 import { PhSong } from '@partyhall/sdk';
 import { useAuth } from '../../hooks/auth';
@@ -63,29 +57,19 @@ export default function SongCard({ song, type }: Props) {
                 />
 
                 <Flex vertical flex={1}>
-                    <Typography.Text className="SongCard__Title">
-                        {song.title}
-                    </Typography.Text>
+                    <Typography.Text className="SongCard__Title">{song.title}</Typography.Text>
                     <Typography.Text>{song.artist}</Typography.Text>
-                    <Typography.Text className="SongCard__Format">
-                        {song.format}
-                    </Typography.Text>
+                    <Typography.Text className="SongCard__Format">{song.format}</Typography.Text>
 
                     <Flex gap={8} className="SongCard__Tracks">
                         <Tooltip title={t('instrumental')}>
                             <IconPiano size={20} color="#fafa" />
                         </Tooltip>
                         <Tooltip title={t('vocals')}>
-                            <IconMicrophone
-                                size={20}
-                                color={song.has_vocals ? '#fafa' : '#777'}
-                            />
+                            <IconMicrophone size={20} color={song.has_vocals ? '#fafa' : '#777'} />
                         </Tooltip>
                         <Tooltip title={t('full_song')}>
-                            <IconVinyl
-                                size={20}
-                                color={song.has_combined ? '#fafa' : '#777'}
-                            />
+                            <IconVinyl size={20} color={song.has_combined ? '#fafa' : '#777'} />
                         </Tooltip>
                     </Flex>
                 </Flex>
@@ -99,10 +83,7 @@ export default function SongCard({ song, type }: Props) {
                                     cancelText={tG('actions.cancel')}
                                     onConfirm={() => addToQueue(true)}
                                 >
-                                    <Button
-                                        icon={<IconPlayerPlay size={20} />}
-                                        shape="circle"
-                                    />
+                                    <Button icon={<IconPlayerPlay size={20} />} shape="circle" />
                                 </Popconfirm>
                             </Tooltip>
                         )}

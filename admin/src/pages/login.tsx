@@ -1,14 +1,4 @@
-import {
-    Button,
-    Card,
-    Flex,
-    Form,
-    FormProps,
-    Input,
-    Switch,
-    Typography,
-    notification,
-} from 'antd';
+import { Button, Card, Flex, Form, FormProps, Input, Switch, Typography, notification } from 'antd';
 
 import { useEffect, useState } from 'react';
 
@@ -46,25 +36,18 @@ export default function LoginPage() {
         } catch (e: any) {
             console.error(e);
 
-            const isBadLogin =
-                e.message?.type ===
-                'https://github.com/partyhall/partyhall/bad-login';
+            const isBadLogin = e.message?.type === 'https://github.com/partyhall/partyhall/bad-login';
 
             notifApi.error({
                 message: t('notification_failed_login.title'),
                 description: t(
-                    'notification_failed_login.' +
-                        (e.status === 400 && isBadLogin
-                            ? 'bad_login'
-                            : 'description')
+                    'notification_failed_login.' + (e.status === 400 && isBadLogin ? 'bad_login' : 'description')
                 ),
             });
         }
     };
 
-    const onFinishFailed: FormProps<FormType>['onFinishFailed'] = (
-        errorInfo
-    ) => {
+    const onFinishFailed: FormProps<FormType>['onFinishFailed'] = (errorInfo) => {
         notifApi.error({
             message: 'Failed to login',
             description: JSON.stringify(errorInfo), // @TODO make it clean
@@ -81,11 +64,7 @@ export default function LoginPage() {
         <Card>
             <Flex gap="middle" align="center" justify="stretch" vertical>
                 <Typography>
-                    <img
-                        src={PhLogo}
-                        alt="PartyHall logo"
-                        style={{ display: 'block', maxHeight: '4em' }}
-                    />
+                    <img src={PhLogo} alt="PartyHall logo" style={{ display: 'block', maxHeight: '4em' }} />
                 </Typography>
                 <Form
                     name="login"
@@ -97,10 +76,7 @@ export default function LoginPage() {
                     autoComplete="off"
                     className="hide-asterisk"
                 >
-                    <Flex
-                        vertical
-                        style={{ marginTop: '2em', marginBottom: '2em' }}
-                    >
+                    <Flex vertical style={{ marginTop: '2em', marginBottom: '2em' }}>
                         <Form.Item<FormType>
                             label={t('username')}
                             name="username"

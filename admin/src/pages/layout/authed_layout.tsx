@@ -25,11 +25,7 @@ export default function AuthedLayout() {
     ];
 
     if (api.tokenUser?.roles.includes('ADMIN')) {
-        pages = [
-            ...pages.slice(0, 1),
-            { key: 'events', label: t('events'), target: '/events' },
-            ...pages.slice(1),
-        ];
+        pages = [...pages.slice(0, 1), { key: 'events', label: t('events'), target: '/events' }, ...pages.slice(1)];
 
         pages.push({ key: 'logs', label: t('logs'), target: '/logs' });
     }
@@ -79,12 +75,7 @@ export default function AuthedLayout() {
                 />
             </Sider>
 
-            {!collapsed && (
-                <div
-                    className="menu-backdrop"
-                    onClick={() => setCollapsed(true)}
-                />
-            )}
+            {!collapsed && <div className="menu-backdrop" onClick={() => setCollapsed(true)} />}
 
             <Layout>
                 <Header style={{ display: 'flex', alignItems: 'center' }}>
@@ -115,11 +106,7 @@ export default function AuthedLayout() {
                 <Footer style={{ textAlign: 'center' }}>
                     <Typography>
                         PartyHall -{' '}
-                        <a
-                            href="https://github.com/partyhall/PartyHall"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                        >
+                        <a href="https://github.com/partyhall/PartyHall" target="_blank" rel="noopener noreferrer">
                             Github
                         </a>
                     </Typography>

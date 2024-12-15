@@ -51,11 +51,15 @@ func RegisterWebappRoutes(router *gin.RouterGroup) {
 	r.POST("/picture", middlewares.HasEventLoaded(), middlewares.Authorized(), routeTakePicture)
 
 	// Admin
-	settings := r.Group("/settings", middlewares.Authorized("ADMIN"))
-	settings.POST("/mode/:mode", routeSetMode)
-	settings.POST("/event/:event", routeSetEvent)
+	settings := r.Group("/settings")
+	settings.POST("/mode/:mode", middlewares.Authorized("ADMIN"), routeSetMode)
+	settings.POST("/event/:event", middlewares.Authorized("ADMIN"), routeSetEvent)
 	settings.POST("/debug", routeSetDebug)
-	settings.POST("/force-sync", routeForceSync)
+	settings.POST("/force-sync", middlewares.Authorized("ADMIN"), routeForceSync)
+
+	settings.GET("/audio-devices", routeGetAudioDevices)
+	settings.POST("/audio-devices", middlewares.Authorized("ADMIN"), routeSetAudioDevices)
+	settings.POST("/audio-devices/:id/volume", routeSetAudioDeviceVolume)
 
 	nexusRoutes := r.Group("/nexus", middlewares.HasEventLoaded(), middlewares.Authorized("ADMIN"))
 	nexusRoutes.POST("/sync", routeSync)

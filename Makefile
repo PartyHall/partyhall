@@ -16,6 +16,9 @@ init:
 	@docker compose up -d
 	# @$(MAKE) fixtures
 
+run-app:
+	@cd backend && go run .
+
 compile-sdk:
 	@sudo rm -rf sdk/dist
 	@docker run --rm -v $(PWD)/sdk:/sdk -w /sdk node:lts npm install
@@ -26,10 +29,16 @@ build-release:
 	@docker run --rm -v $(PWD)/build:/binaries partyhall:latest /bin/sh -c 'cp /partyhall-*-linux-* /binaries/'
 
 fixtures:
+	@$(MAKE) create-users
+	@$(MAKE) create-events
+
+
+create-users:
 	@echo "Creating the default users"
 	@cd backend && go run . user create-admin --username admin --password password --name Administrator
 	@cd backend && go run . user create user password "Some user"
 
+create-events:
 	@echo "Creating an event"
 	@curl -s -o /dev/null -L -X POST 'http://localhost:8080/api/webapp/events' -H "Authorization: Bearer $(VITE_PARTYHALL_APPLIANCE_JWT)" -H 'Content-Type: application/json' --data-raw '{"name":"New event","author":"Some author","date":"2024-01-10T11:58:00Z","location":"Some place"}'
 	@echo "Creating a second event"

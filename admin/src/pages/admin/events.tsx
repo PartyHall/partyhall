@@ -1,11 +1,4 @@
-import {
-    Button,
-    Flex,
-    Popconfirm,
-    Table,
-    Typography,
-    notification,
-} from 'antd';
+import { Button, Flex, Popconfirm, Table, Typography, notification } from 'antd';
 import { Collection, PhEvent, SdkError } from '@partyhall/sdk';
 import { Link, useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -115,9 +108,7 @@ export default function Events() {
                             })}
                             okText={t('actions.ok')}
                             cancelText={t('actions.cancel')}
-                            onConfirm={() =>
-                                deleteEvent(x.id as number, x.name)
-                            }
+                            onConfirm={() => deleteEvent(x.id as number, x.name)}
                         >
                             <Button>{t('actions.delete')}</Button>
                         </Popconfirm>
@@ -147,12 +138,7 @@ export default function Events() {
                     </Title>
                 </Typography>
                 {ctx.resp?.totalCount === 0 && (
-                    <Flex
-                        vertical
-                        align="center"
-                        justify="center"
-                        style={{ marginBottom: '1em' }}
-                    >
+                    <Flex vertical align="center" justify="center" style={{ marginBottom: '1em' }}>
                         <Link to="/events/new">
                             <Button>{t('actions.new')}</Button>
                         </Link>
@@ -167,17 +153,11 @@ export default function Events() {
                         showSizeChanger: false,
                         showTotal: (total) => {
                             return (
-                                <Flex
-                                    gap={16}
-                                    align="center"
-                                    style={{ flex: '1' }}
-                                >
+                                <Flex gap={16} align="center" style={{ flex: '1' }}>
                                     <Link to="/events/new">
                                         <Button>{t('actions.new')}</Button>
                                     </Link>
-                                    <Typography>
-                                        {tE('events_count', { amt: total })}
-                                    </Typography>
+                                    <Typography>{tE('events_count', { amt: total })}</Typography>
                                 </Flex>
                             );
                         },

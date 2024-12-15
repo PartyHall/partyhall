@@ -326,7 +326,7 @@ func routeQueueRemove(c *gin.Context) {
 	)
 
 	if state.STATE.Karaoke.Current != nil && state.STATE.Karaoke.Current.Id == session.Id {
-		// @TODO: Remove the current song
+		services.KARAOKE.StartNextSong()
 	} else {
 		newSessions := []*models.SongSession{}
 		for _, currSession := range state.STATE.KaraokeQueue {

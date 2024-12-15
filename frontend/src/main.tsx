@@ -10,10 +10,7 @@ import { createRoot } from 'react-dom/client';
 
 // In prod it's injected in index.html by the backend
 // @ts-expect-error MERCURE_TOKEN is not defined on window
-const JWT_TOKEN =
-    import.meta.env.VITE_PARTYHALL_APPLIANCE_JWT ||
-    window.MERCURE_TOKEN ||
-    null;
+const JWT_TOKEN = import.meta.env.VITE_PARTYHALL_APPLIANCE_JWT || window.MERCURE_TOKEN || null;
 
 Cookies.set('mercureAuthorization', JWT_TOKEN, {
     sameSite: 'lax',
@@ -22,9 +19,7 @@ Cookies.set('mercureAuthorization', JWT_TOKEN, {
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <SnackbarProvider
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-        >
+        <SnackbarProvider anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}>
             <AuthProvider token={JWT_TOKEN}>
                 <DefaultView />
             </AuthProvider>

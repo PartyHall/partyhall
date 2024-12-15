@@ -57,9 +57,7 @@ export default function EditEvent() {
             <Loader loading={data.loading}>
                 <Flex vertical gap={32}>
                     <Typography>
-                        <Title>
-                            {t('edit_title', { name: data.event?.name })}
-                        </Title>
+                        <Title>{t('edit_title', { name: data.event?.name })}</Title>
                     </Typography>
 
                     <EventForm event={data.event ?? null} />

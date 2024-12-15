@@ -2,15 +2,7 @@ import { ReactNode, createContext, useContext, useState } from 'react';
 import Loader from '../components/loader';
 import useAsyncEffect from 'use-async-effect';
 
-const DEFAULT_TOPICS = [
-    '/time',
-    '/mode',
-    '/event',
-    '/snackbar',
-    '/karaoke',
-    '/karaoke_queue',
-    '/sync-progress',
-];
+const DEFAULT_TOPICS = ['/time', '/mode', '/event', '/snackbar', '/karaoke', '/karaoke_queue', '/sync-progress'];
 
 /** @TODO: Implement APIs */
 type SettingsProps = {
@@ -50,11 +42,7 @@ const SettingsContext = createContext<SettingsContextProps>({
     setPageName: () => {},
 });
 
-export default function SettingsProvider({
-    children,
-}: {
-    children: ReactNode;
-}) {
+export default function SettingsProvider({ children }: { children: ReactNode }) {
     const [ctx, setCtx] = useState<SettingsProps>(defaultProps);
 
     const fetchStatus = async () => {
@@ -86,9 +74,7 @@ export default function SettingsProvider({
     useAsyncEffect(fetchStatus, []);
 
     return (
-        <SettingsContext.Provider
-            value={{ ...ctx, fetch: fetchStatus, setPageName }}
-        >
+        <SettingsContext.Provider value={{ ...ctx, fetch: fetchStatus, setPageName }}>
             <Loader loading={!ctx.loaded}>{children}</Loader>
         </SettingsContext.Provider>
     );

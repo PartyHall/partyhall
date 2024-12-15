@@ -35,8 +35,8 @@ func routeLogin(c *gin.Context) {
 	}
 
 	dbUser, err := dal.USERS.FindByUsername(loginRequest.Username)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
+	if err != nil || dbUser == nil {
+		if errors.Is(err, sql.ErrNoRows) || err == nil {
 			api_errors.ApiError(
 				c,
 				http.StatusBadRequest,

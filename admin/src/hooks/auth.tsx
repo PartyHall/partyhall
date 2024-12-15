@@ -1,11 +1,5 @@
 import { PhEvent, PhKaraoke, PhSongSession, SDK } from '@partyhall/sdk';
-import {
-    ReactNode,
-    createContext,
-    useCallback,
-    useContext,
-    useState,
-} from 'react';
+import { ReactNode, createContext, useCallback, useContext, useState } from 'react';
 import Cookies from 'js-cookie';
 import { DateTime } from 'luxon';
 import MercureProvider from './mercure';
@@ -139,10 +133,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
                 ...oldCtx,
                 loaded: true,
                 api,
-                displayName:
-                    localStorage.getItem('PREVIOUS_DISPLAY_NAME') ||
-                    api.tokenUser?.name ||
-                    null,
+                displayName: localStorage.getItem('PREVIOUS_DISPLAY_NAME') || api.tokenUser?.name || null,
             }));
 
             localStorage.setItem('token', token);
@@ -156,17 +147,13 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
 
     const logout = () => setToken();
 
-    const setEvent = (event: PhEvent) =>
-        setContext((oldCtx) => ({ ...oldCtx, event }));
+    const setEvent = (event: PhEvent) => setContext((oldCtx) => ({ ...oldCtx, event }));
 
-    const setMode = (mode: string) =>
-        setContext((oldCtx) => ({ ...oldCtx, mode }));
+    const setMode = (mode: string) => setContext((oldCtx) => ({ ...oldCtx, mode }));
 
-    const setKaraoke = (karaoke: PhKaraoke) =>
-        setContext((oldCtx) => ({ ...oldCtx, karaoke }));
+    const setKaraoke = (karaoke: PhKaraoke) => setContext((oldCtx) => ({ ...oldCtx, karaoke }));
 
-    const setKaraokeQueue = (queue: PhSongSession[]) =>
-        setContext((oldCtx) => ({ ...oldCtx, karaokeQueue: queue }));
+    const setKaraokeQueue = (queue: PhSongSession[]) => setContext((oldCtx) => ({ ...oldCtx, karaokeQueue: queue }));
 
     const setTimecode = (timecode: number) =>
         setContext((oldCtx) => {
@@ -177,8 +164,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             return { ...oldCtx, karaoke: oldCtx.karaoke.setTimecode(timecode) };
         });
 
-    const setSyncInProgress = (syncInProgress: boolean) =>
-        setContext((oldCtx) => ({ ...oldCtx, syncInProgress }));
+    const setSyncInProgress = (syncInProgress: boolean) => setContext((oldCtx) => ({ ...oldCtx, syncInProgress }));
 
     const setDisplayName = (displayName: string) => {
         localStorage.setItem('PREVIOUS_DISPLAY_NAME', displayName);

@@ -1,3 +1,4 @@
+import { AudioDevice, AudioDevices } from './models/audio';
 import { PhEvent, SDK } from './index';
 
 export default class Settings {
@@ -7,7 +8,7 @@ export default class Settings {
         this.sdk = sdk;
     }
 
-    public async setMode(mode: string) {
+    public async setMode(mode: string): Promise<void> {
         await this.sdk.post(`/api/webapp/settings/mode/${mode}`);
     }
 
@@ -18,7 +19,31 @@ export default class Settings {
         return PhEvent.fromJson(data);
     }
 
-    public async showDebug() {
+    public async showDebug(): Promise<void> {
         await this.sdk.post('/api/webapp/settings/debug');
+    }
+
+    public async getAudioDevices(): Promise<AudioDevices | null> {
+        const resp = await this.sdk.get('/api/webapp/settings/audio-devices');
+        const data = await resp.json();
+
+        return AudioDevices.fromJson(data);
+    }
+
+    public async setAudioDevices(source: number, sink: number): Promise<AudioDevices | null> {
+        const resp = await this.sdk.post('/api/webapp/settings/audio-devices', {
+            source_id: source,
+            sink_id: sink,
+        });
+        const data = await resp.json();
+
+        return AudioDevices.fromJson(data);
+    }
+
+    public async setAudioDeviceVolume(device: AudioDevice, volume: number) {
+        const resp = await this.sdk.post(`/api/webapp/settings/audio-devices/${device.id}/volume`, { volume });
+        const data = await resp.json();
+
+        return AudioDevices.fromJson(data);
     }
 }

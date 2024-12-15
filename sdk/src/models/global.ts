@@ -23,9 +23,7 @@ export class PhKaraoke {
     volumeVocals: number;
 
     constructor(data: Record<string, any>) {
-        this.current = data['current']
-            ? PhSongSession.fromJson(data['current'])
-            : null;
+        this.current = data['current'] ? PhSongSession.fromJson(data['current']) : null;
         this.isPlaying = data['is_playing'];
         this.timecode = data['timecode'];
         this.countdown = data['countdown'];
@@ -68,9 +66,7 @@ export class PhStatus {
 
         this.karaokeQueue = [];
         if (data['karaoke_queue']) {
-            this.karaokeQueue = data['karaoke_queue'].map(
-                (x: Record<string, any>) => PhSongSession.fromJson(x)
-            );
+            this.karaokeQueue = data['karaoke_queue'].map((x: Record<string, any>) => PhSongSession.fromJson(x));
         }
 
         this.syncInProgress = data['sync_in_progress'];

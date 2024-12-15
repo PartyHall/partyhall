@@ -1,11 +1,6 @@
 import '../../assets/css/song_card.scss';
 import { Button, Card, Flex, Popconfirm, Tooltip, Typography } from 'antd';
-import {
-    IconCaretDownFilled,
-    IconCaretUpFilled,
-    IconPlayerPlayFilled,
-    IconTrash,
-} from '@tabler/icons-react';
+import { IconCaretDownFilled, IconCaretUpFilled, IconPlayerPlayFilled, IconTrash } from '@tabler/icons-react';
 import Image from '../image';
 import { PhSongSession } from '@partyhall/sdk';
 import { useAuth } from '../../hooks/auth';
@@ -77,9 +72,7 @@ export default function SessionCard({ session, isFirst, isLast }: Props) {
                     />
 
                     <Flex vertical flex={1}>
-                        <Typography.Text className="SongCard__Title">
-                            {session.title}
-                        </Typography.Text>
+                        <Typography.Text className="SongCard__Title">{session.title}</Typography.Text>
                         <Typography.Text>{session.artist}</Typography.Text>
                         <Typography.Text className="SongCard__Singer">
                             {t('singer')}: {session.sung_by}
@@ -93,10 +86,7 @@ export default function SessionCard({ session, isFirst, isLast }: Props) {
                                 okText={tG('actions.ok')}
                                 cancelText={tG('actions.cancel')}
                             >
-                                <Button
-                                    icon={<IconPlayerPlayFilled size={18} />}
-                                    shape="circle"
-                                />
+                                <Button icon={<IconPlayerPlayFilled size={18} />} shape="circle" />
                             </Popconfirm>
                         </Tooltip>
                         <Tooltip title={tG('actions.cancel')}>
@@ -106,10 +96,7 @@ export default function SessionCard({ session, isFirst, isLast }: Props) {
                                 okText={tG('actions.ok')}
                                 cancelText={tG('actions.cancel')}
                             >
-                                <Button
-                                    icon={<IconTrash size={18} />}
-                                    shape="circle"
-                                />
+                                <Button icon={<IconTrash size={18} />} shape="circle" />
                             </Popconfirm>
                         </Tooltip>
                     </Flex>

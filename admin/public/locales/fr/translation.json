@@ -52,6 +52,13 @@
             "title": "Mon compte",
             "your_display_name": "Pseudo affiché"
         },
+        "sound_settings": {
+            "title": "Audio",
+            "input_device": "Microphone",
+            "output_device": "Haut-parleurs",
+            "volume_input": "Volume micros",
+            "volume_output": "Volume haut-parleurs"
+        },
         "actions": {
             "title": "Actions",
             "ph_version": "Version PartyHall",

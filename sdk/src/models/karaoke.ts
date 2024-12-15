@@ -86,18 +86,10 @@ export class PhSongSession {
         this.title = data['title'];
         this.artist = data['artist'];
         this.sung_by = data['sung_by'];
-        this.added_at = data['added_at']
-            ? DateTime.fromISO(data['added_at'])
-            : null;
-        this.started_at = data['started_at']
-            ? DateTime.fromISO(data['started_at'])
-            : null;
-        this.ended_at = data['ended_at']
-            ? DateTime.fromISO(data['ended_at'])
-            : null;
-        this.cancelled_at = data['cancelled_at']
-            ? DateTime.fromISO(data['cancelled_at'])
-            : null;
+        this.added_at = data['added_at'] ? DateTime.fromISO(data['added_at']) : null;
+        this.started_at = data['started_at'] ? DateTime.fromISO(data['started_at']) : null;
+        this.ended_at = data['ended_at'] ? DateTime.fromISO(data['ended_at']) : null;
+        this.cancelled_at = data['cancelled_at'] ? DateTime.fromISO(data['cancelled_at']) : null;
 
         const song = PhSong.fromJson(data['song']);
         if (!song) {

@@ -1,5 +1,6 @@
-import { Flex, Slider, Tooltip, Typography } from 'antd';
+import { Tooltip, Typography } from 'antd';
 import { ReactNode } from 'react';
+import TextSlider from '../text_slider';
 import { VolumeType } from '@partyhall/sdk';
 import { useAuth } from '../../hooks/auth';
 
@@ -16,8 +17,7 @@ export default function VolumeSlider(props: Props) {
         return;
     }
 
-    const volume =
-        props.type == 'instrumental' ? karaoke.volume : karaoke.volumeVocals;
+    const volume = props.type == 'instrumental' ? karaoke.volume : karaoke.volumeVocals;
 
     /**
      * @TODO: We should decouple the value so that latency is not an issue
@@ -35,16 +35,16 @@ export default function VolumeSlider(props: Props) {
     };
 
     return (
-        <Flex align="center">
-            <Tooltip title={props.tooltip}>{props.icon}</Tooltip>
-            <Slider
-                value={volume}
-                onChange={(x) => setVolume(x)}
-                className="SongCard__Slider"
-            />
-            <Typography.Text className="SongCard__Timecode">
-                {volume}%
-            </Typography.Text>
-        </Flex>
+        <TextSlider
+            leftText={
+                <div className="SongCard__Timecode">
+                    <Tooltip title={props.tooltip}>{props.icon}</Tooltip>
+                </div>
+            }
+            rightText={<Typography.Text className="SongCard__Timecode">{volume}%</Typography.Text>}
+            value={volume}
+            onChange={(x) => setVolume(x)}
+            className="SongCard__Slider"
+        />
     );
 }

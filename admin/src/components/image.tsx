@@ -8,11 +8,5 @@ type Props = {
 };
 
 export default function Image({ hasImage, className, src, alt }: Props) {
-    return (
-        <img
-            className={className}
-            src={!hasImage && hasImage !== undefined ? PlaceHolderCover : src}
-            alt={alt}
-        />
-    );
+    return <img className={className} src={!hasImage && hasImage !== undefined ? PlaceHolderCover : src} alt={alt} />;
 }

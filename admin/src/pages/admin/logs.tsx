@@ -28,9 +28,7 @@ export default function Logs() {
         setLogs((oldLogs) => [
             {
                 ...x,
-                timestamp: DateTime.fromISO(x.timestamp).toFormat(
-                    'yyyy-MM-dd HH:mm:ss'
-                ),
+                timestamp: DateTime.fromISO(x.timestamp).toFormat('yyyy-MM-dd HH:mm:ss'),
             },
             ...oldLogs,
         ]);
@@ -51,16 +49,12 @@ export default function Logs() {
         {
             title: 'TS',
             dataIndex: 'timestamp',
-            render: (_: any, x: any) => (
-                <RenderText type={x.type} msg={x.timestamp} />
-            ),
+            render: (_: any, x: any) => <RenderText type={x.type} msg={x.timestamp} />,
         },
         {
             title: 'Type',
             dataIndex: 'type',
-            render: (_: any, x: any) => (
-                <RenderText type={x.type} msg={x.type} />
-            ),
+            render: (_: any, x: any) => <RenderText type={x.type} msg={x.type} />,
         },
         { title: 'Message', dataIndex: 'text', key: 'id' },
     ];

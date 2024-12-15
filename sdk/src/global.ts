@@ -29,9 +29,7 @@ export default class Global {
 
         return data.results.map((x: any) => ({
             ...x,
-            timestamp: DateTime.fromISO(x.timestamp).toFormat(
-                'yyyy-MM-dd HH:mm:ss'
-            ),
+            timestamp: DateTime.fromISO(x.timestamp).toFormat('yyyy-MM-dd HH:mm:ss'),
         }));
     }
 }

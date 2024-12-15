@@ -9,14 +9,8 @@ export default function EventCard({ event }: { event: PhEvent }) {
 
     return (
         <Card title={<EventTitle event={event} />}>
-            {event.date && (
-                <KeyVal label={t('generic.date')}>
-                    {event?.date.toFormat('yyyy/MM/dd - hh:mm')}
-                </KeyVal>
-            )}
-            {event.location && (
-                <KeyVal label={t('generic.location')}>{event.location}</KeyVal>
-            )}
+            {event.date && <KeyVal label={t('generic.date')}>{event?.date.toFormat('yyyy/MM/dd - hh:mm')}</KeyVal>}
+            {event.location && <KeyVal label={t('generic.location')}>{event.location}</KeyVal>}
         </Card>
     );
 }

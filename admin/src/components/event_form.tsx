@@ -60,14 +60,7 @@ export default function EventForm({ event, onSaved }: Props) {
 
         let formEvent = event;
         if (!formEvent) {
-            formEvent = new PhEvent(
-                null,
-                data.name,
-                data.author,
-                data.date,
-                data.location,
-                data.nexusId
-            );
+            formEvent = new PhEvent(null, data.name, data.author, data.date, data.location, data.nexusId);
         } else {
             formEvent.name = data.name;
             formEvent.author = data.author;
@@ -111,8 +104,7 @@ export default function EventForm({ event, onSaved }: Props) {
             console.error(e);
             notif.error({
                 message: 'Failed to create event on PartyNexus',
-                description:
-                    'The event was not created due to an issue. See console for more detail',
+                description: 'The event was not created due to an issue. See console for more detail',
             });
         }
 
@@ -124,12 +116,7 @@ export default function EventForm({ event, onSaved }: Props) {
     };
 
     return (
-        <Form
-            layout="vertical"
-            style={{ width: 500 }}
-            variant="filled"
-            onFinish={handleSubmit(submit)}
-        >
+        <Form layout="vertical" style={{ width: 500 }} variant="filled" onFinish={handleSubmit(submit)}>
             <FormItem control={control} name="name" label={tG('name')} required>
                 <Input />
             </FormItem>
@@ -137,23 +124,14 @@ export default function EventForm({ event, onSaved }: Props) {
                 <Input />
             </FormItem>
             <FormItem control={control} name="date" label={tG('date')} required>
-                <DatePicker
-                    style={{ width: '100%' }}
-                    format="DD/MM/YYYY hh:mm"
-                    showTime
-                />
+                <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY hh:mm" showTime />
             </FormItem>
             <FormItem control={control} name="location" label={tG('location')}>
                 <Input />
             </FormItem>
 
             <Flex align="center" gap={8}>
-                <FormItem
-                    control={control}
-                    name="nexusId"
-                    label="Nexus ID"
-                    style={{ flex: '1' }}
-                >
+                <FormItem control={control} name="nexusId" label="Nexus ID" style={{ flex: '1' }}>
                     <Input />
                 </FormItem>
 
@@ -167,11 +145,7 @@ export default function EventForm({ event, onSaved }: Props) {
             </Flex>
 
             <Form.Item>
-                <Button
-                    type="primary"
-                    htmlType="submit"
-                    style={{ width: '100%' }}
-                >
+                <Button type="primary" htmlType="submit" style={{ width: '100%' }}>
                     {tG('actions.' + (event?.id ? 'save' : 'create'))}
                 </Button>
             </Form.Item>

@@ -12,16 +12,7 @@ type Props = {
     className?: string;
 };
 
-export default function TextSlider({
-    leftText,
-    rightText,
-    min,
-    max,
-    value,
-    onChange,
-    disabled,
-    className,
-}: Props) {
+export default function TextSlider({ leftText, rightText, min, max, value, onChange, disabled, className }: Props) {
     return (
         <Flex align="center">
             {leftText}

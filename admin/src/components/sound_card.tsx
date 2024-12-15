@@ -15,19 +15,13 @@ function AdminSoundCard({ devices }: { devices: AudioDevices }) {
     const [sourceId, setSourceId] = useState<number>(devices.defaultSource?.id || 0);
 
     const updateSink = async (sinkId: number) => {
-        await api.settings.setAudioDevices(
-            sinkId,
-            sourceId,
-        );
+        await api.settings.setAudioDevices(sinkId, sourceId);
 
         setSinkId(sinkId);
     };
 
     const updateSource = async (sourceId: number) => {
-        await api.settings.setAudioDevices(
-            sinkId,
-            sourceId,
-        );
+        await api.settings.setAudioDevices(sinkId, sourceId);
 
         setSourceId(sinkId);
     };
@@ -45,7 +39,7 @@ function AdminSoundCard({ devices }: { devices: AudioDevices }) {
                     })),
                 ]}
                 value={sinkId}
-                onChange={x => updateSink(x)}
+                onChange={(x) => updateSink(x)}
             />
 
             <Typography.Title level={4} className="no-margin red">
@@ -60,17 +54,13 @@ function AdminSoundCard({ devices }: { devices: AudioDevices }) {
                     })),
                 ]}
                 value={sourceId}
-                onChange={x => updateSource(x)}
+                onChange={(x) => updateSource(x)}
             />
         </>
     );
 }
 
-export default function SoundCard({
-    mercureDevices,
-}: {
-    mercureDevices: AudioDevices | null;
-}) {
+export default function SoundCard({ mercureDevices }: { mercureDevices: AudioDevices | null }) {
     const { t } = useTranslation();
     const { api } = useAuth();
 
@@ -91,10 +81,7 @@ export default function SoundCard({
         setDevices(mercureDevices);
     }, [mercureDevices]);
 
-    const setDeviceVolume = async (
-        device: AudioDevice | null,
-        volume: number
-    ) => {
+    const setDeviceVolume = async (device: AudioDevice | null, volume: number) => {
         if (!device) {
             return;
         }
@@ -108,32 +95,19 @@ export default function SoundCard({
             <Loader loading={loadingDevices}>
                 {devices && (
                     <Flex vertical gap={8}>
-                        {api.tokenUser?.roles.includes('ADMIN') && (
-                            <AdminSoundCard devices={devices} />
-                        )}
+                        {api.tokenUser?.roles.includes('ADMIN') && <AdminSoundCard devices={devices} />}
 
                         <Typography.Title level={4} className="no-margin red">
                             {t('home.sound_settings.volume_output')}
                         </Typography.Title>
                         <TextSlider
-                            value={
-                                devices.defaultSink
-                                    ? devices.defaultSink.volume * 100
-                                    : 0
-                            }
+                            value={devices.defaultSink ? devices.defaultSink.volume * 100 : 0}
                             rightText={
                                 <Typography.Text className="SongCard__Timecode">
-                                    {devices.defaultSink
-                                        ? Math.round(
-                                              devices.defaultSink.volume * 100
-                                          )
-                                        : 0}
-                                    %
+                                    {devices.defaultSink ? Math.round(devices.defaultSink.volume * 100) : 0}%
                                 </Typography.Text>
                             }
-                            onChange={(x) =>
-                                setDeviceVolume(devices.defaultSink, x)
-                            }
+                            onChange={(x) => setDeviceVolume(devices.defaultSink, x)}
                         />
 
                         <Typography.Title level={4} className="no-margin red">
@@ -143,15 +117,10 @@ export default function SoundCard({
                             value={devices.karaokeSink.volume * 100}
                             rightText={
                                 <Typography.Text className="SongCard__Timecode">
-                                    {Math.round(
-                                        devices.karaokeSink.volume * 100
-                                    )}
-                                    %
+                                    {Math.round(devices.karaokeSink.volume * 100)}%
                                 </Typography.Text>
                             }
-                            onChange={(x) =>
-                                setDeviceVolume(devices.karaokeSink, x)
-                            }
+                            onChange={(x) => setDeviceVolume(devices.karaokeSink, x)}
                         />
                     </Flex>
                 )}

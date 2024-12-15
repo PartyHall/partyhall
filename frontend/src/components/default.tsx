@@ -11,13 +11,7 @@ import useAsyncEffect from 'use-async-effect';
 import { useAuth } from '../hooks/auth';
 
 export default function DefaultView() {
-    const {
-        currentMode,
-        modulesSettings,
-        shouldTakePicture,
-        setPictureTaken,
-        api,
-    } = useAuth();
+    const { currentMode, modulesSettings, shouldTakePicture, setPictureTaken, api } = useAuth();
 
     const [countdown, setCountdown] = useState<number>(0);
     const [flash, setFlash] = useState<boolean>(false);
@@ -46,10 +40,7 @@ export default function DefaultView() {
         setFlash(false);
 
         if (picture) {
-            const resp = await api.photobooth.uploadPicture(
-                picture,
-                shouldTakePicture === 'unattended'
-            );
+            const resp = await api.photobooth.uploadPicture(picture, shouldTakePicture === 'unattended');
 
             if (shouldTakePicture === 'normal') {
                 setLastPictureTaken(resp);
@@ -84,10 +75,7 @@ export default function DefaultView() {
             {flash && <Flash />}
             {lastPictureTaken && (
                 <div className="lastPicture">
-                    <img
-                        src={window.URL.createObjectURL(lastPictureTaken)}
-                        alt="Last picture"
-                    />
+                    <img src={window.URL.createObjectURL(lastPictureTaken)} alt="Last picture" />
                 </div>
             )}
         </div>

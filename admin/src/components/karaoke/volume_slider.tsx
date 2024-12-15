@@ -17,8 +17,7 @@ export default function VolumeSlider(props: Props) {
         return;
     }
 
-    const volume =
-        props.type == 'instrumental' ? karaoke.volume : karaoke.volumeVocals;
+    const volume = props.type == 'instrumental' ? karaoke.volume : karaoke.volumeVocals;
 
     /**
      * @TODO: We should decouple the value so that latency is not an issue
@@ -42,11 +41,7 @@ export default function VolumeSlider(props: Props) {
                     <Tooltip title={props.tooltip}>{props.icon}</Tooltip>
                 </div>
             }
-            rightText={
-                <Typography.Text className="SongCard__Timecode">
-                    {volume}%
-                </Typography.Text>
-            }
+            rightText={<Typography.Text className="SongCard__Timecode">{volume}%</Typography.Text>}
             value={volume}
             onChange={(x) => setVolume(x)}
             className="SongCard__Slider"

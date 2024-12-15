@@ -19,9 +19,7 @@ export default function Karaoke() {
     useMercureTopic('/karaoke-timecode', (x: any) => setTimecode(x.timecode));
 
     useMercureTopic('/karaoke-queue', (x: any[]) => {
-        setKaraokeQueue(
-            x.map((y) => PhSongSession.fromJson(y)).filter((y) => !!y)
-        );
+        setKaraokeQueue(x.map((y) => PhSongSession.fromJson(y)).filter((y) => !!y));
     });
 
     useMercureTopic('/karaoke', (x: any) => {
@@ -31,11 +29,7 @@ export default function Karaoke() {
     const [active, setActive] = useState<string>('search');
 
     useEffect(() => {
-        setPageName('karaoke', [
-            '/karaoke-queue',
-            '/karaoke-timecode',
-            '/karaoke',
-        ]);
+        setPageName('karaoke', ['/karaoke-queue', '/karaoke-timecode', '/karaoke']);
     }, []);
 
     // Not using tabs the correct way

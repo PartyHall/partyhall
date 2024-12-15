@@ -30,10 +30,7 @@ export default class Settings {
         return AudioDevices.fromJson(data);
     }
 
-    public async setAudioDevices(
-        source: number,
-        sink: number
-    ): Promise<AudioDevices | null> {
+    public async setAudioDevices(source: number, sink: number): Promise<AudioDevices | null> {
         const resp = await this.sdk.post('/api/webapp/settings/audio-devices', {
             source_id: source,
             sink_id: sink,
@@ -44,10 +41,7 @@ export default class Settings {
     }
 
     public async setAudioDeviceVolume(device: AudioDevice, volume: number) {
-        const resp = await this.sdk.post(
-            `/api/webapp/settings/audio-devices/${device.id}/volume`,
-            { volume }
-        );
+        const resp = await this.sdk.post(`/api/webapp/settings/audio-devices/${device.id}/volume`, { volume });
         const data = await resp.json();
 
         return AudioDevices.fromJson(data);

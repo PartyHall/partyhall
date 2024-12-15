@@ -33,19 +33,14 @@ declare module 'cdgraphics' {
     class CDGParser {
         readonly COMMAND_MASK: number;
         readonly CDG_COMMAND: number;
-        readonly BY_TYPE: Record<
-            number,
-            new (bytes: Uint8Array) => CDGInstruction
-        >;
+        readonly BY_TYPE: Record<number, new (bytes: Uint8Array) => CDGInstruction>;
 
         bytes: Uint8Array;
         numPackets: number;
         pc: number;
 
         constructor(buffer: ArrayBuffer);
-        parseThrough(
-            sec: number
-        ): (CDGInstruction & { isRestarting?: boolean })[];
+        parseThrough(sec: number): (CDGInstruction & { isRestarting?: boolean })[];
         parse(packet: Uint8Array): CDGInstruction | false;
     }
 

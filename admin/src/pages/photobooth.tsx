@@ -24,21 +24,15 @@ export default function Photobooth() {
             </Typography>
             {event && (
                 <>
-                    <KeyVal label={t('amt_manually_taken')}>
-                        {event.amtImagesHandtaken}
-                    </KeyVal>
-                    <KeyVal label={t('amt_unattended')}>
-                        {event.amtImagesUnattended}
-                    </KeyVal>
+                    <KeyVal label={t('amt_manually_taken')}>{event.amtImagesHandtaken}</KeyVal>
+                    <KeyVal label={t('amt_unattended')}>{event.amtImagesUnattended}</KeyVal>
                     <Flex style={{ marginTop: '2em' }} vertical>
                         <Button
                             onClick={async () => {
                                 await api.photobooth.takePicture();
                                 notif.success({
                                     message: t('success_notification.title'),
-                                    description: t(
-                                        'success_notification.description'
-                                    ),
+                                    description: t('success_notification.description'),
                                 });
                             }}
                         >

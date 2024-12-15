@@ -42,30 +42,15 @@ export default function SongSearch() {
             <Loader loading={loading}>
                 {(!songs || songs.totalCount === 0) && (
                     <Flex align="center" justify="center">
-                        <Typography.Title level={2}>
-                            {t('no_songs_found')}
-                        </Typography.Title>
+                        <Typography.Title level={2}>{t('no_songs_found')}</Typography.Title>
                     </Flex>
                 )}
                 {songs && songs.results.length > 0 && (
                     <>
-                        <Flex
-                            vertical
-                            style={{ overflowY: 'scroll' }}
-                            align="center"
-                        >
-                            <Flex
-                                vertical
-                                gap={8}
-                                align="stretch"
-                                style={{ width: 'min(100%, 500px)' }}
-                            >
+                        <Flex vertical style={{ overflowY: 'scroll' }} align="center">
+                            <Flex vertical gap={8} align="stretch" style={{ width: 'min(100%, 500px)' }}>
                                 {songs.results.map((x) => (
-                                    <SongCard
-                                        key={x.nexus_id}
-                                        song={x}
-                                        type="SEARCH"
-                                    />
+                                    <SongCard key={x.nexus_id} song={x} type="SEARCH" />
                                 ))}
                             </Flex>
                         </Flex>
@@ -77,9 +62,7 @@ export default function SongSearch() {
                             style={{ margin: 'auto' }}
                             total={songs.totalCount ?? 10}
                             pageSize={30} // @TODO: Default API platform one but we should add it to the hydra thing so that the front knows it
-                            showTotal={(total) =>
-                                t('amt_songs', { amt: total })
-                            }
+                            showTotal={(total) => t('amt_songs', { amt: total })}
                             showSizeChanger={false}
                             current={page}
                             onChange={(x) => setPage(x)}

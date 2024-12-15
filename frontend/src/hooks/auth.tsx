@@ -1,17 +1,5 @@
-import {
-    ModuleSettings,
-    PhEvent,
-    PhKaraoke,
-    PhSongSession,
-    SDK,
-} from '@partyhall/sdk';
-import {
-    ReactNode,
-    createContext,
-    useContext,
-    useEffect,
-    useState,
-} from 'react';
+import { ModuleSettings, PhEvent, PhKaraoke, PhSongSession, SDK } from '@partyhall/sdk';
+import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
 import { DateTime } from 'luxon';
 
@@ -82,20 +70,12 @@ const AuthContext = createContext<AuthContextProps>({
     setPictureTaken: () => {},
 });
 
-export default function AuthProvider({
-    children,
-    token,
-}: {
-    children: ReactNode;
-    token: string;
-}) {
+export default function AuthProvider({ children, token }: { children: ReactNode; token: string }) {
     const { enqueueSnackbar } = useSnackbar();
     const [ctx, setCtx] = useState<AuthProps>(defaultProps);
 
     const createEventSource = () => {
-        const url = new URL(
-            `${window.location.protocol}//${window.location.host}/.well-known/mercure`
-        );
+        const url = new URL(`${window.location.protocol}//${window.location.host}/.well-known/mercure`);
         [
             '/time',
             '/mode',
@@ -158,10 +138,7 @@ export default function AuthProvider({
 
         es.addEventListener('/debug', (x) => {
             setCtx((oldCtx) => ({ ...oldCtx, debug: JSON.parse(x.data) }));
-            setTimeout(
-                () => setCtx((oldCtx) => ({ ...oldCtx, debug: null })),
-                30000
-            );
+            setTimeout(() => setCtx((oldCtx) => ({ ...oldCtx, debug: null })), 30000);
         });
 
         es.addEventListener('/snackbar', (x) => {
@@ -171,9 +148,7 @@ export default function AuthProvider({
 
         es.addEventListener('/take-picture', (x) =>
             setCtx((oldCtx) => {
-                const pictureType = JSON.parse(x.data).unattended
-                    ? 'unattended'
-                    : 'normal';
+                const pictureType = JSON.parse(x.data).unattended ? 'unattended' : 'normal';
 
                 // If we are manually taking a picture at the same moment
                 // Lets just silently ignore the unattended one

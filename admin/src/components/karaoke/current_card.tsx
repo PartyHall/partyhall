@@ -1,12 +1,6 @@
 import '../../assets/css/song_card.scss';
 import { Button, Card, Flex, Popconfirm, Tooltip, Typography } from 'antd';
-import {
-    IconPlayerPause,
-    IconPlayerPlay,
-    IconRecordMail,
-    IconVolume,
-    IconX,
-} from '@tabler/icons-react';
+import { IconPlayerPause, IconPlayerPlay, IconRecordMail, IconVolume, IconX } from '@tabler/icons-react';
 import Image from '../image';
 import TextSlider from '../text_slider';
 import VolumeSlider from './volume_slider';
@@ -39,9 +33,7 @@ export default function CurrentCard() {
             return;
         }
 
-        await api.karaoke.cancelSession(
-            karaoke.current.id,
-        );
+        await api.karaoke.cancelSession(karaoke.current.id);
     };
 
     return (
@@ -58,12 +50,8 @@ export default function CurrentCard() {
                     />
 
                     <Flex vertical flex={1}>
-                        <Typography.Text className="SongCard__Title">
-                            {karaoke.current.title}
-                        </Typography.Text>
-                        <Typography.Text>
-                            {karaoke.current.artist}
-                        </Typography.Text>
+                        <Typography.Text className="SongCard__Title">{karaoke.current.title}</Typography.Text>
+                        <Typography.Text>{karaoke.current.artist}</Typography.Text>
                         <Typography.Text className="SongCard__Singer">
                             {t('singer')}: {karaoke.current.sung_by}
                         </Typography.Text>
@@ -94,10 +82,7 @@ export default function CurrentCard() {
                                 okText={tG('actions.ok')}
                                 cancelText={tG('actions.cancel')}
                             >
-                                <Button
-                                    icon={<IconX size={20} />}
-                                    shape="circle"
-                                />
+                                <Button icon={<IconX size={20} />} shape="circle" />
                             </Popconfirm>
                         </Tooltip>
                     </Flex>
@@ -120,17 +105,9 @@ export default function CurrentCard() {
                     disabled
                 />
 
-                <VolumeSlider
-                    type="instrumental"
-                    icon={<IconVolume size={20} />}
-                    tooltip={t('volume')}
-                />
+                <VolumeSlider type="instrumental" icon={<IconVolume size={20} />} tooltip={t('volume')} />
                 {karaoke.current.song.has_vocals && (
-                    <VolumeSlider
-                        type="vocals"
-                        icon={<IconRecordMail size={20} />}
-                        tooltip={t('voices')}
-                    />
+                    <VolumeSlider type="vocals" icon={<IconRecordMail size={20} />} tooltip={t('voices')} />
                 )}
             </Flex>
         </Card>

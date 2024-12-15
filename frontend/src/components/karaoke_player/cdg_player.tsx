@@ -49,9 +49,7 @@ export default function CDGPlayer({
     const cleanupFunctionsRef = useRef<(() => void)[]>([]);
 
     // State
-    const [backgroundRGBA, setBackgroundRGBA] = useState<number[]>([
-        0, 0, 0, 0,
-    ]);
+    const [backgroundRGBA, setBackgroundRGBA] = useState<number[]>([0, 0, 0, 0]);
     const [contentBounds, setContentBounds] = useState<number[]>([0, 0, 0, 0]);
 
     // Setup initial Canvas and CDG
@@ -64,18 +62,12 @@ export default function CDGPlayer({
 
         // Setup timing sync
         if (audioRef.current) {
-            const cleanup = setTimingsrc(
-                audioRef.current,
-                timingObjectRef.current
-            );
+            const cleanup = setTimingsrc(audioRef.current, timingObjectRef.current);
             cleanupFunctionsRef.current.push(cleanup);
         }
 
         if (vocalsRef.current) {
-            const cleanup = setTimingsrc(
-                vocalsRef.current,
-                timingObjectRef.current
-            );
+            const cleanup = setTimingsrc(vocalsRef.current, timingObjectRef.current);
             cleanupFunctionsRef.current.push(cleanup);
         }
 
@@ -151,19 +143,10 @@ export default function CDGPlayer({
             const { clientWidth, clientHeight } = canvasRef.current;
 
             canvasCtxRef.current.imageSmoothingEnabled = false;
-            canvasCtxRef.current.shadowBlur = Math.min(
-                16,
-                clientHeight * cdgSize * 0.0333
-            );
+            canvasCtxRef.current.shadowBlur = Math.min(16, clientHeight * cdgSize * 0.0333);
             canvasCtxRef.current.shadowColor = 'rgba(0,0,0,1)';
             canvasCtxRef.current.clearRect(0, 0, clientWidth, clientHeight);
-            canvasCtxRef.current.drawImage(
-                bitmap,
-                0,
-                0,
-                clientWidth,
-                clientHeight
-            );
+            canvasCtxRef.current.drawImage(bitmap, 0, 0, clientWidth, clientHeight);
         },
         [cdgSize]
     );
@@ -180,9 +163,7 @@ export default function CDGPlayer({
         const frame = cdgRef.current.render(currentTime, { forceKey: true });
         if (!frame.isChanged) return;
 
-        if (
-            !frame.backgroundRGBA.every((val, i) => val === backgroundRGBA[i])
-        ) {
+        if (!frame.backgroundRGBA.every((val, i) => val === backgroundRGBA[i])) {
             setBackgroundRGBA(frame.backgroundRGBA);
         }
 
@@ -238,10 +219,7 @@ export default function CDGPlayer({
                 className="karaoke__backdrop"
                 style={{
                     backdropFilter: cdgAlpha !== 1 ? filters.join(' ') : 'none',
-                    backgroundColor:
-                        cdgAlpha !== 1
-                            ? 'transparent'
-                            : `rgba(${r},${g},${b},${cdgAlpha})`,
+                    backgroundColor: cdgAlpha !== 1 ? 'transparent' : `rgba(${r},${g},${b},${cdgAlpha})`,
                     borderRadius: BORDER_RADIUS * scale,
                     left: (x1 - pad) * scale,
                     top: (y1 - pad) * scale,
@@ -249,22 +227,10 @@ export default function CDGPlayer({
                     height: (y2 - y1 + pad * 2) * scale,
                 }}
             />
-            <canvas
-                ref={canvasRef}
-                width={300 * scale}
-                height={216 * scale}
-                className="karaoke__canvas"
-            />
+            <canvas ref={canvasRef} width={300 * scale} height={216 * scale} className="karaoke__canvas" />
             <br />
-            <audio
-                preload="auto"
-                onEnded={handleEnded}
-                onTimeUpdate={handleTimeUpdate}
-                ref={audioRef}
-            />
-            {session.song.has_vocals && (
-                <audio preload="auto" ref={vocalsRef} />
-            )}
+            <audio preload="auto" onEnded={handleEnded} onTimeUpdate={handleTimeUpdate} ref={audioRef} />
+            {session.song.has_vocals && <audio preload="auto" ref={vocalsRef} />}
         </div>
     );
 }

@@ -1,11 +1,4 @@
-import {
-    Collection,
-    PhKaraoke,
-    PhSong,
-    PhSongSession,
-    SDK,
-    VolumeType,
-} from './index';
+import { Collection, PhKaraoke, PhSong, PhSongSession, SDK, VolumeType } from './index';
 
 export default class Karaoke {
     private sdk: SDK;
@@ -14,10 +7,7 @@ export default class Karaoke {
         this.sdk = sdk;
     }
 
-    public async getCollection(
-        page: number | null,
-        search?: string | null
-    ): Promise<Collection<PhSong>> {
+    public async getCollection(page: number | null, search?: string | null): Promise<Collection<PhSong>> {
         if (!page) {
             page = 1;
         }
@@ -28,9 +18,7 @@ export default class Karaoke {
             query.set('search', search);
         }
 
-        const resp = await this.sdk.get(
-            `/api/webapp/songs?${query.toString()}`
-        );
+        const resp = await this.sdk.get(`/api/webapp/songs?${query.toString()}`);
         const data = await resp.json();
 
         const events = Collection.fromJson(data, (x) => {
@@ -68,18 +56,11 @@ export default class Karaoke {
         await this.sdk.delete(`/api/webapp/session/${sessionId}`);
     }
 
-    public async moveInQueue(
-        sessionId: number,
-        direction: 'up' | 'down'
-    ): Promise<PhSongSession[]> {
-        const resp = await this.sdk.post(
-            `/api/webapp/session/${sessionId}/move/${direction}`
-        );
+    public async moveInQueue(sessionId: number, direction: 'up' | 'down'): Promise<PhSongSession[]> {
+        const resp = await this.sdk.post(`/api/webapp/session/${sessionId}/move/${direction}`);
         const data = await resp.json();
 
-        return data
-            .map((x: any) => PhSongSession.fromJson(x))
-            .filter((x: any) => !!x);
+        return data.map((x: any) => PhSongSession.fromJson(x)).filter((x: any) => !!x);
     }
 
     public async directPlay(sessionId: number) {
@@ -100,13 +81,8 @@ export default class Karaoke {
         await this.sdk.post(`/api/webapp/karaoke/playing-status/${playing}`);
     }
 
-    public async setVolume(
-        type: VolumeType,
-        volume: number
-    ): Promise<PhKaraoke> {
-        const resp = await this.sdk.post(
-            `/api/webapp/karaoke/set-volume/${type}/${volume}`
-        );
+    public async setVolume(type: VolumeType, volume: number): Promise<PhKaraoke> {
+        const resp = await this.sdk.post(`/api/webapp/karaoke/set-volume/${type}/${volume}`);
         const data = await resp.json();
 
         return PhKaraoke.fromJson(data);

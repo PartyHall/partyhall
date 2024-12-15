@@ -19,6 +19,17 @@ func (k Karaoke) EndCurrentSong(publish bool) {
 		return
 	}
 
+	if state.STATE.Karaoke.Current.CancelledAt.Valid || state.STATE.Karaoke.Current.EndedAt.Valid {
+		if publish {
+			mercure_client.CLIENT.PublishEvent(
+				"/karaoke",
+				state.STATE.Karaoke,
+			)
+		}
+
+		return
+	}
+
 	state.STATE.Karaoke.Current.CancelledAt = models.JsonnableNullTime{Time: time.Now(), Valid: true}
 	dal.SONGS.UpdateSession(state.STATE.Karaoke.Current)
 
@@ -68,6 +79,8 @@ func (k Karaoke) StartNextSong() error {
 		if err != nil {
 			log.Error("Failed to start next song", "err", err)
 		}
+	} else {
+		k.EndCurrentSong(false)
 	}
 
 	mercure_client.CLIENT.PublishEvent(

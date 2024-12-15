@@ -15,6 +15,7 @@ import (
 	"github.com/partyhall/partyhall/mercure_client"
 	"github.com/partyhall/partyhall/nexus"
 	"github.com/partyhall/partyhall/pipewire"
+	routes_requests "github.com/partyhall/partyhall/routes/requests"
 	"github.com/partyhall/partyhall/services"
 	"github.com/partyhall/partyhall/state"
 )
@@ -103,6 +104,7 @@ func routeSetEvent(c *gin.Context) {
 		err := mercure_client.CLIENT.PublishEvent("/event", event)
 		if err != nil {
 			c.Render(http.StatusInternalServerError, api_errors.MERCURE_PUBLISH_FAILURE)
+
 			return
 		}
 
@@ -116,6 +118,7 @@ func routeSetDebug(c *gin.Context) {
 	err := services.ShowDebug()
 	if err != nil {
 		c.Render(http.StatusInternalServerError, api_errors.MERCURE_PUBLISH_FAILURE)
+
 		return
 	}
 
@@ -128,10 +131,123 @@ func routeGetAudioDevices(c *gin.Context) {
 		api_errors.BAD_REQUEST.WithExtra(map[string]any{
 			"err": err,
 		})
+
 		return
 	}
 
 	c.JSON(http.StatusOK, devices)
+}
+
+func routeSetAudioDevices(c *gin.Context) {
+	var req routes_requests.AudioSetDevices
+	if err := c.ShouldBindJSON(&req); err != nil {
+		api_errors.RenderValidationErr(c, err)
+
+		return
+	}
+
+	err := pipewire.SetDefaultDevices(req.SourceId, req.SinkId)
+	if err != nil {
+		api_errors.BAD_REQUEST.WithExtra(map[string]any{
+			"err": err,
+		})
+
+		return
+	}
+
+	// Note that the links will not be updated in the response
+	// but we don't care, the font do not have to use them
+	devices, err := pipewire.GetDevices()
+	if err != nil {
+		api_errors.BAD_REQUEST.WithExtra(map[string]any{
+			"err": err,
+		})
+
+		return
+	}
+
+	mercure_client.CLIENT.PublishEvent(
+		"/audio-devices",
+		devices,
+	)
+
+	err = pipewire.LinkDevice(devices.DefaultSource, devices.DefaultSink)
+	if err != nil {
+		api_errors.BAD_REQUEST.WithExtra(map[string]any{
+			"err": err,
+		})
+
+		return
+	}
+
+	c.JSON(200, devices)
+}
+
+func routeSetAudioDeviceVolume(c *gin.Context) {
+	var req routes_requests.AudioSetDeviceVolume
+	if err := c.ShouldBindJSON(&req); err != nil {
+		api_errors.RenderValidationErr(c, err)
+
+		return
+	}
+
+	deviceIdStr := strings.TrimSpace(c.Params.ByName("id"))
+	deviceId, err := strconv.Atoi(deviceIdStr)
+
+	if len(deviceIdStr) == 0 || err != nil {
+		api_errors.INVALID_PARAMETERS.WithExtra(map[string]any{
+			"err": err,
+		})
+
+		return
+	}
+
+	devices, err := pipewire.GetDevices()
+	if err != nil {
+		api_errors.BAD_REQUEST.WithExtra(map[string]any{
+			"err": err,
+		})
+
+		return
+	}
+
+	var device *pipewire.Device = nil
+	if devices.DefaultSink != nil && deviceId == devices.DefaultSink.ID {
+		device = devices.DefaultSink
+	} else if deviceId == devices.KaraokeSink.ID {
+		device = &devices.KaraokeSink
+	} else {
+		api_errors.BAD_REQUEST.WithExtra(map[string]any{
+			"err": "The requested device is not set as default",
+		})
+
+		return
+	}
+
+	err = pipewire.SetVolume(device, float64(req.Volume)/100)
+	if err != nil {
+		api_errors.BAD_REQUEST.WithExtra(map[string]any{
+			"err": err,
+		})
+
+		return
+	}
+
+	devices, err = pipewire.GetDevices()
+	if err != nil {
+		api_errors.BAD_REQUEST.WithExtra(map[string]any{
+			"err": err,
+		})
+
+		return
+	}
+
+	mercure_client.CLIENT.PublishEvent(
+		"/audio-devices",
+		devices,
+	)
+
+	c.JSON(200, devices)
 }
 
 func routeForceSync(c *gin.Context) {

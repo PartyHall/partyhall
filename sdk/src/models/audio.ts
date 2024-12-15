@@ -8,10 +8,10 @@ export class AudioDevice {
         this.id = data['id'];
         this.name = data['name'];
         this.description = data['description'];
-        this.volume = data['volume']
+        this.volume = data['volume'];
     }
 
-    static fromJson(data: Record<string, any>|null) {
+    static fromJson(data: Record<string, any> | null) {
         if (!data) {
             return null;
         }
@@ -20,15 +20,15 @@ export class AudioDevice {
     }
 
     static fromArray(data: Record<string, any>[]) {
-        return data.map(x => new AudioDevice(x));
+        return data.map((x) => new AudioDevice(x));
     }
 }
 
 export class AudioDevices {
     karaokeSource: AudioDevice;
     karaokeSink: AudioDevice;
-    defaultSource: AudioDevice|null;
-    defaultSink: AudioDevice|null;
+    defaultSource: AudioDevice | null;
+    defaultSink: AudioDevice | null;
     sources: AudioDevice[];
     sinks: AudioDevice[];
 
@@ -41,7 +41,7 @@ export class AudioDevices {
         this.sinks = AudioDevice.fromArray(data['sinks']);
     }
 
-    static fromJson(data: Record<string, any>|null) {
+    static fromJson(data: Record<string, any> | null) {
         if (!data) {
             return null;
         }

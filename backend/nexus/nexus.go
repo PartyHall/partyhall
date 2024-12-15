@@ -487,9 +487,6 @@ func (ns *NexusSync) syncSession(session *models.SongSession) error {
 		return err
 	}
 
-	x, _ := json.MarshalIndent(resp, "", "  ")
-	fmt.Println(string(x))
-
 	nexusId, ok := resp["id"]
 	if !ok {
 		return errors.New("no id retreived from creating the session on PartyNexus")

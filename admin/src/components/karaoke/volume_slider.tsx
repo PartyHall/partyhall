@@ -35,19 +35,21 @@ export default function VolumeSlider(props: Props) {
         setKaraoke(data);
     };
 
-    return <TextSlider
-        leftText={
-            <div className='SongCard__Timecode'>
-                <Tooltip title={props.tooltip}>{props.icon}</Tooltip>
-            </div>
-        }
-        rightText={
-            <Typography.Text className="SongCard__Timecode">
-                {volume}%
-            </Typography.Text>
-        }
-        value={volume}
-        onChange={x => setVolume(x)}
-        className='SongCard__Slider'
-    />;
+    return (
+        <TextSlider
+            leftText={
+                <div className="SongCard__Timecode">
+                    <Tooltip title={props.tooltip}>{props.icon}</Tooltip>
+                </div>
+            }
+            rightText={
+                <Typography.Text className="SongCard__Timecode">
+                    {volume}%
+                </Typography.Text>
+            }
+            value={volume}
+            onChange={(x) => setVolume(x)}
+            className="SongCard__Slider"
+        />
+    );
 }

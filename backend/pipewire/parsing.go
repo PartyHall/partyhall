@@ -134,7 +134,6 @@ func findDefaults(objects []PipeWireObject) (string, string) {
 					if !ok {
 						continue
 					}
-					fmt.Println(valueMap)
 
 					name, ok := valueMap["name"].(string)
 					if !ok {

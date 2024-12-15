@@ -3,7 +3,6 @@ package dal
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -114,7 +113,6 @@ func (e Events) Create(evt *models.Event) error {
 	row := DB.QueryRow(`SELECT id FROM event WHERE rowid = last_insert_rowid();`)
 
 	if row.Err() != nil {
-		fmt.Println("ERR: " + row.Err().Error())
 		return row.Err()
 	}
 
@@ -122,7 +120,6 @@ func (e Events) Create(evt *models.Event) error {
 	err = row.Scan(&id)
 
 	if err != nil {
-		fmt.Println("ERR: " + err.Error())
 		return err
 	}
 

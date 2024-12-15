@@ -169,6 +169,7 @@ func GetDevices() (*Devices, error) {
 }
 
 func SetVolume(d *Device, vol float64) error {
+	fmt.Println(fmt.Sprintf("Set volume: wpctl set-volume %v %v", d.ID, vol))
 	cmd := exec.Command(
 		"wpctl",
 		"set-volume",
@@ -280,7 +281,7 @@ func LinkDevice(source, sink *Device) error {
 		}
 
 		if !slices.Contains(KNOWN_CHANNELS, p.Channel) {
-			fmt.Println("Unknown channel: ", p.Channel)
+			log.Warn("Unknown channel", "channel", p.Channel)
 			continue
 		}
 

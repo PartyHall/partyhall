@@ -1,18 +1,21 @@
 import { Button, Card, Flex, Input, Select } from 'antd';
+import { useEffect, useState } from 'react';
+import { useMercure, useMercureTopic } from '../hooks/mercure';
 
+import { AudioDevices } from '@partyhall/sdk/dist/models/audio';
 import EventCard from '../components/event_card';
 import KeyVal from '../components/keyval';
+import SoundCard from '../components/sound_card';
 
 import { useAuth } from '../hooks/auth';
-import { useEffect } from 'react';
-import { useMercure } from '../hooks/mercure';
 import { useSettings } from '../hooks/settings';
 import { useTranslation } from 'react-i18next';
-import SoundCard from '../components/sound_card';
 
 export default function Index() {
     const { t } = useTranslation('', { keyPrefix: 'home' });
     const { t: tG } = useTranslation('', { keyPrefix: 'generic' });
+
+    const [audioDevices, setAudioDevices] = useState<AudioDevices | null>(null);
 
     const { version, commit, setPageName } = useSettings();
     const {
@@ -24,14 +27,17 @@ export default function Index() {
         logout,
         syncInProgress,
     } = useAuth();
+
     const { time } = useMercure();
 
-    const changeMode = async (val: string) => {
-        await api.settings.setMode(val);
-    };
+    useMercureTopic('/audio-devices', (x: any) =>
+        setAudioDevices(AudioDevices.fromJson(x))
+    );
+
+    const changeMode = async (val: string) => await api.settings.setMode(val);
 
     useEffect(() => {
-        setPageName('home', []);
+        setPageName('home', ['/audio-devices']);
     }, []);
 
     /** @TODO: Make responsive for < 400 => width=95% or something like that */
@@ -51,7 +57,7 @@ export default function Index() {
 
             {event && <EventCard event={event} />}
 
-            <SoundCard />
+            <SoundCard mercureDevices={audioDevices} />
 
             <Card title={t('actions.title')}>
                 <Flex vertical gap={'.25em'}>

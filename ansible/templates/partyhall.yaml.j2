@@ -17,6 +17,9 @@ guests_allowed: true
 
 # PartyNexus credentials
 nexus_url: '{{ partyhall_nexus_url }}'
+{% if partyhall_nexus_ignore_ssl is defined and partyhall_nexus_ignore_ssl is true %}
+nexus_ignore_ssl: true
+{% endif %}
 hardware_id: '{{ partyhall_nexus_hardware_id }}'
 api_key: '{{ partyhall_nexus_api_key }}'
 

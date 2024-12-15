@@ -12,7 +12,8 @@ all:
       partyhall_photobooth_webcam_width: 1280
       partyhall_photobooth_webcam_height: 720
 
-      #### @TODO: Unattended enabled + unattended interval
+      partyhall_photobooth_unattended: true
+      partyhall_photobooth_unattended_interval: 300
 
       ## PartyNexus config (Keep empty if not enabled)
       partyhall_nexus_url: ''

@@ -6,8 +6,8 @@ import platform
 
 # -linux-xxxx-default.tar.gz = spotifyd
 CUSTOM_ARCH_NAMES = {
-    'x86_64': ['amd64', '-linux-default.tar.gz'],
-    'aarch64': ['arm64', '-linux-armhf-default.tar.gz'],
+    'x86_64': ['x86_64', 'amd64', '-linux-default.tar.gz'],
+    'aarch64': ['aarch64', 'arm64', '-linux-armhf-default.tar.gz'],
 }
 
 def main():

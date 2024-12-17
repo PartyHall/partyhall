@@ -52,6 +52,7 @@ func RegisterWebappRoutes(router *gin.RouterGroup) {
 
 	// Admin
 	settings := r.Group("/settings")
+	settings.POST("/shutdown", middlewares.Authorized("ADMIN"), routeShutdown)
 	settings.POST("/mode/:mode", middlewares.Authorized("ADMIN"), routeSetMode)
 	settings.POST("/event/:event", middlewares.Authorized("ADMIN"), routeSetEvent)
 	settings.POST("/debug", routeSetDebug)

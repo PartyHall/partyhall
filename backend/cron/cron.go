@@ -53,21 +53,17 @@ func RunCron() {
 		}
 	}()
 
-	// Sync-ing songs every 5 minutes
+	// Sync-ing songs, images, and sessions every 5 minutes
 	go func() {
 		for {
-			if !state.STATE.SyncInProgress && nexus.INSTANCE.IsSetup {
-				state.STATE.SyncInProgress = true
-				mercure_client.CLIENT.PublishSyncInProgress()
-
-				err := nexus.INSTANCE.SyncSongs()
+			if !state.STATE.SyncInProgress {
+				err := nexus.INSTANCE.Sync(state.STATE.CurrentEvent)
 				if err != nil {
 					mercure_client.CLIENT.PublishSyncInProgress()
 					log.Error("Failed to sync songs", "err", err)
 				}
-
-				state.STATE.SyncInProgress = false
-				mercure_client.CLIENT.PublishSyncInProgress()
+			} else {
+				log.Info("CRON Synchronizing has been skipped as it's already in progress")
 			}
 
 			time.Sleep(5 * time.Minute)

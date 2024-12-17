@@ -396,9 +396,9 @@ func routeSetEnded(c *gin.Context) {
 		return
 	}
 
-	err = nexus.INSTANCE.SyncSessions()
+	err = nexus.INSTANCE.Sync(state.STATE.CurrentEvent)
 	if err != nil {
-		log.Error("Failed to sync song session", "err", err)
+		log.Error("Failed to sync", "err", err)
 	}
 
 	state.STATE.Karaoke.Current = nil

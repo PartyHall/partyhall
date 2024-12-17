@@ -8,6 +8,10 @@ export default class Settings {
         this.sdk = sdk;
     }
 
+    public async shutdown(): Promise<void> {
+        await this.sdk.post(`/api/webapp/settings/shutdown`);
+    }
+
     public async setMode(mode: string): Promise<void> {
         await this.sdk.post(`/api/webapp/settings/mode/${mode}`);
     }

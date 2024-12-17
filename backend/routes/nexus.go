@@ -78,7 +78,7 @@ func routeSync(c *gin.Context) {
 		return
 	}
 
-	err := nexus.INSTANCE.SyncPictures(state.STATE.CurrentEvent)
+	err := nexus.INSTANCE.Sync(state.STATE.CurrentEvent)
 	if err != nil {
 		api_errors.ApiError(
 			c,

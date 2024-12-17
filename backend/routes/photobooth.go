@@ -137,7 +137,7 @@ func routeUploadPicture(c *gin.Context) {
 			mercure_client.CLIENT.PublishEvent("/event", event)
 		}
 
-		if err := nexus.INSTANCE.SyncPictures(state.STATE.CurrentEvent); err != nil {
+		if err := nexus.INSTANCE.Sync(state.STATE.CurrentEvent); err != nil {
 			log.Error("Failed to sync taken picture to Nexus", "err", err)
 		}
 	}()

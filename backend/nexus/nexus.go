@@ -498,13 +498,13 @@ func (ns *NexusSync) syncSession(session *models.SongSession) error {
 		return errors.New("no id retreived from creating the session on PartyNexus")
 	}
 
-	nexusIdInt, ok := nexusId.(int64)
+	nexusIdInt, ok := nexusId.(float64)
 	if !ok {
-		return errors.New("id retreived from creating the session on PartyNexus is not an int64")
+		return errors.New("id retreived from creating the session on PartyNexus is not a float64")
 	}
 
 	session.SessionNexusId = models.JsonnableNullInt64{
-		Int64: nexusIdInt,
+		Int64: int64(nexusIdInt),
 		Valid: true,
 	}
 

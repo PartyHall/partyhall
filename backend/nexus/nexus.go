@@ -192,7 +192,7 @@ func (ns *NexusSync) CreateEvent(eventId int64) error {
 	return dal.EVENTS.Update(state.STATE.CurrentEvent)
 }
 
-func (ns *NexusSync) DownloadSong(id int64) (string, error) {
+func (ns *NexusSync) downloadSong(id int64) (string, error) {
 	tmpFile, err := os.CreateTemp("", "phksong-*")
 	if err != nil {
 		return "", err
@@ -342,7 +342,7 @@ func (ns *NexusSync) syncPicture(event *models.Event, p models.Picture) error {
 	return dal.EVENTS.UpdatePicture(p)
 }
 
-func (ns *NexusSync) SyncPictures(event *models.Event) error {
+func (ns *NexusSync) syncPictures(event *models.Event, shouldSendStatus bool) error {
 	if !ns.IsSetup {
 		log.Info("No PartyNexus credentials. No sync will be made")
 
@@ -360,12 +360,16 @@ func (ns *NexusSync) SyncPictures(event *models.Event) error {
 	}
 
 	log.Info("Fetching pictures to upload")
-	state.STATE.SyncInProgress = true
-	mercure_client.CLIENT.PublishSyncInProgress()
+	if shouldSendStatus {
+		state.STATE.SyncInProgress = true
+		mercure_client.CLIENT.PublishSyncInProgress()
+	}
+
 	pictures, err := dal.EVENTS.GetUnsubmittedPictures(state.STATE.CurrentEvent.Id)
 	if err != nil {
 		state.STATE.SyncInProgress = false
 		mercure_client.CLIENT.PublishSyncInProgress()
+
 		return err
 	}
 
@@ -385,13 +389,15 @@ func (ns *NexusSync) SyncPictures(event *models.Event) error {
 		}
 	}
 
-	state.STATE.SyncInProgress = true
-	mercure_client.CLIENT.PublishSyncInProgress()
+	if shouldSendStatus {
+		state.STATE.SyncInProgress = false
+		mercure_client.CLIENT.PublishSyncInProgress()
+	}
 
 	return errors.Join(pictureUploadErrors...)
 }
 
-func (ns *NexusSync) SyncSongs() error {
+func (ns *NexusSync) syncSongs() error {
 	log.Info("Fetching songs from Nexus")
 
 	// Fetch all songs from the API
@@ -448,7 +454,7 @@ func (ns *NexusSync) SyncSongs() error {
 
 	for _, id := range phkToDownload {
 		log.Info("Downloading song", "id", id)
-		songPhkPath, err := ns.DownloadSong(id)
+		songPhkPath, err := ns.downloadSong(id)
 		if err != nil {
 			return err
 		}
@@ -492,20 +498,20 @@ func (ns *NexusSync) syncSession(session *models.SongSession) error {
 		return errors.New("no id retreived from creating the session on PartyNexus")
 	}
 
-	nexusIdInt, ok := nexusId.(int64)
+	nexusIdInt, ok := nexusId.(float64)
 	if !ok {
-		return errors.New("id retreived from creating the session on PartyNexus is not an int64")
+		return errors.New("id retreived from creating the session on PartyNexus is not a float64")
 	}
 
 	session.SessionNexusId = models.JsonnableNullInt64{
-		Int64: nexusIdInt,
+		Int64: int64(nexusIdInt),
 		Valid: true,
 	}
 
 	return dal.SONGS.UpdateSession(session)
 }
 
-func (ns *NexusSync) SyncSessions() error {
+func (ns *NexusSync) syncSessions() error {
 	if state.STATE.CurrentEvent == nil || !state.STATE.CurrentEvent.NexusId.Valid {
 		log.Info("No current event or no partynexus id. No sync session will be made ")
 
@@ -536,28 +542,44 @@ func (ns *NexusSync) Sync(event *models.Event) error {
 		return nil
 	}
 
+	if state.STATE.SyncInProgress {
+		return errors.New("trying to sync while already syncronizing")
+	}
+
+	state.STATE.SyncInProgress = true
+	mercure_client.CLIENT.PublishSyncInProgress()
+
+	err := ns.syncSongs()
+	if err != nil {
+		mercure_client.CLIENT.PublishSyncInProgress()
+		log.Error("Failed to sync songs", "err", err)
+	}
+
 	if state.STATE.CurrentEvent == nil {
+		state.STATE.SyncInProgress = false
+		mercure_client.CLIENT.PublishSyncInProgress()
+
 		log.Info("No current event. No sync will be made ")
+
 		return nil
 	}
 
-	// Should the appliance explicitely create an event ?
-	// Because we don't want it to create one if we want to
-	// add it to an existing one
-	// Maybe we want something on the appliance admin
-	// to say "YES I WANT TO CREATE IT"
-	err := ns.CreateEvent(event.Id)
+	err = ns.syncPictures(state.STATE.CurrentEvent, false)
 	if err != nil {
-		return err
+		mercure_client.CLIENT.PublishSyncInProgress()
+		log.Error("Failed to sync songs", "err", err)
 	}
 
-	// Now we have the event
-	// We can submit everything
-	err = ns.SyncPictures(event)
+	err = ns.syncSessions()
+	if err != nil {
+		mercure_client.CLIENT.PublishSyncInProgress()
+		log.Error("Failed to sync songs", "err", err)
+	}
 
-	// Finally, we can retreive karaoke songs
+	state.STATE.SyncInProgress = false
+	mercure_client.CLIENT.PublishSyncInProgress()
 
-	return err
+	return nil
 }
 
 func NewClient(baseUrl string, hwid string, apiKey string, ignoreSsl bool) {

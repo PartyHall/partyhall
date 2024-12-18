@@ -59,7 +59,7 @@
 
     - name: 'Copy the pipewire config'
       become: yes
-      file:
+      copy:
         src: 'files/pipewire_karaoke.conf'
         dest: '/home/{{ ansible_user }}/.config/pipewire/pipewire.conf.d/90-karaoke.conf'
         mode: '0644'

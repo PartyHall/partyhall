@@ -58,6 +58,12 @@ func (k Karaoke) StartSong(session *models.SongSession) error {
 
 			if state.STATE.Karaoke.Countdown == 0 {
 				state.STATE.Karaoke.IsPlaying = true
+
+				state.STATE.Karaoke.Current.StartedAt = models.JsonnableNullTime{
+					Valid: true,
+					Time:  time.Now(),
+				}
+				dal.SONGS.UpdateSession(state.STATE.Karaoke.Current)
 			}
 
 			mercure_client.CLIENT.PublishEvent(

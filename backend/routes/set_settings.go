@@ -252,23 +252,18 @@ func routeSetAudioDeviceVolume(c *gin.Context) {
 
 func routeForceSync(c *gin.Context) {
 	go func() {
-		if state.STATE.CurrentEvent != nil {
-			err := nexus.INSTANCE.SyncPictures(state.STATE.CurrentEvent)
-			if err != nil {
-				log.Error("Failed to sync pictures", "err", err)
-			}
-		}
-
-		err := nexus.INSTANCE.SyncSongs()
+		err := nexus.INSTANCE.Sync(state.STATE.CurrentEvent)
 		if err != nil {
-			log.Error("Failed to sync songs", "err", err)
-		}
-
-		err = nexus.INSTANCE.SyncSessions()
-		if err != nil {
-			log.Error("Failed to sync songs sessions", "err", err)
+			log.Error("Failed to sync", "err", err)
 		}
 	}()
 
 	c.Status(http.StatusOK)
+}
+
+func routeShutdown(c *gin.Context) {
+	err := services.Shutdown()
+	if err != nil {
+		log.Error("Failed to shutdown", "err", err)
+	}
 }

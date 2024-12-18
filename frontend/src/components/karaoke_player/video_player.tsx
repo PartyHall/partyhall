@@ -83,7 +83,6 @@ export default function VideoPlayer({ session, isPlaying, volumeInstru, volumeVo
                 src={session.song.getInstrumentalUrl()}
                 onEnded={onEnded}
                 ref={videoRef}
-                controls
                 onTimeUpdate={async (x: React.SyntheticEvent<HTMLVideoElement>) => {
                     const video = x.target as HTMLVideoElement;
                     await onProgress(Math.floor(video.currentTime));

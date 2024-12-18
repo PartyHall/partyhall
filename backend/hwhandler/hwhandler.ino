@@ -1,5 +1,6 @@
 #define AMT_BUTTONS 3
 #define STARTING_PIN 2
+#define LED_RELAY_PIN 9 // D9
 //   9 -> CE  (nRF24)
 //  10 -> CSN (nRF24)
 //  11 -> MO  (nRF24)

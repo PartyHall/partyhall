@@ -170,5 +170,9 @@ func routeUpdateEvent(c *gin.Context) {
 		return
 	}
 
+	if state.STATE.CurrentEvent != nil && state.STATE.CurrentEvent.Id == evt.Id {
+		state.STATE.CurrentEvent = &evt
+	}
+
 	c.JSON(200, evt)
 }

@@ -1,7 +1,6 @@
 package hwhandler
 
 import (
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"os"
@@ -13,35 +12,113 @@ import (
 	"go.bug.st/serial"
 )
 
-var client mqtt.Client
-
-type HardwareHandler struct {
+type Device struct {
+	Handler             *HardwareHandler
 	PortName            string
+	Port                *serial.Port
 	LastPing            time.Time
 	LastButtonPress     string
 	LastButtonPressTime time.Time
 }
 
-func Load() error {
-	opts := mqtt.NewClientOptions().AddBroker(config.GET.MosquittoAddr).SetClientID("hwhandler").SetPingTimeout(10 * time.Second).SetKeepAlive(10 * time.Second)
-	opts.SetAutoReconnect(true).SetMaxReconnectInterval(10 * time.Second)
-	opts.SetConnectionLostHandler(func(c mqtt.Client, err error) {
-		fmt.Printf("[MQTT] Connection lost: %s\n" + err.Error())
-	})
-	opts.SetReconnectingHandler(func(c mqtt.Client, options *mqtt.ClientOptions) {
-		fmt.Println("[MQTT] Reconnecting...")
-	})
+type HardwareHandler struct {
+	Devices []*Device
+	Mqtt    *mqtt.Client
+}
 
-	client = mqtt.NewClient(opts)
+func Load() (*HardwareHandler, error) {
+	ports, err := serial.GetPortsList()
+	if err != nil {
+		return nil, err
+	}
+
+	if len(ports) == 0 {
+		return nil, errors.New("no arduino/esp32 found")
+	}
+
+	devices := []*Device{}
+	for _, p := range ports {
+		if !strings.HasPrefix(p, "/dev/ttyUSB") {
+			continue
+		}
+
+		devices = append(devices, &Device{
+			PortName:            p,
+			LastPing:            time.Now(),
+			LastButtonPressTime: time.Now(),
+			LastButtonPress:     "",
+		})
+	}
+
+	return &HardwareHandler{
+		Devices: devices,
+	}, nil
+}
+
+func (hh *HardwareHandler) Start() error {
+	opts := mqtt.
+		NewClientOptions().
+		AddBroker(config.GET.MosquittoAddr).
+		SetClientID("hwhandler").
+		SetPingTimeout(10 * time.Second).
+		SetKeepAlive(10 * time.Second).
+		SetAutoReconnect(true).
+		SetMaxReconnectInterval(10 * time.Second).
+		SetConnectionLostHandler(func(c mqtt.Client, err error) {
+			fmt.Printf("[MQTT] Connection lost: %s\n", err.Error())
+		}).
+		SetReconnectingHandler(func(c mqtt.Client, co *mqtt.ClientOptions) {
+			fmt.Println("[MQTT] Reconnecting...")
+		})
+
+	client := mqtt.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		return token.Error()
+	}
+
+	hh.Mqtt = &client
+
+	for _, d := range hh.Devices {
+		d.Handler = hh
+
+		err := d.subscribe()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		err = hh.ProcessSerialConn(d)
+		if err != nil {
+			fmt.Printf("Failed to init device %v: %v\n", d.PortName, err)
+			os.Exit(1)
+		}
 	}
 
 	return nil
 }
 
-func (hh *HardwareHandler) ProcessSerialConn() {
-	port, err := serial.Open(hh.PortName, &serial.Mode{
+func (d *Device) subscribeToMqtt(topic string, fn func(c mqtt.Client, m mqtt.Message)) error {
+	token := (*d.Handler.Mqtt).Subscribe(topic, 1, fn)
+	token.Wait()
+	if err := token.Error(); err != nil {
+		return fmt.Errorf("failed to subscribe to %s: %v", topic, err)
+	}
+
+	fmt.Println("Subscribed to " + topic)
+
+	return nil
+}
+
+func (d *Device) subscribe() error {
+	if err := d.subscribeToMqtt("partyhall/flash", d.OnFlash); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (hh *HardwareHandler) ProcessSerialConn(d *Device) error {
+	port, err := serial.Open(d.PortName, &serial.Mode{
 		BaudRate: config.GET.HardwareHandler.BaudRate,
 		Parity:   serial.NoParity,
 		DataBits: 8,
@@ -49,113 +126,113 @@ func (hh *HardwareHandler) ProcessSerialConn() {
 	})
 
 	if err != nil {
-		fmt.Println("Failed to open device: ")
-		fmt.Println(err)
-		return
+		return err
 	}
-	hh.LastPing = time.Now()
+
+	d.Port = &port
+	d.LastPing = time.Now()
+	d.HandlePing()
 
 	go func() {
 		for {
+			err := d.ProcessMessage()
+
+			if err != nil {
+				fmt.Println("Failed to read: ", err)
+				continue
+			}
+
+		}
+	}()
+
+	return nil
+}
+
+func (d *Device) HandlePing() {
+	go func() {
+		for {
 			time.Sleep(time.Second)
-			if hh.LastPing.Add(15 * time.Second).Before(time.Now()) {
+			if d.LastPing.Add(15 * time.Second).Before(time.Now()) {
 				fmt.Println("No ping received for the last 15 seconds. Crashing !")
 				os.Exit(1)
 			}
 		}
 	}()
+}
 
-	for {
-		line, err := hh.readLine(port)
-		if err != nil {
-			fmt.Println("Failed to read: ", err)
-			continue
-		}
+func (d *Device) OnFlash(c mqtt.Client, m mqtt.Message) {
+	data := strings.ToLower(string(m.Payload()))
+	fmt.Println("[MQTT] Flash " + data)
 
-		hh.processSerialMessage(line)
+	var err error = nil
+	if data == "on" {
+		err = d.WriteMessage("FLASH_ON")
+	} else if data == "off" {
+		err = d.WriteMessage("FLASH_OFF")
+	} else {
+		fmt.Println("\t=> Bad request")
+	}
+
+	if err != nil {
+		fmt.Println("\t=> Failed to send message to device: " + err.Error())
 	}
 }
 
-func (hh *HardwareHandler) readLine(port serial.Port) (string, error) {
-	str := ""
-
-	// We read char by char
-	buff := make([]byte, 1)
-	for {
-		n, err := port.Read(buff)
-		if err != nil {
-			return str, err
-		}
-
-		if n == 0 {
-			fmt.Println("No clue what to do here")
-			return "", errors.New("byte = 0")
-		}
-
-		str += string(buff[:n])
-		if strings.HasSuffix(str, "\n") || strings.HasSuffix(str, "\r") {
-			break
-		}
+func (d *Device) WriteMessage(msg string) error {
+	if !strings.HasSuffix(msg, "\n") {
+		msg += "\n"
 	}
 
-	str = strings.ReplaceAll(str, "\n", "")
-	str = strings.ReplaceAll(str, "\r", "")
+	_, err := (*d.Port).Write([]byte(msg))
 
-	return str, nil
+	return err
 }
 
-func (hh *HardwareHandler) DebugMsg(msg string, hx string) {
-	fmt.Printf("Unknown message: %v\n\t=> 0x%v\n", msg, hx)
-}
+func (d *Device) ProcessMessage() error {
+	msg, err := readLine(*d.Port)
+	if err != nil {
+		return err
+	}
 
-func (hh *HardwareHandler) processSerialMessage(msg string) {
 	if len(msg) == 0 {
-		return
+		return nil
 	}
 
-	hx := hex.EncodeToString([]byte(msg))
-
+	// If its a button press, special case
 	if strings.HasPrefix(msg, "BTN_") {
 		msg = strings.Trim(msg, " \t")
 		val, ok := config.GET.HardwareHandler.Mappings[msg]
 		if !ok {
-			hh.DebugMsg(msg, hx)
-			return
+			debugMsg(msg)
+
+			return nil
 		}
 
 		currTime := time.Now()
-		diff := currTime.Sub(hh.LastButtonPressTime).Seconds()
+		diff := currTime.Sub(d.LastButtonPressTime).Seconds()
 
 		// Debounce
-		if hh.LastButtonPress != val || diff > 1 {
+		if d.LastButtonPress != val || diff > 1 {
 			topic := "partyhall/" + strings.ToLower(val)
 			fmt.Println("Button pressed: ", msg, " sending ", topic)
-			client.Publish(topic, 2, false, "press")
+			(*d.Handler.Mqtt).Publish(topic, 2, false, "press")
 
-			hh.LastButtonPress = val
-			hh.LastButtonPressTime = currTime
+			d.LastButtonPress = val
+			d.LastButtonPressTime = currTime
 		}
 
-		return
-	}
-
-	if len(msg) == 0 {
-		fmt.Print("Bad message: ")
-		hh.DebugMsg(msg, hx)
-		return
+		return nil
 	}
 
 	data := strings.Split(msg, " ")
-
 	switch data[0] {
 	case "STARTING_UP":
 		fmt.Println("Arduino's starting up...")
-	case "OK_RF24":
-		fmt.Println("Wireless device detected & ready to be used")
 	case "PING":
-		hh.LastPing = time.Now()
+		d.LastPing = time.Now()
 	default:
-		hh.DebugMsg(msg, hx)
-		fmt.Println(strings.Join(append([]string{"\targs: "}, data[1:]...), " "))
+		debugMsg(msg)
 	}
+
+	return nil
 }

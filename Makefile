@@ -19,6 +19,9 @@ init:
 run-app:
 	@cd backend && go run .
 
+hwhandler:
+	@cd backend && go run . hwhandler
+
 compile-sdk:
 	@sudo rm -rf sdk/dist
 	@docker run --rm -v $(PWD)/sdk:/sdk -w /sdk node:lts npm install

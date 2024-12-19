@@ -28,4 +28,8 @@ export default class Photobooth {
 
         return await resp.blob();
     }
+
+    public async setFlash(isEnabled: boolean) {
+        await this.sdk.post(`/api/appliance/flash/${isEnabled ? 'on' : 'off'}`);
+    }
 }

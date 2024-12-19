@@ -33,11 +33,16 @@ export default function DefaultView() {
 
             setCountdown(0);
 
+            await api.photobooth.setFlash(true);
             setFlash(true);
             await timeout(1000); // We wait for the webcam to pick-up the flash
         }
         const picture = webcamRef.current.getScreenshot();
         setFlash(false);
+
+        if (shouldTakePicture === 'normal') {
+            await api.photobooth.setFlash(false);
+        }
 
         if (picture) {
             const resp = await api.photobooth.uploadPicture(picture, shouldTakePicture === 'unattended');

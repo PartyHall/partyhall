@@ -70,6 +70,7 @@ func RegisterWebappRoutes(router *gin.RouterGroup) {
 func RegisterApplianceRoutes(router *gin.RouterGroup) {
 	r := router.Group("/appliance", middlewares.Authorized("APPLIANCE"))
 	r.POST("/picture", middlewares.HasEventLoaded(), routeUploadPicture)
+	r.POST("/flash/:value", middlewares.HasEventLoaded(), routeSetFlash)
 }
 
 func routeStatus(c *gin.Context) {

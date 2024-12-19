@@ -75,7 +75,7 @@ export default function Index() {
                                 <Button
                                     color="danger"
                                     onClick={() => api.settings.showDebug()}
-                                    icon={<IconBug size={20}/>}
+                                    icon={<IconBug size={20} />}
                                 >
                                     {t('actions.show_debug')}
                                 </Button>
@@ -83,7 +83,7 @@ export default function Index() {
                                     color="danger"
                                     disabled={syncInProgress}
                                     onClick={() => api.global.forceSync()}
-                                    icon={<IconCloudUp size={20}/>}
+                                    icon={<IconCloudUp size={20} />}
                                 >
                                     {t('actions.force_sync')}
                                 </Button>
@@ -93,11 +93,13 @@ export default function Index() {
                                     okText={tG('actions.ok')}
                                     cancelText={tG('actions.cancel')}
                                 >
-                                    <Button color="danger" icon={<IconPower size={20}/>}>{t('actions.shutdown')}</Button>
+                                    <Button color="danger" icon={<IconPower size={20} />}>
+                                        {t('actions.shutdown')}
+                                    </Button>
                                 </Popconfirm>
                             </>
                         )}
-                        <Button color="danger" onClick={logout} icon={<IconLogout size={20}/>}>
+                        <Button color="danger" onClick={logout} icon={<IconLogout size={20} />}>
                             {t('actions.logout')}
                         </Button>
                     </Flex>

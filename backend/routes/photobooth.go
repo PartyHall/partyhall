@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,7 @@ import (
 	"github.com/partyhall/partyhall/dal"
 	"github.com/partyhall/partyhall/log"
 	"github.com/partyhall/partyhall/mercure_client"
+	"github.com/partyhall/partyhall/mqtt"
 	"github.com/partyhall/partyhall/nexus"
 	"github.com/partyhall/partyhall/state"
 )
@@ -149,4 +151,35 @@ func routeUploadPicture(c *gin.Context) {
 	}
 
 	c.Status(http.StatusCreated)
+}
+
+func routeSetFlash(c *gin.Context) {
+	val := strings.ToLower(c.Param("value"))
+
+	if val != "on" && val != "off" {
+		api_errors.BAD_REQUEST.WithExtra(map[string]any{
+			"err": "The value should be either ON or OFF",
+		})
+
+		return
+	}
+
+	if mqtt.EasyMqtt == nil {
+		api_errors.BAD_REQUEST.WithExtra(map[string]any{
+			"err": "No MQTT server for some reason",
+		})
+
+		return
+	}
+
+	err := mqtt.EasyMqtt.Send("partyhall/flash", val)
+	if err != nil {
+		api_errors.MQTT_PUBLISH_FAILURE.WithExtra(map[string]any{
+			"err": err,
+		})
+
+		return
+	}
+
+	c.Status(200)
 }

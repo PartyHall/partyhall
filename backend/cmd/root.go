@@ -94,6 +94,10 @@ var rootCmd = &cobra.Command{
 			}
 		}
 
+		if len(utils.CURRENT_COMMIT) > 7 {
+			utils.CURRENT_COMMIT = utils.CURRENT_COMMIT[:7]
+		}
+
 		state.STATE.GuestsAllowed = config.GET.GuestsAllowed
 		state.STATE.HardwareId = config.GET.HardwareID
 		state.STATE.Version = utils.CURRENT_VERSION

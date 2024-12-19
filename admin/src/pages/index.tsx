@@ -1,4 +1,4 @@
-import { Button, Card, Flex, Input, Select } from 'antd';
+import { Button, Card, Flex, Input, Popconfirm, Select } from 'antd';
 import { useEffect, useState } from 'react';
 import { useMercure, useMercureTopic } from '../hooks/mercure';
 
@@ -10,6 +10,7 @@ import SoundCard from '../components/sound_card';
 import { useAuth } from '../hooks/auth';
 import { useSettings } from '../hooks/settings';
 import { useTranslation } from 'react-i18next';
+import { IconBug, IconCloudUp, IconLogout, IconPower } from '@tabler/icons-react';
 
 export default function Index() {
     const { t } = useTranslation('', { keyPrefix: 'home' });
@@ -71,16 +72,34 @@ export default function Index() {
                     <Flex gap="1em" style={{ marginTop: '2em' }} wrap="wrap" justify="center">
                         {api.tokenUser?.roles.includes('ADMIN') && (
                             <>
-                                <Button color="danger" onClick={() => api.settings.showDebug()}>
+                                <Button
+                                    color="danger"
+                                    onClick={() => api.settings.showDebug()}
+                                    icon={<IconBug size={20} />}
+                                >
                                     {t('actions.show_debug')}
                                 </Button>
-                                <Button color="danger" disabled={syncInProgress} onClick={() => api.global.forceSync()}>
+                                <Button
+                                    color="danger"
+                                    disabled={syncInProgress}
+                                    onClick={() => api.global.forceSync()}
+                                    icon={<IconCloudUp size={20} />}
+                                >
                                     {t('actions.force_sync')}
                                 </Button>
-                                <Button color="danger">{t('actions.shutdown')}</Button>
+                                <Popconfirm
+                                    title={t('confirm_cancel')}
+                                    onConfirm={() => api.settings.shutdown()}
+                                    okText={tG('actions.ok')}
+                                    cancelText={tG('actions.cancel')}
+                                >
+                                    <Button color="danger" icon={<IconPower size={20} />}>
+                                        {t('actions.shutdown')}
+                                    </Button>
+                                </Popconfirm>
                             </>
                         )}
-                        <Button color="danger" onClick={logout}>
+                        <Button color="danger" onClick={logout} icon={<IconLogout size={20} />}>
                             {t('actions.logout')}
                         </Button>
                     </Flex>

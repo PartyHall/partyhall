@@ -35,6 +35,11 @@ type AuthProps = {
     event: PhEvent | null;
     time: DateTime | null;
 
+    hardwareFlash: {
+        powered: boolean;
+        brightness: number;
+    };
+
     karaoke: PhKaraoke | null;
     karaokeQueue: PhSongSession[];
 
@@ -53,6 +58,7 @@ type AuthContextProps = AuthProps & {
 
     setMode: (mode: string) => void;
     setEvent: (evt: PhEvent) => void;
+    setHardwareFlash: (powered: boolean, brightness: number) => void;
     setKaraoke: (karaoke: PhKaraoke) => void;
     setTimecode: (timecode: number) => void;
     setKaraokeQueue: (queue: PhSongSession[]) => void;
@@ -69,6 +75,11 @@ const defaultProps: AuthProps = {
     mode: 'photobooth',
     event: null,
     time: null,
+
+    hardwareFlash: {
+        powered: false,
+        brightness: 100,
+    },
 
     karaoke: null,
     karaokeQueue: [],
@@ -89,6 +100,7 @@ const AuthContext = createContext<AuthContextProps>({
 
     setMode: () => {},
     setEvent: () => {},
+    setHardwareFlash: () => {},
     setKaraoke: () => {},
     setTimecode: () => {},
     setKaraokeQueue: () => {},
@@ -98,8 +110,14 @@ const AuthContext = createContext<AuthContextProps>({
 });
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
-    const [context, setContext] = useState<AuthProps>(defaultProps);
-    const { topics } = useSettings();
+    const { topics, hwflash_powered, modules_settings } = useSettings();
+    const [context, setContext] = useState<AuthProps>({
+        ...defaultProps,
+        hardwareFlash: {
+            powered: hwflash_powered,
+            brightness: modules_settings.photobooth.flash_brightness,
+        },
+    });
 
     const login = async (username: string, password: string) => {
         const data = await context.api.auth.login(username, password);
@@ -171,6 +189,12 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         setContext((oldCtx) => ({ ...oldCtx, displayName: displayName }));
     };
 
+    const setHardwareFlash = (powered: boolean, brightness: number) =>
+        setContext((oldCtx) => ({
+            ...oldCtx,
+            hardwareFlash: { powered, brightness },
+        }));
+
     useAsyncEffect(async () => {
         context.api.setOnExpired(() => setToken());
 
@@ -200,6 +224,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
                 isLoggedIn,
                 logout,
                 setEvent,
+                setHardwareFlash,
                 setMode,
                 setKaraoke,
                 setTimecode,

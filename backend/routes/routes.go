@@ -24,7 +24,6 @@ func RegisterWebappRoutes(router *gin.RouterGroup) {
 	events.GET("/:eventId", routeGetEvent)
 	events.PUT("/:eventId", routeUpdateEvent)
 	events.DELETE("/events/:eventId", routeDeleteEvent)
-
 	//#endregion
 
 	//#region Karaoke related stuff
@@ -49,6 +48,7 @@ func RegisterWebappRoutes(router *gin.RouterGroup) {
 	r.GET("/logs", middlewares.Authorized(models.ROLE_ADMIN), routeGetLogs)
 
 	r.POST("/picture", middlewares.HasEventLoaded(), middlewares.Authorized(), routeTakePicture)
+	r.POST("/flash", middlewares.HasEventLoaded(), routeSetFlash)
 
 	// Admin
 	settings := r.Group("/settings")
@@ -70,7 +70,6 @@ func RegisterWebappRoutes(router *gin.RouterGroup) {
 func RegisterApplianceRoutes(router *gin.RouterGroup) {
 	r := router.Group("/appliance", middlewares.Authorized("APPLIANCE"))
 	r.POST("/picture", middlewares.HasEventLoaded(), routeUploadPicture)
-	r.POST("/flash/:value", middlewares.HasEventLoaded(), routeSetFlash)
 }
 
 func routeStatus(c *gin.Context) {

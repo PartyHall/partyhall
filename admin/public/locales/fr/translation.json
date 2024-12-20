@@ -99,6 +99,9 @@
         "title": "Photomaton",
         "amt_manually_taken": "Photos prises manuellement",
         "amt_unattended": "Photos prises automatiquement",
+        "flash": "Flash",
+        "toggle_on": "Allumer",
+        "toggle_off": "Éteindre",
         "remote_take_picture": "Prendre une photo",
         "success_notification": {
             "title": "Prise de photo",

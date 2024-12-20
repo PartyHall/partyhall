@@ -6,6 +6,7 @@ export type VolumeType = 'instrumental' | 'vocals';
 export interface ModuleSettings {
     photobooth: {
         countdown: number;
+        flash_brightness: number;
         resolution: {
             width: number;
             height: number;
@@ -46,6 +47,7 @@ export class PhStatus {
     currentMode: string;
     currentEvent: PhEvent | null;
     modulesSettings: ModuleSettings;
+    hardwareFlashPowered: boolean;
     guestsAllowed: boolean;
 
     karaoke: PhKaraoke;
@@ -60,6 +62,7 @@ export class PhStatus {
         this.currentMode = data['current_mode'];
         this.currentEvent = PhEvent.fromJson(data['current_event']);
         this.modulesSettings = data['modules_settings'];
+        this.hardwareFlashPowered = data['hardware_flash_powered'];
         this.guestsAllowed = data['guests_allowed'];
 
         this.karaoke = PhKaraoke.fromJson(data['karaoke']);

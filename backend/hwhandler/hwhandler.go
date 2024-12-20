@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -164,15 +165,14 @@ func (d *Device) OnFlash(c mqtt.Client, m mqtt.Message) {
 	data := strings.ToLower(string(m.Payload()))
 	fmt.Println("[MQTT] Flash " + data)
 
-	var err error = nil
-	if data == "on" {
-		err = d.WriteMessage("FLASH_ON")
-	} else if data == "off" {
-		err = d.WriteMessage("FLASH_OFF")
-	} else {
-		fmt.Println("\t=> Bad request")
+	val, err := strconv.Atoi(data)
+	if err != nil {
+		fmt.Println("Failed to send flash: bad payload => ", err)
+
+		return
 	}
 
+	err = d.WriteMessage(fmt.Sprintf("FLASH %v", val))
 	if err != nil {
 		fmt.Println("\t=> Failed to send message to device: " + err.Error())
 	}

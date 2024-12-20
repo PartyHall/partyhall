@@ -46,10 +46,21 @@ void checkButton(int btn) {
 //#endregion
 
 void process_data(const char* data) {
-  if (strcmp(data, "FLASH_ON") == 0) {
-    digitalWrite(LEDS_RELAY_PIN, HIGH);
-  } else if (strcmp(data, "FLASH_OFF") == 0) {
-    digitalWrite(LEDS_RELAY_PIN, LOW);
+  char buffer[MAX_INPUT];
+  strncpy(buffer, data, sizeof(buffer) - 1);
+  buffer[sizeof(buffer) - 1] = '\0';
+
+  char* command = strtok(buffer, " ");
+  char* value_str = strtok(NULL, " ");
+
+  if (command && value_str) {
+    if (strcmp(command, "FLASH") == 0) {
+      int value = atoi(value_str);
+
+      if (value >= 0 && value <= 255) {
+        analogWrite(LEDS_RELAY_PIN, value);
+      }
+    }
   }
 }
 

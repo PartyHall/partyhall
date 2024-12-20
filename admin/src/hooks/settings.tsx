@@ -2,15 +2,28 @@ import { ReactNode, createContext, useContext, useState } from 'react';
 import Loader from '../components/loader';
 import useAsyncEffect from 'use-async-effect';
 
-const DEFAULT_TOPICS = ['/time', '/mode', '/event', '/snackbar', '/karaoke', '/karaoke_queue', '/sync-progress'];
+const DEFAULT_TOPICS = [
+    '/time',
+    '/mode',
+    '/event',
+    '/snackbar',
+    '/karaoke',
+    '/karaoke_queue',
+    '/sync-progress',
+    '/flash',
+];
 
 /** @TODO: Implement APIs */
 type SettingsProps = {
     loaded: boolean;
     pageName: string;
 
+    modules_settings: Record<string, any>;
+
     guests_allowed: boolean;
     enabled_modules: string[];
+
+    hwflash_powered: boolean;
 
     version: string;
     commit: string;
@@ -29,8 +42,13 @@ const defaultProps: SettingsProps = {
     pageName: 'home',
     topics: DEFAULT_TOPICS,
 
+    modules_settings: {},
+
     guests_allowed: false,
     enabled_modules: [],
+
+    hwflash_powered: false,
+
     version: 'INDEV',
     commit: 'XXXXXX',
     hwid: null,

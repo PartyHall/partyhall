@@ -9,6 +9,7 @@ all:
       partyhall_admin_password: 'admin_password'
       partyhall_admin_fullname: 'Administrator'
 
+      partyhall_photobooth_flash_brightness: 100 # Hardware flash brightness, in percentage
       partyhall_photobooth_webcam_width: 1280
       partyhall_photobooth_webcam_height: 720
 

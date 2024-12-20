@@ -41,7 +41,7 @@ export default function MercureProvider({
     children: ReactNode;
 }) {
     const [ctx, setCtx] = useState<MercureProps>(defaultProps);
-    const { setEvent, setMode, isLoggedIn, setSyncInProgress } = useAuth();
+    const { setEvent, setMode, isLoggedIn, setSyncInProgress, setHardwareFlash } = useAuth();
     const [notif, ctxHolder] = notification.useNotification();
 
     const eventSource = useRef<EventSource>();
@@ -91,6 +91,11 @@ export default function MercureProvider({
             }
 
             setEvent(event);
+        });
+
+        es.addEventListener('/flash', (x) => {
+            const data = JSON.parse(x.data);
+            setHardwareFlash(data.powered, data.brightness);
         });
 
         es.addEventListener('/mode', (x) => setMode(JSON.parse(x.data).mode));

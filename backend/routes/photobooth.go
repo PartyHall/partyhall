@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -17,6 +16,7 @@ import (
 	"github.com/partyhall/partyhall/mercure_client"
 	"github.com/partyhall/partyhall/mqtt"
 	"github.com/partyhall/partyhall/nexus"
+	routes_requests "github.com/partyhall/partyhall/routes/requests"
 	"github.com/partyhall/partyhall/state"
 )
 
@@ -154,12 +154,9 @@ func routeUploadPicture(c *gin.Context) {
 }
 
 func routeSetFlash(c *gin.Context) {
-	val := strings.ToLower(c.Param("value"))
-
-	if val != "on" && val != "off" {
-		api_errors.BAD_REQUEST.WithExtra(map[string]any{
-			"err": "The value should be either ON or OFF",
-		})
+	var req routes_requests.SetFlashRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		api_errors.RenderValidationErr(c, err)
 
 		return
 	}
@@ -167,19 +164,12 @@ func routeSetFlash(c *gin.Context) {
 	if mqtt.EasyMqtt == nil {
 		api_errors.BAD_REQUEST.WithExtra(map[string]any{
 			"err": "No MQTT server for some reason",
-		})
+		}).Render(c.Writer)
 
 		return
 	}
 
-	err := mqtt.EasyMqtt.Send("partyhall/flash", val)
-	if err != nil {
-		api_errors.MQTT_PUBLISH_FAILURE.WithExtra(map[string]any{
-			"err": err,
-		})
-
-		return
-	}
+	mqtt.SetFlash(req.Powered, req.Brightness)
 
 	c.Status(200)
 }

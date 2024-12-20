@@ -44,8 +44,9 @@ type HardwareHandler struct {
 
 type ModulesSettings struct {
 	Photobooth struct {
-		Countdown  int `yaml:"countdown" json:"countdown"`
-		Resolution struct {
+		Countdown       int `yaml:"countdown" json:"countdown"`
+		FlashBrightness int `yaml:"flash_brightness" json:"flash_brightness"`
+		Resolution      struct {
 			Width  int `yaml:"width" json:"width"`
 			Height int `yaml:"height" json:"height"`
 		} `yaml:"resolution" json:"resolution"`

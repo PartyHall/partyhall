@@ -99,6 +99,9 @@
         "title": "Photobooth",
         "amt_manually_taken": "Amount of pictures manually taken",
         "amt_unattended": "Amount of pictures unattended",
+        "flash": "Flash",
+        "toggle_on": "Turn ON",
+        "toggle_off": "Turn OFF",
         "remote_take_picture": "Remote take picture",
         "success_notification": {
             "title": "Remote picture",

@@ -33,7 +33,7 @@ export default function DefaultView() {
 
             setCountdown(0);
 
-            await api.photobooth.setFlash(true);
+            await api.photobooth.setFlash(true, modulesSettings.photobooth.flash_brightness);
             setFlash(true);
             await timeout(1000); // We wait for the webcam to pick-up the flash
         }
@@ -41,7 +41,7 @@ export default function DefaultView() {
         setFlash(false);
 
         if (shouldTakePicture === 'normal') {
-            await api.photobooth.setFlash(false);
+            await api.photobooth.setFlash(false, modulesSettings.photobooth.flash_brightness);
         }
 
         if (picture) {

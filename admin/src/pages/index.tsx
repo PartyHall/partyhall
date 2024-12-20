@@ -1,4 +1,5 @@
 import { Button, Card, Flex, Input, Popconfirm, Select } from 'antd';
+import { IconBug, IconCloudUp, IconLogout, IconPower } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useMercure, useMercureTopic } from '../hooks/mercure';
 
@@ -10,7 +11,6 @@ import SoundCard from '../components/sound_card';
 import { useAuth } from '../hooks/auth';
 import { useSettings } from '../hooks/settings';
 import { useTranslation } from 'react-i18next';
-import { IconBug, IconCloudUp, IconLogout, IconPower } from '@tabler/icons-react';
 
 export default function Index() {
     const { t } = useTranslation('', { keyPrefix: 'home' });
@@ -88,7 +88,7 @@ export default function Index() {
                                     {t('actions.force_sync')}
                                 </Button>
                                 <Popconfirm
-                                    title={t('confirm_cancel')}
+                                    title={t('shutdown')}
                                     onConfirm={() => api.settings.shutdown()}
                                     okText={tG('actions.ok')}
                                     cancelText={tG('actions.cancel')}

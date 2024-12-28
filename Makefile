@@ -17,10 +17,10 @@ init:
 	# @$(MAKE) fixtures
 
 run-app:
-	@cd backend && go run .
+	@cd backend && go run -tags sqlite_fts5 .
 
 hwhandler:
-	@cd backend && go run . hwhandler
+	@cd backend && go run -tags sqlite_fts5 . hwhandler
 
 compile-sdk:
 	@sudo rm -rf sdk/dist

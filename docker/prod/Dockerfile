@@ -29,6 +29,7 @@ RUN cd /app \
        GOOS=linux \
        GOARCH=amd64 \
        go build \
+        -tags "sqlite_fts5" \
         -ldflags="-X github.com/partyhall/partyhall/utils.CURRENT_VERSION=${PARTYHALL_VERSION} -X github.com/partyhall/partyhall/utils.CURRENT_COMMIT=${PARTYHALL_COMMIT}" \
         -o /partyhall-${PARTYHALL_VERSION}-linux-x86_64 \
     && chmod +x /partyhall-${PARTYHALL_VERSION}-linux-x86_64
@@ -39,6 +40,7 @@ RUN cd /app \
        GOOS=linux \
        GOARCH=arm64 \
        go build \
+        -tags "sqlite_fts5" \
         -ldflags="-X github.com/partyhall/partyhall/utils.CURRENT_VERSION=${PARTYHALL_VERSION} -X github.com/partyhall/partyhall/utils.CURRENT_COMMIT=${PARTYHALL_COMMIT}" \
         -o /partyhall-${PARTYHALL_VERSION}-linux-aarch64 \
     && chmod +x /partyhall-${PARTYHALL_VERSION}-linux-aarch64

@@ -52,12 +52,16 @@ func (s Songs) GetCollection(search string, amt, offset int) (*models.PaginatedR
 	resp := models.PaginatedResponse{}
 
 	row := DB.QueryRow(`
-		SELECT COUNT(*)
-		FROM song
+		SELECT COUNT(DISTINCT s.rowid)
+		FROM song s
+		JOIN songs_fts fts ON s.rowid = fts.rowid
 		WHERE LENGTH(?) = 0
-		   OR LOWER(title) LIKE '%' || LOWER(?) || '%'
-		   OR LOWER(artist) LIKE '%' || LOWER(?) || '%'
-	`, search, search, search)
+		OR s.rowid IN (
+            SELECT rowid
+            FROM songs_fts
+            WHERE songs_fts MATCH ? || '*'
+        )
+	`, search, search)
 	if row.Err() != nil {
 		return nil, row.Err()
 	}
@@ -71,24 +75,27 @@ func (s Songs) GetCollection(search string, amt, offset int) (*models.PaginatedR
 
 	rows, err := DB.Queryx(`
 		SELECT
-			nexus_id,
-			title,
-			artist,
-			format,
-			spotify_id,
-			duration,
-			hotspot,
-			has_cover,
-			has_vocals,
-			has_combined
-		FROM song
+			s.nexus_id,
+			s.title,
+			s.artist,
+			s.format,
+			s.spotify_id,
+			s.duration,
+			s.hotspot,
+			s.has_cover,
+			s.has_vocals,
+			s.has_combined
+		FROM song s
+		JOIN songs_fts fts ON s.rowid = fts.rowid
 		WHERE LENGTH(?) = 0
-		   OR LOWER(title) LIKE '%' || LOWER(?) || '%'
-		   OR LOWER(artist) LIKE '%' || LOWER(?) || '%'
-		ORDER BY artist ASC, title ASC
-		LIMIT ?
-		OFFSET ?
-	`, search, search, search, amt, offset)
+		OR s.rowid IN (
+            SELECT rowid
+            FROM songs_fts
+            WHERE songs_fts MATCH ? || '*'
+        )
+		ORDER BY s.artist ASC, s.title ASC
+		LIMIT ? OFFSET ?
+	`, search, search, amt, offset)
 
 	if err != nil {
 		return nil, err

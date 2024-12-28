@@ -47,7 +47,7 @@ export default function SongSearch() {
                 )}
                 {songs && songs.results.length > 0 && (
                     <>
-                        <Flex vertical style={{ overflowY: 'scroll' }} align="center">
+                        <Flex vertical style={{ overflowY: 'scroll', flex: 1 }} align="center">
                             <Flex vertical gap={8} align="stretch" style={{ width: 'min(100%, 500px)' }}>
                                 {songs.results.map((x) => (
                                     <SongCard key={x.nexus_id} song={x} type="SEARCH" />

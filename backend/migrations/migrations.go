@@ -153,6 +153,36 @@ var migrations = []Migration{
 		Down:        "",
 		MigrationTS: 1732467353, // 2024-11-24 @ 17:55
 	},
+	{
+		Name: "Full text search for songs",
+		Up: `
+			CREATE VIRTUAL TABLE songs_fts USING fts5(
+				title,
+				artist,
+				content='song',
+				content_rowid='rowid',
+				tokenize='unicode61 remove_diacritics 1'
+			);
+
+			INSERT INTO songs_fts(rowid, title, artist)
+			SELECT rowid, title, artist FROM song;
+
+			CREATE TRIGGER songs_ai AFTER INSERT ON song BEGIN
+				INSERT INTO songs_fts(rowid, title, artist) VALUES (new.rowid, new.title, new.artist);
+			END;
+
+			CREATE TRIGGER songs_ad AFTER DELETE ON song BEGIN
+				INSERT INTO songs_fts(songs_fts, rowid, title, artist) VALUES('delete', old.rowid, old.title, old.artist);
+			END;
+
+			CREATE TRIGGER songs_au AFTER UPDATE ON song BEGIN
+				INSERT INTO songs_fts(songs_fts, rowid, title, artist) VALUES('delete', old.rowid, old.title, old.artist);
+				INSERT INTO songs_fts(rowid, title, artist) VALUES (new.rowid, new.title, new.artist);
+			END;
+		`,
+		Down:        "",
+		MigrationTS: 1735405547, // 2024-12-28 @ 18:05
+	},
 }
 
 func reverse(s []Migration) {

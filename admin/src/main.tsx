@@ -108,6 +108,11 @@ const phTheme = {
         Modal: {
             contentBg: 'rgb(23,21,32)',
         },
+        Segmented: {
+            itemActiveBg: '#f92aa9',
+            itemSelectedBg: '#f92aa9',
+            itemSelectedColor: 'rgb(23,21,32)',
+        },
     },
     algorithm: [theme.darkAlgorithm, theme.compactAlgorithm],
 };

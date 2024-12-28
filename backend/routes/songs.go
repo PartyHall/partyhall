@@ -22,18 +22,21 @@ import (
 	routes_requests "github.com/partyhall/partyhall/routes/requests"
 	"github.com/partyhall/partyhall/services"
 	"github.com/partyhall/partyhall/state"
+	"github.com/partyhall/partyhall/utils"
 )
 
 func routeGetSongs(c *gin.Context) {
 	offset := 0
 
 	search := c.Query("search")
-	page := c.Query("page")
+	pageStr := c.Query("page")
+	formatsStr := c.Query("formats")
+	hasVocalsStr := c.Query("has_vocals")
 
-	var pageInt int = 1
+	var page int = 1
 	var err error
-	if len(page) > 0 {
-		pageInt, err = strconv.Atoi(page)
+	if len(pageStr) > 0 {
+		page, err = strconv.Atoi(pageStr)
 		if err != nil {
 			c.Render(http.StatusBadRequest, api_errors.INVALID_PARAMETERS.WithExtra(map[string]any{
 				"page": "The page should be an integer",
@@ -42,10 +45,38 @@ func routeGetSongs(c *gin.Context) {
 			return
 		}
 
-		offset = (pageInt - 1) * config.AMT_RESULTS_PER_PAGE
+		offset = (page - 1) * config.AMT_RESULTS_PER_PAGE
 	}
 
-	songs, err := dal.SONGS.GetCollection(search, config.AMT_RESULTS_PER_PAGE, offset)
+	formats := []string{}
+	if len(formatsStr) > 0 {
+		formats = strings.Split(strings.ToLower(formatsStr), ",")
+	}
+
+	hasVocals := utils.Thrilean{IsNull: true}
+	if len(hasVocalsStr) > 0 {
+		hasVocalsBool, err := strconv.ParseBool(hasVocalsStr)
+		if err != nil {
+			c.Render(http.StatusBadRequest, api_errors.INVALID_PARAMETERS.WithExtra(map[string]any{
+				"has_vocals": "Should be either left blank, true or false",
+			}))
+
+			return
+		}
+
+		hasVocals = utils.Thrilean{
+			Value:  hasVocalsBool,
+			IsNull: false,
+		}
+	}
+
+	songs, err := dal.SONGS.GetCollection(
+		search,
+		formats,
+		hasVocals,
+		config.AMT_RESULTS_PER_PAGE,
+		offset,
+	)
 	if err != nil {
 		c.Render(http.StatusInternalServerError, api_errors.DATABASE_ERROR.WithExtra(map[string]any{
 			"err": err.Error(),
@@ -54,7 +85,7 @@ func routeGetSongs(c *gin.Context) {
 		return
 	}
 
-	songs.Page = pageInt
+	songs.Page = page
 
 	c.JSON(http.StatusOK, songs)
 }

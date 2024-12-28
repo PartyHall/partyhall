@@ -1,6 +1,7 @@
+import { Button, Checkbox, Flex, Input, Pagination, Popover, Segmented, Typography } from 'antd';
 import { Collection, PhSong } from '@partyhall/sdk';
-import { Flex, Input, Pagination, Typography } from 'antd';
 
+import { IconFilter } from '@tabler/icons-react';
 import Loader from '../loader';
 import SongCard from './song_card';
 
@@ -8,6 +9,7 @@ import useAsyncEffect from 'use-async-effect';
 import { useAuth } from '../../hooks/auth';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { CheckboxChangeEvent } from 'antd/es/checkbox';
 
 export default function SongSearch() {
     const { t } = useTranslation('', { keyPrefix: 'karaoke' });
@@ -15,6 +17,8 @@ export default function SongSearch() {
     const { api } = useAuth();
 
     const [search, setSearch] = useState<string>('');
+    const [formats, setFormats] = useState<string[]>([]);
+    const [hasVocals, setHasVocals] = useState<boolean | null>(null);
 
     const [loading, setLoading] = useState<boolean>(true);
     const [page, setPage] = useState<number>(1);
@@ -22,15 +26,30 @@ export default function SongSearch() {
 
     useAsyncEffect(async () => {
         setLoading(true);
-        setSongs(await api.karaoke.getCollection(page, search));
+        setSongs(await api.karaoke.getCollection(page, search, formats, hasVocals));
         setLoading(false);
-    }, [page, search]);
+    }, [page, search, formats, hasVocals]);
+
+    const onCheckboxChange = (e: CheckboxChangeEvent) => {
+        if (!e.target.checked) {
+            setFormats(formats.filter((y) => y !== e.target.value));
+            setPage(1);
+
+            return;
+        }
+
+        if (formats.includes(e.target.value)) {
+            return;
+        }
+
+        setFormats([...formats, e.target.value]);
+        setPage(1);
+    };
 
     return (
         <>
-            <Flex align="center" justify="center">
+            <Flex align="center" justify="center" gap={8} style={{ width: 'min(100%, 500px)', margin: 'auto' }}>
                 <Input
-                    style={{ width: 'min(100%, 500px)' }}
                     placeholder={tG('actions.search') + '...'}
                     value={search}
                     onChange={(x) => {
@@ -38,6 +57,41 @@ export default function SongSearch() {
                         setPage(1);
                     }}
                 />
+                <Popover
+                    title={t('filter.title')}
+                    trigger="click"
+                    content={
+                        <Flex vertical gap={8}>
+                            <Typography.Text>{t('filter.has_vocals')}:</Typography.Text>
+                            <Segmented
+                                block
+                                options={[
+                                    { value: false, label: t('filter.no') },
+                                    { value: null, label: '-' },
+                                    { value: true, label: t('filter.yes') },
+                                ]}
+                                value={hasVocals}
+                                onChange={(x) => setHasVocals(x)}
+                            />
+                            <Typography.Text>{t('filter.format')}:</Typography.Text>
+                            <Checkbox value="video" checked={formats.includes('video')} onChange={onCheckboxChange}>
+                                {t('filter.video')}
+                            </Checkbox>
+                            <Checkbox value="cdg" checked={formats.includes('cdg')} onChange={onCheckboxChange}>
+                                {t('filter.cdg')}
+                            </Checkbox>
+                            <Checkbox
+                                value="transparent_video"
+                                checked={formats.includes('transparent_video')}
+                                onChange={onCheckboxChange}
+                            >
+                                {t('filter.transparent_video')}
+                            </Checkbox>
+                        </Flex>
+                    }
+                >
+                    <Button icon={<IconFilter size={20} />} />
+                </Popover>
             </Flex>
             <Loader loading={loading}>
                 {(!songs || songs.totalCount === 0) && (

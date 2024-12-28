@@ -6,6 +6,7 @@ import (
 
 	"github.com/partyhall/partyhall/log"
 	"github.com/partyhall/partyhall/models"
+	"github.com/partyhall/partyhall/utils"
 )
 
 var SONGS Songs
@@ -48,20 +49,51 @@ func (s Songs) GetAll() ([]models.Song, error) {
 	return songs, nil
 }
 
-func (s Songs) GetCollection(search string, amt, offset int) (*models.PaginatedResponse, error) {
+func (s Songs) GetCollection(
+	search string,
+	formats []string,
+	hasVocals utils.Thrilean,
+	amt,
+	offset int,
+) (*models.PaginatedResponse, error) {
+	args := []any{search, search}
+
+	formatClause := ""
+	if len(formats) > 0 {
+		formatPlaceholders := make([]string, len(formats))
+		for i := range formats {
+			formatPlaceholders[i] = "?"
+		}
+
+		formatClause = fmt.Sprintf("AND s.format IN (%s)", strings.Join(formatPlaceholders, ", "))
+
+		for _, format := range formats {
+			args = append(args, format)
+		}
+	}
+
+	vocalsClause := ""
+	if !hasVocals.IsNull {
+		vocalsClause = "AND s.has_vocals = ?"
+		args = append(args, hasVocals.Value)
+	}
+
 	resp := models.PaginatedResponse{}
 
-	row := DB.QueryRow(`
+	row := DB.QueryRow(fmt.Sprintf(`
 		SELECT COUNT(DISTINCT s.rowid)
 		FROM song s
 		JOIN songs_fts fts ON s.rowid = fts.rowid
-		WHERE LENGTH(?) = 0
-		OR s.rowid IN (
-            SELECT rowid
-            FROM songs_fts
-            WHERE songs_fts MATCH ? || '*'
-        )
-	`, search, search)
+		WHERE (
+			LENGTH(?) = 0
+			OR s.rowid IN (
+				SELECT rowid
+				FROM songs_fts
+				WHERE songs_fts MATCH ? || '*'
+			)
+		)
+		%s %s
+	`, formatClause, vocalsClause), args...)
 	if row.Err() != nil {
 		return nil, row.Err()
 	}
@@ -73,7 +105,9 @@ func (s Songs) GetCollection(search string, amt, offset int) (*models.PaginatedR
 
 	resp.CalculateMaxPage()
 
-	rows, err := DB.Queryx(`
+	args = append(args, amt, offset)
+
+	rows, err := DB.Queryx(fmt.Sprintf(`
 		SELECT
 			s.nexus_id,
 			s.title,
@@ -87,15 +121,18 @@ func (s Songs) GetCollection(search string, amt, offset int) (*models.PaginatedR
 			s.has_combined
 		FROM song s
 		JOIN songs_fts fts ON s.rowid = fts.rowid
-		WHERE LENGTH(?) = 0
-		OR s.rowid IN (
-            SELECT rowid
-            FROM songs_fts
-            WHERE songs_fts MATCH ? || '*'
-        )
+		WHERE (
+			LENGTH(?) = 0
+			OR s.rowid IN (
+				SELECT rowid
+				FROM songs_fts
+				WHERE songs_fts MATCH ? || '*'
+			)
+		)
+		%s %s
 		ORDER BY s.artist ASC, s.title ASC
 		LIMIT ? OFFSET ?
-	`, search, search, amt, offset)
+	`, formatClause, vocalsClause), args...)
 
 	if err != nil {
 		return nil, err

@@ -7,7 +7,12 @@ export default class Karaoke {
         this.sdk = sdk;
     }
 
-    public async getCollection(page: number | null, search?: string | null): Promise<Collection<PhSong>> {
+    public async getCollection(
+        page: number | null,
+        search?: string | null,
+        formats: string[] = [],
+        hasVocals: boolean | null = null
+    ): Promise<Collection<PhSong>> {
         if (!page) {
             page = 1;
         }
@@ -16,6 +21,14 @@ export default class Karaoke {
         query.set('page', `${page}`);
         if (search) {
             query.set('search', search);
+        }
+
+        if (formats.length > 0) {
+            query.set('formats', formats.join(','));
+        }
+
+        if (hasVocals !== null) {
+            query.set('has_vocals', hasVocals ? 'true' : 'false');
         }
 
         const resp = await this.sdk.get(`/api/webapp/songs?${query.toString()}`);

@@ -139,6 +139,16 @@
             "title": "Échec de l'ajout/suppression de la musique",
             "description": "Voir la console pour plus d'infos"
         },
-        "singer": "Chanteur"
+        "singer": "Chanteur",
+        "filter": {
+            "title": "Filtres",
+            "format": "Format",
+            "video": "Vidéo",
+            "cdg": "CDG",
+            "transparent_video": "Vidéo transparente",
+            "has_vocals": "Voix",
+            "yes": "Oui",
+            "no": "Non"
+        }
     }
 }

@@ -139,6 +139,16 @@
             "title": "Failed to add/remove song in the queue",
             "description": "See console for more infos"
         },
-        "singer": "Singer"
+        "singer": "Singer",
+        "filter": {
+            "title": "Filters",
+            "format": "Format",
+            "video": "Video",
+            "cdg": "CDG",
+            "transparent_video": "Transparent video",
+            "has_vocals": "Has vocals",
+            "yes": "Yes",
+            "no": "No"
+        }
     }
 }

@@ -21,7 +21,7 @@ func readLine(port serial.Port) (string, error) {
 		}
 
 		if n == 0 {
-			fmt.Println("No clue what to do here")
+			print("No clue what to do here")
 			return "", errors.New("byte = 0")
 		}
 
@@ -40,6 +40,7 @@ func readLine(port serial.Port) (string, error) {
 func debugMsg(msg string, args ...string) {
 	hx := hex.EncodeToString([]byte(msg))
 
+	print("Unknown message: %v\n\t=> 0x%v", msg, hx)
 	fmt.Printf("Unknown message: %v\n\t=> 0x%v", msg, hx)
 	if len(args) > 0 {
 		fmt.Print("\n\tArgs: ")

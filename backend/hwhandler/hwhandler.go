@@ -24,7 +24,15 @@ type Device struct {
 
 type HardwareHandler struct {
 	Devices []*Device
-	Mqtt    *mqtt.Client
+	Mqtt    mqtt.Client
+}
+
+func print(msg string, args ...any) {
+	fmt.Printf(
+		"%s - [MQTT] %v\n",
+		time.Now().Format(time.RFC3339),
+		fmt.Sprintf(msg, args...),
+	)
 }
 
 func Load() (*HardwareHandler, error) {
@@ -66,10 +74,13 @@ func (hh *HardwareHandler) Start() error {
 		SetAutoReconnect(true).
 		SetMaxReconnectInterval(10 * time.Second).
 		SetConnectionLostHandler(func(c mqtt.Client, err error) {
-			fmt.Printf("[MQTT] Connection lost: %s\n", err.Error())
+			print("Connection lost: %v", err)
 		}).
 		SetReconnectingHandler(func(c mqtt.Client, co *mqtt.ClientOptions) {
-			fmt.Println("[MQTT] Reconnecting...")
+			print("Reconnecting...")
+		}).
+		SetOnConnectHandler(func(c mqtt.Client) {
+			print("Connected")
 		})
 
 	client := mqtt.NewClient(opts)
@@ -77,7 +88,7 @@ func (hh *HardwareHandler) Start() error {
 		return token.Error()
 	}
 
-	hh.Mqtt = &client
+	hh.Mqtt = client
 
 	for _, d := range hh.Devices {
 		d.Handler = hh
@@ -90,7 +101,7 @@ func (hh *HardwareHandler) Start() error {
 
 		err = hh.ProcessSerialConn(d)
 		if err != nil {
-			fmt.Printf("Failed to init device %v: %v\n", d.PortName, err)
+			print("Failed to init device %v: %v", d.PortName, err)
 			os.Exit(1)
 		}
 	}
@@ -99,13 +110,13 @@ func (hh *HardwareHandler) Start() error {
 }
 
 func (d *Device) subscribeToMqtt(topic string, fn func(c mqtt.Client, m mqtt.Message)) error {
-	token := (*d.Handler.Mqtt).Subscribe(topic, 1, fn)
+	token := d.Handler.Mqtt.Subscribe(topic, 1, fn)
 	token.Wait()
 	if err := token.Error(); err != nil {
 		return fmt.Errorf("failed to subscribe to %s: %v", topic, err)
 	}
 
-	fmt.Println("Subscribed to " + topic)
+	print("Subscribed to %v", topic)
 
 	return nil
 }
@@ -139,7 +150,7 @@ func (hh *HardwareHandler) ProcessSerialConn(d *Device) error {
 			err := d.ProcessMessage()
 
 			if err != nil {
-				fmt.Println("Failed to read: ", err)
+				print("Failed to read: %v", err)
 				continue
 			}
 
@@ -154,7 +165,7 @@ func (d *Device) HandlePing() {
 		for {
 			time.Sleep(time.Second)
 			if d.LastPing.Add(15 * time.Second).Before(time.Now()) {
-				fmt.Println("No ping received for the last 15 seconds. Crashing !")
+				print("No ping received for the last 15 seconds. Crashing !")
 				os.Exit(1)
 			}
 		}
@@ -163,18 +174,17 @@ func (d *Device) HandlePing() {
 
 func (d *Device) OnFlash(c mqtt.Client, m mqtt.Message) {
 	data := strings.ToLower(string(m.Payload()))
-	fmt.Println("[MQTT] Flash " + data)
+	print("Flash %v", data)
 
 	val, err := strconv.Atoi(data)
 	if err != nil {
-		fmt.Println("Failed to send flash: bad payload => ", err)
-
+		print("Failed to send flash: bad payload => %v", err)
 		return
 	}
 
 	err = d.WriteMessage(fmt.Sprintf("FLASH %v", val))
 	if err != nil {
-		fmt.Println("\t=> Failed to send message to device: " + err.Error())
+		print("=> Failed to send message to device: %v", err)
 	}
 }
 
@@ -214,8 +224,8 @@ func (d *Device) ProcessMessage() error {
 		// Debounce
 		if d.LastButtonPress != val || diff > 1 {
 			topic := "partyhall/" + strings.ToLower(val)
-			fmt.Println("Button pressed: ", msg, " sending ", topic)
-			(*d.Handler.Mqtt).Publish(topic, 2, false, "press")
+			print("Button pressed: %v, sending %v", msg, topic)
+			d.Handler.Mqtt.Publish(topic, 2, false, "press")
 
 			d.LastButtonPress = val
 			d.LastButtonPressTime = currTime
@@ -227,9 +237,10 @@ func (d *Device) ProcessMessage() error {
 	data := strings.Split(msg, " ")
 	switch data[0] {
 	case "STARTING_UP":
-		fmt.Println("Arduino's starting up...")
+		print("Arduino's starting up...")
 	case "PING":
 		d.LastPing = time.Now()
+		print("Ping received")
 	default:
 		debugMsg(msg)
 	}

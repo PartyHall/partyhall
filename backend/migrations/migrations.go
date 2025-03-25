@@ -183,6 +183,28 @@ var migrations = []Migration{
 		Down:        "",
 		MigrationTS: 1735405547, // 2024-12-28 @ 18:05
 	},
+	{
+		Name: "Adding backdrops",
+		Up: `
+			CREATE TABLE backdrop_album (
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				nexus_id INTEGER NULL DEFAULT NULL,
+				name TEXT NOT NULL,
+				author TEXT NOT NULL,
+				version INTEGER NULL DEFAULT NULL
+			);
+
+			CREATE TABLE backdrop (
+				id INTEGER PRIMARY KEY AUTOINCREMENT,
+				album_id INTEGER NOT NULL REFERENCES backdrop_album(id),
+				nexus_id INTEGER NULL DEFAULT NULL,
+				title TEXT NOT NULL,
+				filename VARCHAR(255) NULL
+			);
+		`,
+		Down:        "",
+		MigrationTS: 1742846926, // 2025-03-24 @ 21:09
+	},
 }
 
 func reverse(s []Migration) {

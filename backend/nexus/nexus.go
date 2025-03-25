@@ -16,6 +16,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/dal"
 	"github.com/partyhall/partyhall/log"
@@ -240,6 +241,47 @@ func (ns *NexusSync) downloadSong(id int64) (string, error) {
 	}
 
 	return absPath, nil
+}
+
+func (ns *NexusSync) downloadFile(url, dest string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	outputFile, err := os.Create(dest)
+	if err != nil {
+		return fmt.Errorf("failed to create file: %w", err)
+	}
+	defer outputFile.Close()
+
+	req, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodGet,
+		url,
+		nil,
+	)
+	if err != nil {
+		return err
+	}
+
+	ns.setUserAgent(req)
+	req.Header.Set("X-HARDWARE-ID", ns.HardwareID)
+	req.Header.Set("X-API-TOKEN", ns.ApiKey)
+
+	resp, err := ns.http.Do(req)
+	if err != nil {
+		return err
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return errors.New("bad status: " + resp.Status)
+	}
+
+	_, err = io.Copy(outputFile, resp.Body)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (ns *NexusSync) syncPicture(event *models.Event, p models.Picture) error {
@@ -470,6 +512,162 @@ func (ns *NexusSync) syncSongs() error {
 	return nil
 }
 
+func (ns *NexusSync) syncBackdrops() error {
+	log.Info("Fetching backdrops from Nexus")
+
+	// Fetch all backdrop albums from the API
+	nexusBackdropAlbums, err := ns.fetchAllBackdropAlbums()
+	if err != nil {
+		return err
+	}
+
+	// Fetch all backdrop albums in the DB
+	applianceBackdropAlbums, err := dal.BACKDROPS.GetAllAlbums()
+	if err != nil {
+		return err
+	}
+
+	backdropsBasePath := filepath.Join(config.GET.RootPath, "backdrops")
+	if !fileExists(backdropsBasePath) {
+		err := os.MkdirAll(backdropsBasePath, os.ModePerm)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Removing those that are no longer on Nexus
+	log.Info("Removing backdrop albums no longer available")
+	for _, aBdAlbum := range applianceBackdropAlbums {
+		found := false
+
+		for _, apiBdAlbum := range nexusBackdropAlbums {
+			// We specifically check for the version
+			if apiBdAlbum.Id == aBdAlbum.NexusId && apiBdAlbum.Version == aBdAlbum.Version {
+				found = true
+				break
+			} else if apiBdAlbum.Id == aBdAlbum.NexusId {
+				log.Warn("Outdated backdrop album, redownloading it", aBdAlbum.Name)
+			}
+		}
+
+		if !found {
+			log.Info("Removing backdrop album", "name", aBdAlbum.Name, "author", aBdAlbum.Author)
+
+			albumBasePath := filepath.Join(backdropsBasePath, fmt.Sprintf("%v", aBdAlbum.Id))
+
+			deletedBackdropIds, err := dal.BACKDROPS.DeleteAlbum(aBdAlbum.Id)
+
+			// We delete before checking for error because
+			// those are always already removed from the database
+			// so we absolutely do not want to keep them as
+			// orphan files
+			if deletedBackdropIds != nil || len(deletedBackdropIds) == 0 {
+				for _, id := range deletedBackdropIds {
+					filePath := filepath.Join(albumBasePath, fmt.Sprintf("%v.png", id))
+
+					if fileExists(filePath) {
+						err = os.Remove(filePath)
+						if err != nil {
+							log.Error("Failed to remove backdrop image", "err", err)
+						}
+					}
+				}
+			}
+
+			if err != nil {
+				return err
+			}
+
+			if fileExists(albumBasePath) {
+				err = os.RemoveAll(albumBasePath)
+				if err != nil {
+					log.Error("Failed to remove backdrop album", "err", err)
+				}
+			}
+		}
+	}
+
+	albumsToDownload := []ApiBackdropAlbum{}
+
+	// Downloading those which are not available locally
+	log.Info("Downloading new backdrop albums")
+	for _, nBdAlbum := range nexusBackdropAlbums {
+		found := false
+
+		for _, aBdAlbum := range applianceBackdropAlbums {
+			// We specifically check for the version
+			if nBdAlbum.Id == aBdAlbum.NexusId && nBdAlbum.Version == aBdAlbum.Version {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			albumsToDownload = append(albumsToDownload, nBdAlbum)
+		}
+	}
+
+	for _, apiBdAlbum := range albumsToDownload {
+		log.Info("Downloading backdrop album", "id", apiBdAlbum.Id)
+
+		aBdAlbum := models.BackdropAlbum{
+			NexusId: apiBdAlbum.Id,
+			Name:    apiBdAlbum.Title,
+			Author:  apiBdAlbum.Author,
+			Version: apiBdAlbum.Version,
+		}
+
+		err := dal.BACKDROPS.CreateAlbum(&aBdAlbum)
+		if err != nil {
+			log.Error("Failed to create backdrop album in db", "album", aBdAlbum, "err", err)
+			continue
+		}
+
+		albumBasePath := filepath.Join(backdropsBasePath, fmt.Sprintf("%v", aBdAlbum.Id))
+		if !fileExists(albumBasePath) {
+			os.MkdirAll(albumBasePath, os.ModePerm)
+		}
+
+		backdrops, err := ns.fetchAllBackdrops(apiBdAlbum.Id)
+		if err != nil {
+			log.Error("Failed to fetch backdrops for album", "album", apiBdAlbum.Id, "err", err)
+			continue
+		}
+
+		for _, backdrop := range backdrops {
+			// Generate a UUID for the filename
+			filename := fmt.Sprintf("%v.png", uuid.New().String())
+
+			// Download the backdrop image and place it properly
+			outFile := filepath.Join(albumBasePath, filename)
+			err = ns.downloadFile(backdrop.Url, outFile)
+			if err != nil {
+				log.Error("Failed to download backdrop image", "nexusId", backdrop.Id, "nexusAlbum", aBdAlbum.NexusId, "err", err)
+				os.Remove(outFile)
+				continue
+			}
+
+			// Insert it in the database
+			aBackdrop := models.Backdrop{
+				AlbumId:  aBdAlbum.Id,
+				NexusId:  backdrop.Id,
+				Title:    backdrop.Title,
+				Filename: filename,
+			}
+
+			err = dal.BACKDROPS.Create(&aBackdrop)
+			if err != nil {
+				log.Error("Failed to insert backdrop in database", "err", err)
+			}
+		}
+	}
+
+	log.Info("Backdrop albums sync done")
+
+	os.Exit(1)
+	return nil
+}
+
 func (ns *NexusSync) syncSession(session *models.SongSession) error {
 	if session.SessionNexusId.Valid {
 		log.Warn("Trying to sync an already synced song session", "sessionId", session.Id)
@@ -551,8 +749,12 @@ func (ns *NexusSync) Sync(event *models.Event) error {
 
 	err := ns.syncSongs()
 	if err != nil {
-		mercure_client.CLIENT.PublishSyncInProgress()
 		log.Error("Failed to sync songs", "err", err)
+	}
+
+	err = ns.syncBackdrops()
+	if err != nil {
+		log.Error("Failed to sync backdrops", "err", err)
 	}
 
 	if state.STATE.CurrentEvent == nil {

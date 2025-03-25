@@ -51,7 +51,8 @@ create-events:
 	@curl -s -o /dev/null -L -X POST 'http://localhost:8080/api/webapp/settings/mode/photobooth' -H "Authorization: Bearer $(VITE_PARTYHALL_APPLIANCE_JWT)"
 
 gen-jwt:
-	@docker compose exec app go run . dev jwt
+	# @docker compose exec app go run . dev jwt
+	@cd backend && go run . dev jwt
 
 show-debug:
 	@echo "Displaying debug through MQTT"

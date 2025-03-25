@@ -40,3 +40,16 @@ type PhkSong struct {
 	Duration      int64  `json:"duration"`
 	Hotspot       *int64 `json:"hotspot"`
 }
+
+type ApiBackdropAlbum struct {
+	Id      int64  `json:"id"`
+	Title   string `json:"title"`
+	Author  string `json:"author"`
+	Version int64  `json:"version"`
+}
+
+type ApiBackdrop struct {
+	Id    int64  `json:"id"`
+	Title string `json:"title"`
+	Url   string `json:"url"`
+}

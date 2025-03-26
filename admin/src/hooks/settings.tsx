@@ -11,6 +11,7 @@ const DEFAULT_TOPICS = [
     '/karaoke_queue',
     '/sync-progress',
     '/flash',
+    '/backdrop-state',
 ];
 
 /** @TODO: Implement APIs */

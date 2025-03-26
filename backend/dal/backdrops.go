@@ -107,6 +107,39 @@ func (b Backdrops) GetAlbumCollection(
 	return &resp, nil
 }
 
+func (b Backdrops) GetAlbum(albumId int64) (models.BackdropAlbum, error) {
+	album := models.BackdropAlbum{}
+
+	row := DB.QueryRowx(`
+		SELECT
+			id,
+			nexus_id,
+			name,
+			author,
+			version
+		FROM backdrop_album
+		WHERE id = ?
+	`, albumId)
+
+	if row.Err() != nil {
+		return album, row.Err()
+	}
+
+	err := row.StructScan(&album)
+	if err != nil {
+		return album, err
+	}
+
+	backdrops, err := b.GetAll(albumId)
+	if err != nil {
+		return album, err
+	}
+
+	album.Backdrops = backdrops
+
+	return album, nil
+}
+
 func (b Backdrops) CreateAlbum(backdropAlbum *models.BackdropAlbum) error {
 	res, err := DB.NamedExec(`
 		INSERT INTO backdrop_album (
@@ -165,8 +198,8 @@ func (b Backdrops) GetAll(albumId int64) ([]models.Backdrop, error) {
 			title,
 			filename
 		FROM backdrop
-		WHERE id = ?
-		ORDER BY title ASC
+		WHERE album_id = ?
+		ORDER BY id ASC
 	`, albumId)
 
 	if err != nil {
@@ -257,6 +290,29 @@ func (ba Backdrops) GetCollection(
 	resp.Results = backdrops
 
 	return &resp, nil
+}
+
+func (b Backdrops) Get(albumId, backdropId int64) (models.Backdrop, error) {
+	backdrop := models.Backdrop{}
+
+	row := DB.QueryRowx(`
+		SELECT
+			id,
+			album_id,
+			nexus_id,
+			title,
+			filename
+		FROM backdrop
+		WHERE id = ? AND album_id = ?
+	`, backdropId, albumId)
+
+	if row.Err() != nil {
+		return backdrop, row.Err()
+	}
+
+	err := row.StructScan(&backdrop)
+
+	return backdrop, err
 }
 
 func (b Backdrops) Create(backdrop *models.Backdrop) error {

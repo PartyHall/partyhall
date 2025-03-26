@@ -664,7 +664,6 @@ func (ns *NexusSync) syncBackdrops() error {
 
 	log.Info("Backdrop albums sync done")
 
-	os.Exit(1)
 	return nil
 }
 

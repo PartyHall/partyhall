@@ -1,4 +1,5 @@
 export * from './auth';
+export * from './backdrop';
 export * from './collection';
 export * from './event';
 export * from './global';

@@ -221,13 +221,13 @@ func (e Events) Set(event *models.Event) error {
 	return err
 }
 
-func (e Events) InsertPicture(eventId int64, filename string, unattended bool) (string, error) {
+func (e Events) InsertPicture(eventId int64, filename string, unattended bool, alternateFilename string) (string, error) {
 	id := uuid.NewString()
 
 	_, err := DB.Exec(`
-		INSERT INTO picture(id, taken_at, unattended, filename, event_id, nexus_id)
-		VALUES (?, ?, ?, ?, ?, NULL);
-	`, id, time.Now(), unattended, filename, state.STATE.CurrentEvent.Id)
+		INSERT INTO picture(id, taken_at, unattended, filename, event_id, nexus_id, alternate_filename)
+		VALUES (?, ?, ?, ?, ?, NULL, ?);
+	`, id, time.Now(), unattended, filename, state.STATE.CurrentEvent.Id, alternateFilename)
 
 	if err != nil {
 		return "", err

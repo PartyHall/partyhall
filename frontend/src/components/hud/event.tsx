@@ -1,4 +1,4 @@
-import { DebugLeft } from './debug';
+import { DebugLeft, FORCE_DEBUG } from './debug';
 import { useAuth } from '../../hooks/auth';
 
 export default function EventRenderer() {
@@ -7,7 +7,7 @@ export default function EventRenderer() {
     return (
         <div>
             <div>{current_event?.name}</div>
-            {debug && <DebugLeft />}
+            {(debug || FORCE_DEBUG) && <DebugLeft />}
         </div>
     );
 }

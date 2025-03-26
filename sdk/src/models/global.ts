@@ -1,3 +1,4 @@
+import { BackdropAlbum } from './backdrop';
 import { PhEvent } from './event';
 import { PhSongSession } from './karaoke';
 
@@ -50,6 +51,9 @@ export class PhStatus {
     hardwareFlashPowered: boolean;
     guestsAllowed: boolean;
 
+    backdropAlbum: BackdropAlbum|null;
+    selectedBackdrop: number;
+
     karaoke: PhKaraoke;
     karaokeQueue: PhSongSession[];
 
@@ -64,6 +68,9 @@ export class PhStatus {
         this.modulesSettings = data['modules_settings'];
         this.hardwareFlashPowered = data['hardware_flash_powered'];
         this.guestsAllowed = data['guests_allowed'];
+
+        this.backdropAlbum = BackdropAlbum.fromJson(data['backdrop_album'])
+        this.selectedBackdrop = data['selected_backdrop'];
 
         this.karaoke = PhKaraoke.fromJson(data['karaoke']);
 

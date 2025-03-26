@@ -1,5 +1,5 @@
-import { PhEvent, PhKaraoke, PhSongSession, SDK } from '@partyhall/sdk';
-import { ReactNode, createContext, useCallback, useContext, useState } from 'react';
+import { BackdropAlbum, PhEvent, PhKaraoke, PhSongSession, SDK } from '@partyhall/sdk';
+import { ReactNode, createContext, useCallback, useContext, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import { DateTime } from 'luxon';
 import MercureProvider from './mercure';
@@ -40,6 +40,9 @@ type AuthProps = {
         brightness: number;
     };
 
+    backdropAlbum: BackdropAlbum | null;
+    selectedBackdrop: number;
+
     karaoke: PhKaraoke | null;
     karaokeQueue: PhSongSession[];
 
@@ -63,6 +66,7 @@ type AuthContextProps = AuthProps & {
     setTimecode: (timecode: number) => void;
     setKaraokeQueue: (queue: PhSongSession[]) => void;
     setSyncInProgress: (syncInProgress: boolean) => void;
+    setBackdrops: (backdropAlbum: BackdropAlbum|null, selectedBackdrop: number) => void;
 
     setDisplayName: (displayName: string) => void;
 };
@@ -81,6 +85,9 @@ const defaultProps: AuthProps = {
         brightness: 100,
     },
 
+    backdropAlbum: null,
+    selectedBackdrop: 0,
+
     karaoke: null,
     karaokeQueue: [],
 
@@ -92,21 +99,22 @@ const defaultProps: AuthProps = {
 
 const AuthContext = createContext<AuthContextProps>({
     ...defaultProps,
-    login: async () => {},
-    loginGuest: async () => {},
-    setToken: () => {},
+    login: async () => { },
+    loginGuest: async () => { },
+    setToken: () => { },
     isLoggedIn: () => false,
-    logout: () => {},
+    logout: () => { },
 
-    setMode: () => {},
-    setEvent: () => {},
-    setHardwareFlash: () => {},
-    setKaraoke: () => {},
-    setTimecode: () => {},
-    setKaraokeQueue: () => {},
-    setSyncInProgress: () => {},
+    setMode: () => { },
+    setEvent: () => { },
+    setHardwareFlash: () => { },
+    setKaraoke: () => { },
+    setTimecode: () => { },
+    setKaraokeQueue: () => { },
+    setSyncInProgress: () => { },
+    setBackdrops: () => { },
 
-    setDisplayName: () => {},
+    setDisplayName: () => { },
 });
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
@@ -195,6 +203,12 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             hardwareFlash: { powered, brightness },
         }));
 
+    const setBackdrops = (backdropAlbum: BackdropAlbum|null, selectedBackdrop: number) => setContext(oldCtx => ({
+        ...oldCtx,
+        backdropAlbum,
+        selectedBackdrop,
+    }));
+
     useAsyncEffect(async () => {
         context.api.setOnExpired(() => setToken());
 
@@ -208,6 +222,8 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             ...oldCtx,
             mode: status.currentMode,
             event: status.currentEvent,
+            backdropAlbum: status.backdropAlbum,
+            selectedBackdrop: status.selectedBackdrop,
             karaoke: status.karaoke,
             karaokeQueue: status.karaokeQueue,
             syncInProgress: status.syncInProgress,
@@ -231,6 +247,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
                 setKaraokeQueue,
                 setDisplayName,
                 setSyncInProgress,
+                setBackdrops,
             }}
         >
             <MercureProvider

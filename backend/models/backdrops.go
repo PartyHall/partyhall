@@ -8,6 +8,8 @@ type BackdropAlbum struct {
 	Name    string `db:"name" json:"name"`
 	Author  string `db:"author" json:"author"`
 	Version int64  `db:"version" json:"version"`
+
+	Backdrops []Backdrop `db:"-" json:"backdrops"`
 }
 
 func (ba BackdropAlbum) String() string {

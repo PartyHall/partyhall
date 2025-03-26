@@ -205,6 +205,14 @@ var migrations = []Migration{
 		Down:        "",
 		MigrationTS: 1742846926, // 2025-03-24 @ 21:09
 	},
+	{
+		Name: "Adding alternate file",
+		Up: `
+			ALTER TABLE picture ADD COLUMN alternate_filename TEXT NULL DEFAULT NULL;
+		`,
+		Down:        "",
+		MigrationTS: 1742849939, // 2025-03-24 @ 21:58
+	},
 }
 
 func reverse(s []Migration) {

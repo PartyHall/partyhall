@@ -18,6 +18,7 @@
         "author": "Auteur",
         "date": "Date",
         "location": "Lieux",
+        "none": "Aucun",
         "actions": {
             "noun": "Actions",
             "new": "Nouveau",
@@ -30,7 +31,9 @@
             "create": "Créer",
             "search": "Rechercher",
             "resume": "Lire",
-            "pause": "Pause"
+            "pause": "Pause",
+            "next": "Suivant",
+            "previous": "Précédent"
         }
     },
     "login": {
@@ -99,6 +102,8 @@
         "title": "Photomaton",
         "amt_manually_taken": "Photos prises manuellement",
         "amt_unattended": "Photos prises automatiquement",
+        "backdrops": "Passes-tête",
+        "selected_backdrop": "Passe-tête sélectionné",
         "flash": "Flash",
         "toggle_on": "Allumer",
         "toggle_off": "Éteindre",

@@ -1,4 +1,4 @@
-import { PhEvent, SDK } from '@partyhall/sdk';
+import { BackdropAlbum, PhEvent, SDK } from '@partyhall/sdk';
 import { ReactNode, createContext, useContext, useEffect, useRef, useState } from 'react';
 import { DateTime } from 'luxon';
 import { notification } from 'antd';
@@ -41,7 +41,7 @@ export default function MercureProvider({
     children: ReactNode;
 }) {
     const [ctx, setCtx] = useState<MercureProps>(defaultProps);
-    const { setEvent, setMode, isLoggedIn, setSyncInProgress, setHardwareFlash } = useAuth();
+    const { setEvent, setMode, isLoggedIn, setSyncInProgress, setHardwareFlash, setBackdrops } = useAuth();
     const [notif, ctxHolder] = notification.useNotification();
 
     const eventSource = useRef<EventSource>();
@@ -109,6 +109,15 @@ export default function MercureProvider({
                 message: 'Incoming transmission',
                 description: data['msg'],
             });
+        });
+
+        es.addEventListener('/backdrop-state', x => {
+            const data = JSON.parse(x.data);
+
+            setBackdrops(
+                BackdropAlbum.fromJson(data['backdrop_album']),
+                data['selected_backdrop'],
+            );
         });
 
         listenersRef.current.forEach((l) => {

@@ -23,6 +23,9 @@ type State struct {
 	ModulesSettings      config.ModulesSettings `json:"modules_settings"`
 	HardwareFlashPowered bool                   `json:"hardware_flash_powered"`
 
+	BackdropAlbum    *models.BackdropAlbum `json:"backdrop_album"`
+	SelectedBackdrop int                   `json:"selected_backdrop"`
+
 	Karaoke      KaraokeState          `json:"karaoke"`
 	KaraokeQueue []*models.SongSession `json:"karaoke_queue"`
 

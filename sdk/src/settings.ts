@@ -50,4 +50,15 @@ export default class Settings {
 
         return AudioDevices.fromJson(data);
     }
+
+    public async setBackdrops(albumId: number | null, selectedBackdrop: number | null) {
+        const resp = await this.sdk.post(`/api/webapp/settings/backdrops`, {
+            backdrop_album: albumId,
+            selected_backdrop: selectedBackdrop,
+        });
+
+        const data = await resp.json();
+
+        return data;
+    }
 }

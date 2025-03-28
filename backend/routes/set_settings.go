@@ -250,6 +250,47 @@ func routeSetAudioDeviceVolume(c *gin.Context) {
 	c.JSON(200, devices)
 }
 
+func routeSetBackdrops(c *gin.Context) {
+	var req routes_requests.SetBackdropRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		api_errors.RenderValidationErr(c, err)
+
+		return
+	}
+
+	if req.BackdropAlbum != nil {
+		alb, err := dal.BACKDROPS.GetAlbum(*req.BackdropAlbum)
+		if err != nil {
+			api_errors.RenderValidationErr(c, err)
+
+			return
+		}
+
+		state.STATE.SelectedBackdrop = req.SelectedBackdrop
+
+		if state.STATE.BackdropAlbum == nil || alb.Id != state.STATE.BackdropAlbum.Id {
+			state.STATE.SelectedBackdrop = 0
+		}
+
+		state.STATE.BackdropAlbum = &alb
+	} else {
+		state.STATE.BackdropAlbum = nil
+		state.STATE.SelectedBackdrop = 0
+	}
+
+	data := map[string]any{
+		"backdrop_album":    state.STATE.BackdropAlbum,
+		"selected_backdrop": state.STATE.SelectedBackdrop,
+	}
+
+	mercure_client.CLIENT.PublishEvent(
+		"/backdrop-state",
+		data,
+	)
+
+	c.JSON(200, data)
+}
+
 func routeForceSync(c *gin.Context) {
 	go func() {
 		err := nexus.INSTANCE.Sync(state.STATE.CurrentEvent)

@@ -12,10 +12,15 @@ export default class Photobooth {
         await this.sdk.post('/api/webapp/picture');
     }
 
-    public async uploadPicture(b64Image: string, unattended: boolean) {
+    public async uploadPicture(b64Image: string, unattended: boolean, b64AlternateImage: string | null) {
         const form = new FormData();
 
         form.append('picture', b64ImageToBlob(b64Image));
+
+        if (b64AlternateImage) {
+            form.append('alternate_picture', b64ImageToBlob(b64AlternateImage));
+        }
+
         form.append('unattended', unattended ? 'true' : 'false');
 
         const resp = await fetch('/api/appliance/picture', {

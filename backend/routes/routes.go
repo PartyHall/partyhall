@@ -45,6 +45,13 @@ func RegisterWebappRoutes(router *gin.RouterGroup) {
 	karaoke.POST("/set-volume/:type/:volume", routeSetVolume)
 	//#endregion
 
+	//#region Backdrop related stuff
+	backdrops := r.Group("/backdrops")
+	backdrops.GET("", routeGetBackdropAlbums)
+	backdrops.GET(":albumId", routeGetBackdropAlbum)
+	backdrops.GET(":albumId/image/:backdropId/download", routeDownloadBackdrop)
+	//#endregion
+
 	r.GET("/logs", middlewares.Authorized(models.ROLE_ADMIN), routeGetLogs)
 
 	r.POST("/picture", middlewares.HasEventLoaded(), middlewares.Authorized(), routeTakePicture)
@@ -57,6 +64,7 @@ func RegisterWebappRoutes(router *gin.RouterGroup) {
 	settings.POST("/event/:event", middlewares.Authorized("ADMIN"), routeSetEvent)
 	settings.POST("/debug", routeSetDebug)
 	settings.POST("/force-sync", middlewares.Authorized("ADMIN"), routeForceSync)
+	settings.POST("/backdrops", routeSetBackdrops)
 
 	settings.GET("/audio-devices", routeGetAudioDevices)
 	settings.POST("/audio-devices", middlewares.Authorized("ADMIN"), routeSetAudioDevices)

@@ -61,7 +61,8 @@ func routeUploadPicture(c *gin.Context) {
 	unattended, err := strconv.ParseBool(unattendedStr)
 	if err != nil {
 		c.Render(http.StatusBadRequest, api_errors.BAD_REQUEST.WithExtra(map[string]any{
-			"err": err.Error(),
+			"err":  err.Error(),
+			"line": "unattended parse bool",
 		}))
 
 		return
@@ -70,7 +71,23 @@ func routeUploadPicture(c *gin.Context) {
 	file, err := c.FormFile("picture")
 	if err != nil {
 		c.Render(http.StatusBadRequest, api_errors.BAD_REQUEST.WithExtra(map[string]any{
-			"err": err.Error(),
+			"err":  err.Error(),
+			"line": "get form picture file",
+		}))
+
+		return
+	}
+
+	/**
+	 * Allow to keep a backup of the original image
+	 * i.e. Using a backdrop, using special fx, etc..
+	 **/
+	alternateFile, err := c.FormFile("alternate_picture")
+	hasAlternateFile := err != http.ErrMissingFile
+	if err != nil && hasAlternateFile {
+		c.Render(http.StatusBadRequest, api_errors.BAD_REQUEST.WithExtra(map[string]any{
+			"err":  err.Error(),
+			"line": "get form alternate picture file",
 		}))
 
 		return
@@ -118,14 +135,39 @@ func routeUploadPicture(c *gin.Context) {
 		return
 	}
 
+	alternateImage := ""
+	if hasAlternateFile {
+		alternateImage = fmt.Sprintf("%v_alternate.jpg", time.Now().Format("20060102-150405"))
+		alternateImagePath := filepath.Join(basePath, alternateImage)
+
+		// Copy the image
+		err = c.SaveUploadedFile(alternateFile, alternateImagePath)
+		if err != nil {
+			api_errors.ApiErrorWithData(
+				c,
+				http.StatusInternalServerError,
+				"generic-issue",
+				"Failed to save alternate image",
+				"The alternate image was not saved",
+				map[string]any{
+					"err": err,
+				},
+			)
+
+			return
+		}
+	}
+
 	_, err = dal.EVENTS.InsertPicture(
 		state.STATE.CurrentEvent.Id,
 		imageName,
 		unattended,
+		alternateImage,
 	)
 	if err != nil {
 		c.Render(http.StatusInternalServerError, api_errors.DATABASE_ERROR.WithExtra(map[string]any{
-			"err": err.Error(),
+			"err":  err.Error(),
+			"line": "insert picture in DB",
 		}))
 
 		return

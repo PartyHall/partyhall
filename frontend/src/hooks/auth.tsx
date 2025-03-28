@@ -1,4 +1,4 @@
-import { ModuleSettings, PhEvent, PhKaraoke, PhSongSession, SDK } from '@partyhall/sdk';
+import { BackdropAlbum, ModuleSettings, PhEvent, PhKaraoke, PhSongSession, SDK } from '@partyhall/sdk';
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
 import { DateTime } from 'luxon';
@@ -19,6 +19,9 @@ type AuthProps = {
             [key: string]: string[];
         };
     } | null;
+
+    backdropAlbum: BackdropAlbum | null;
+    selectedBackdrop: number;
 
     karaoke: PhKaraoke;
     karaokeQueue: PhSongSession[];
@@ -44,6 +47,9 @@ const defaultProps: AuthProps = {
     currentMode: 'photobooth',
     currentEvent: null,
     debug: null,
+
+    backdropAlbum: null,
+    selectedBackdrop: 0,
 
     karaoke: new PhKaraoke({
         current: null,
@@ -86,6 +92,7 @@ export default function AuthProvider({ children, token }: { children: ReactNode;
             '/snackbar',
             '/karaoke',
             '/karaoke-queue',
+            '/backdrop-state',
         ].forEach((x) => url.searchParams.append('topic', x));
 
         const es = new EventSource(url, { withCredentials: true });
@@ -183,6 +190,16 @@ export default function AuthProvider({ children, token }: { children: ReactNode;
             }));
         });
 
+        es.addEventListener('/backdrop-state', (x) => {
+            const data = JSON.parse(x.data);
+
+            setCtx((oldCtx) => ({
+                ...oldCtx,
+                backdropAlbum: BackdropAlbum.fromJson(data['backdrop_album']),
+                selectedBackdrop: data['selected_backdrop'],
+            }));
+        });
+
         return es;
     };
 
@@ -210,6 +227,8 @@ export default function AuthProvider({ children, token }: { children: ReactNode;
             loaded: true,
             currentEvent: status.currentEvent,
             currentMode: status.currentMode,
+            backdropAlbum: status.backdropAlbum,
+            selectedBackdrop: status.selectedBackdrop,
             karaoke: status.karaoke,
             karaokeQueue: status.karaokeQueue,
             modulesSettings: status.modulesSettings,

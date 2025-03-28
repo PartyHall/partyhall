@@ -8,6 +8,7 @@ import { PhTokenUser } from './models/user';
 import Photobooth from './photobooth';
 import { SdkError } from './models/sdk_error';
 import Settings from './settings';
+import Backdrop from './backdrops';
 
 export type StoreToken = (token: string | null, refreshToken: string | null) => void;
 export type OnExpired = () => void;
@@ -23,6 +24,7 @@ export class SDK {
     public tokenUser: PhTokenUser | null = null;
 
     public auth: Auth;
+    public backdrops: Backdrop;
     public global: Global;
     public events: Events;
     public photobooth: Photobooth;
@@ -35,6 +37,7 @@ export class SDK {
         this.refreshToken = refreshToken;
 
         this.auth = new Auth(this);
+        this.backdrops = new Backdrop(this);
         this.global = new Global(this);
         this.events = new Events(this);
         this.photobooth = new Photobooth(this);

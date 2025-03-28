@@ -111,13 +111,10 @@ export default function MercureProvider({
             });
         });
 
-        es.addEventListener('/backdrop-state', x => {
+        es.addEventListener('/backdrop-state', (x) => {
             const data = JSON.parse(x.data);
 
-            setBackdrops(
-                BackdropAlbum.fromJson(data['backdrop_album']),
-                data['selected_backdrop'],
-            );
+            setBackdrops(BackdropAlbum.fromJson(data['backdrop_album']), data['selected_backdrop']);
         });
 
         listenersRef.current.forEach((l) => {

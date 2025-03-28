@@ -20,7 +20,7 @@ type AuthProps = {
         };
     } | null;
 
-    backdropAlbum: BackdropAlbum|null;
+    backdropAlbum: BackdropAlbum | null;
     selectedBackdrop: number;
 
     karaoke: PhKaraoke;
@@ -190,10 +190,10 @@ export default function AuthProvider({ children, token }: { children: ReactNode;
             }));
         });
 
-        es.addEventListener('/backdrop-state', x => {
+        es.addEventListener('/backdrop-state', (x) => {
             const data = JSON.parse(x.data);
 
-            setCtx(oldCtx => ({
+            setCtx((oldCtx) => ({
                 ...oldCtx,
                 backdropAlbum: BackdropAlbum.fromJson(data['backdrop_album']),
                 selectedBackdrop: data['selected_backdrop'],

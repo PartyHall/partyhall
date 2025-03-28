@@ -21,7 +21,7 @@ export class Backdrop {
         return new Backdrop(data);
     }
 
-    static fromArray(data: Record<string, any>[]|null) {
+    static fromArray(data: Record<string, any>[] | null) {
         if (!data) {
             return [];
         }
@@ -58,4 +58,4 @@ export class BackdropAlbum {
     static fromArray(data: Record<string, any>[]) {
         return data.map((x) => new BackdropAlbum(x));
     }
-};
+}

@@ -51,7 +51,7 @@ export class PhStatus {
     hardwareFlashPowered: boolean;
     guestsAllowed: boolean;
 
-    backdropAlbum: BackdropAlbum|null;
+    backdropAlbum: BackdropAlbum | null;
     selectedBackdrop: number;
 
     karaoke: PhKaraoke;
@@ -69,7 +69,7 @@ export class PhStatus {
         this.hardwareFlashPowered = data['hardware_flash_powered'];
         this.guestsAllowed = data['guests_allowed'];
 
-        this.backdropAlbum = BackdropAlbum.fromJson(data['backdrop_album'])
+        this.backdropAlbum = BackdropAlbum.fromJson(data['backdrop_album']);
         this.selectedBackdrop = data['selected_backdrop'];
 
         this.karaoke = PhKaraoke.fromJson(data['karaoke']);

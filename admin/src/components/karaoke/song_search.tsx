@@ -1,6 +1,6 @@
 import { Button, Checkbox, Flex, Input, Pagination, Popover, Segmented, Typography } from 'antd';
 import { Collection, PhSong } from '@partyhall/sdk';
-
+import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import { IconFilter } from '@tabler/icons-react';
 import Loader from '../loader';
 import SongCard from './song_card';
@@ -9,7 +9,6 @@ import useAsyncEffect from 'use-async-effect';
 import { useAuth } from '../../hooks/auth';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CheckboxChangeEvent } from 'antd/es/checkbox';
 
 export default function SongSearch() {
     const { t } = useTranslation('', { keyPrefix: 'karaoke' });

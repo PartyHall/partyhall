@@ -21,18 +21,19 @@ export function DebugLeft() {
             {D('Current mode', <span>{currentMode}</span>)}
             {D('Event ID', `${currentEvent?.id}`)}
             {D('Backdrop Album', !backdropAlbum ? '' : `${backdropAlbum.name} (${backdropAlbum.id})`)}
-            {debug && D(
-                'IPs',
-                <ul>
-                    {Object.entries(debug.ip_addresses)
-                        .filter(([, x]) => x.length > 0)
-                        .map(([key, inter]) => (
-                            <li key={key}>
-                                {key}: {inter.join(', ')}
-                            </li>
-                        ))}
-                </ul>
-            )}
+            {debug &&
+                D(
+                    'IPs',
+                    <ul>
+                        {Object.entries(debug.ip_addresses)
+                            .filter(([, x]) => x.length > 0)
+                            .map(([key, inter]) => (
+                                <li key={key}>
+                                    {key}: {inter.join(', ')}
+                                </li>
+                            ))}
+                    </ul>
+                )}
         </div>
     );
 }

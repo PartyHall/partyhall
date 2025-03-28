@@ -1,12 +1,12 @@
 import { Button, Flex, Slider, Tooltip, Typography, notification } from 'antd';
 import { IconSun, IconSunOff } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
+import BackdropSelector from '../components/backdrop_selector';
 import KeyVal from '../components/keyval';
 import Title from 'antd/es/typography/Title';
 import { useAuth } from '../hooks/auth';
 import { useSettings } from '../hooks/settings';
 import { useTranslation } from 'react-i18next';
-import BackdropSelector from '../components/backdrop_selector';
 
 export default function Photobooth() {
     const { t: tGen } = useTranslation('', { keyPrefix: 'generic' });
@@ -54,30 +54,40 @@ export default function Photobooth() {
                     <span className="red">{t('backdrops')}: </span>
                     <BackdropSelector />
 
-                    {
-                        backdropAlbum && <Flex vertical gap={4} align='center'>
-                            <Typography.Text>{t('selected_backdrop')}: {selectedBackdrop === 0 ? tGen('none') : backdropAlbum.backdrops[selectedBackdrop-1].title}</Typography.Text>
-                            {
-                                selectedBackdrop > 0
-                                && <img
-                                    src={`/api/webapp/backdrops/${backdropAlbum.id}/image/${backdropAlbum.backdrops[selectedBackdrop-1].id}/download`}
-                                    alt={`Current backdrop: ${backdropAlbum.backdrops[selectedBackdrop-1].title}`}
+                    {backdropAlbum && (
+                        <Flex vertical gap={4} align="center">
+                            <Typography.Text>
+                                {t('selected_backdrop')}:{' '}
+                                {selectedBackdrop === 0
+                                    ? tGen('none')
+                                    : backdropAlbum.backdrops[selectedBackdrop - 1].title}
+                            </Typography.Text>
+                            {selectedBackdrop > 0 && (
+                                <img
+                                    src={`/api/webapp/backdrops/${backdropAlbum.id}/image/${backdropAlbum.backdrops[selectedBackdrop - 1].id}/download`}
+                                    alt={`Current backdrop: ${backdropAlbum.backdrops[selectedBackdrop - 1].title}`}
                                     style={{
                                         maxWidth: '150px',
                                         maxHeight: '150px',
                                     }}
                                 />
-                            }
-                            <Flex gap={4} style={{width: '100%'}}>
-                                <Button style={{width: '100%'}} onClick={() => changeSelectedBackdrop(selectedBackdrop - 1)}>
+                            )}
+                            <Flex gap={4} style={{ width: '100%' }}>
+                                <Button
+                                    style={{ width: '100%' }}
+                                    onClick={() => changeSelectedBackdrop(selectedBackdrop - 1)}
+                                >
                                     {tGen('actions.previous')}
                                 </Button>
-                                <Button style={{width: '100%'}} onClick={() => changeSelectedBackdrop(selectedBackdrop + 1)}>
+                                <Button
+                                    style={{ width: '100%' }}
+                                    onClick={() => changeSelectedBackdrop(selectedBackdrop + 1)}
+                                >
                                     {tGen('actions.next')}
                                 </Button>
                             </Flex>
                         </Flex>
-                    }
+                    )}
 
                     <span className="red">{t('flash')}: </span>
                     <Flex gap={8} align="center">

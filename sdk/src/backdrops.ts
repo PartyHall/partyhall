@@ -8,10 +8,7 @@ export default class Backdrop {
         this.sdk = sdk;
     }
 
-    public async getAlbumCollection(
-        page: number | null,
-        search?: string | null,
-    ): Promise<Collection<BackdropAlbum>> {
+    public async getAlbumCollection(page: number | null, search?: string | null): Promise<Collection<BackdropAlbum>> {
         if (!page) {
             page = 1;
         }

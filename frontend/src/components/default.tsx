@@ -4,11 +4,10 @@ import Disabled from './hud/disabled';
 import Flash from './hud/flash';
 import Hud from './hud';
 import KaraokeHud from './hud/karaoke';
-import { timeout } from '../utils';
-import { useAuth } from '../hooks/auth';
-
 import Webcam from 'react-webcam';
+import { timeout } from '../utils';
 import useAsyncEffect from 'use-async-effect';
+import { useAuth } from '../hooks/auth';
 
 const loadImage = (src: string): Promise<HTMLImageElement> => {
     return new Promise((resolve, reject) => {
@@ -17,18 +16,11 @@ const loadImage = (src: string): Promise<HTMLImageElement> => {
         img.onerror = reject;
         img.src = src;
     });
-}
+};
 
 export default function DefaultView() {
-    const {
-        currentMode,
-        modulesSettings,
-        shouldTakePicture,
-        setPictureTaken,
-        api,
-        backdropAlbum,
-        selectedBackdrop,
-     } = useAuth();
+    const { currentMode, modulesSettings, shouldTakePicture, setPictureTaken, api, backdropAlbum, selectedBackdrop } =
+        useAuth();
 
     const [countdown, setCountdown] = useState<number>(0);
     const [flash, setFlash] = useState<boolean>(false);
@@ -79,11 +71,13 @@ export default function DefaultView() {
                     // First we draw the webcam image
                     const webcamImage = await loadImage(picture);
                     ctx.drawImage(webcamImage, 0, 0, canvas.width, canvas.height);
-    
+
                     // Then we draw the backdrop
-                    const backdropImage = await loadImage(`/api/webapp/backdrops/${backdropAlbum.id}/image/${backdropAlbum.backdrops[selectedBackdrop-1].id}/download`);
+                    const backdropImage = await loadImage(
+                        `/api/webapp/backdrops/${backdropAlbum.id}/image/${backdropAlbum.backdrops[selectedBackdrop - 1].id}/download`
+                    );
                     ctx.drawImage(backdropImage, 0, 0, canvas.width, canvas.height);
-                
+
                     editedPicture = canvas.toDataURL('image/jpg', 100);
                 }
             }
@@ -91,7 +85,7 @@ export default function DefaultView() {
             const resp = await api.photobooth.uploadPicture(
                 editedPicture ?? picture,
                 shouldTakePicture === 'unattended',
-                editedPicture ? picture : null,
+                editedPicture ? picture : null
             );
 
             if (shouldTakePicture === 'normal') {
@@ -109,7 +103,7 @@ export default function DefaultView() {
             <canvas
                 ref={canvasRef}
                 // style={{ position: 'absolute', zIndex: 1000, top: 0, left: 0, width: '320px', height: '180px', background: 'red'}}
-                style={{display: 'none'}}
+                style={{ display: 'none' }}
             />
 
             <Hud />
@@ -127,14 +121,13 @@ export default function DefaultView() {
                     forceScreenshotSourceSize
                 />
 
-            {
-                backdropAlbum && selectedBackdrop > 0
-                && <img
-                    id="webcam--backdrop"
-                    src={`/api/webapp/backdrops/${backdropAlbum.id}/image/${backdropAlbum.backdrops[selectedBackdrop-1].id}/download`}
-                    alt="Backdrop"
-                />
-            }
+                {backdropAlbum && selectedBackdrop > 0 && (
+                    <img
+                        id="webcam--backdrop"
+                        src={`/api/webapp/backdrops/${backdropAlbum.id}/image/${backdropAlbum.backdrops[selectedBackdrop - 1].id}/download`}
+                        alt="Backdrop"
+                    />
+                )}
             </div>
 
             <KaraokeHud />

@@ -49,6 +49,12 @@ func (h RoutesState) Register(router *gin.RouterGroup) {
 		h.setBackdrops,
 	)
 
+	// Non authenticated
+	router.GET(
+		"flash",
+		h.getFlash,
+	)
+
 	// Onboarded & Authenticated
 	router.PUT(
 		"flash",
@@ -201,6 +207,12 @@ func (h RoutesState) setBackdrops(c *gin.Context) {
 	c.JSON(200, map[string]any{
 		"backdrop_album":    state.STATE.BackdropAlbum,
 		"selected_backdrop": state.STATE.SelectedBackdrop,
+	})
+}
+
+func (h RoutesState) getFlash(c *gin.Context) {
+	c.JSON(200, map[string]any{
+		"powered": state.STATE.HardwareFlashPowered,
 	})
 }
 

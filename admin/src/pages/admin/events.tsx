@@ -17,7 +17,7 @@ type Status = {
     resp: Collection<PhEvent> | null;
 };
 
-export default function Events() {
+export default function EventsPage() {
     const { t } = useTranslation('', { keyPrefix: 'generic' });
     const { t: tE } = useTranslation('', { keyPrefix: 'events' });
     const { setPageName } = useSettings();

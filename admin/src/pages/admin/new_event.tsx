@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSettings } from '../../hooks/settings';
 import { useTranslation } from 'react-i18next';
 
-export default function NewEvent() {
+export default function NewEventPage() {
     const { t } = useTranslation('', { keyPrefix: 'events.editor' });
     const { setPageName } = useSettings();
     const navigate = useNavigate();

@@ -1,14 +1,10 @@
 import { Button, Card, Flex, Input, Popconfirm, Select } from 'antd';
 import { IconBug, IconCloudUp, IconLogout, IconPower } from '@tabler/icons-react';
-import { useEffect, useState } from 'react';
-import { useMercure, useMercureTopic } from '../hooks/mercure';
-
-import { AudioDevices } from '@partyhall/sdk/dist/models/audio';
 import EventCard from '../components/event_card';
 import KeyVal from '../components/keyval';
-import SoundCard from '../components/sound_card';
-
 import { useAuth } from '../hooks/auth';
+import { useEffect } from 'react';
+import { useMercure } from '../hooks/mercure';
 import { useSettings } from '../hooks/settings';
 import { useTranslation } from 'react-i18next';
 
@@ -16,19 +12,15 @@ export default function Index() {
     const { t } = useTranslation('', { keyPrefix: 'home' });
     const { t: tG } = useTranslation('', { keyPrefix: 'generic' });
 
-    const [audioDevices, setAudioDevices] = useState<AudioDevices | null>(null);
-
     const { version, commit, setPageName } = useSettings();
     const { api, displayName, setDisplayName, mode, event, logout, syncInProgress } = useAuth();
 
     const { time } = useMercure();
 
-    useMercureTopic('/audio-devices', (x: any) => setAudioDevices(AudioDevices.fromJson(x)));
-
     const changeMode = async (val: string) => await api.state.setMode(val);
 
     useEffect(() => {
-        setPageName('home', ['/audio-devices']);
+        setPageName('home', []);
     }, []);
 
     /** @TODO: Make responsive for < 400 => width=95% or something like that */
@@ -43,8 +35,6 @@ export default function Index() {
             </Card>
 
             {event && <EventCard event={event} />}
-
-            <SoundCard mercureDevices={audioDevices} />
 
             <Card title={t('actions.title')}>
                 <Flex vertical gap={'.25em'}>

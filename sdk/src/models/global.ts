@@ -11,7 +11,7 @@ export type WebcamResolution = {
 
 export type UnattendedSettings = {
     enabled: boolean;
-
+    interval: number;
 }
 
 export class PhUserSettingsPhotobooth {

@@ -39,7 +39,7 @@ export function DebugLeft() {
 }
 
 export function DebugRight() {
-    const { userSettings, version, commit, debug } = useAuth();
+    const { user_settings, version, commit, debug } = useAuth();
 
     if (!debug && !FORCE_DEBUG) {
         return <></>;
@@ -47,7 +47,7 @@ export function DebugRight() {
 
     return (
         <div className="debug">
-            {D('HWID', userSettings?.hardwareId)}
+            {D('HWID', user_settings?.hardwareId)}
             {D('Version', version)}
             {D('Commit', commit)}
         </div>

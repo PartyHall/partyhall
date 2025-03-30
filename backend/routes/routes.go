@@ -78,7 +78,7 @@ import (
 	/settings non-onboarded | admin
 		GET /ap
 		PUT /ap
-		GET /webcam
+		GET /webcam // Not sure if useful
 		PUT /webcam
 		POST /flash                  => Set the default brightness value
 		GET /photobooth

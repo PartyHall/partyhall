@@ -13,6 +13,7 @@ const DEFAULT_TOPICS = [
     '/sync-progress',
     '/flash',
     '/backdrop-state',
+    '/user-settings',
 ];
 
 /** @TODO: Implement APIs */
@@ -20,7 +21,7 @@ type SettingsProps = {
     loaded: boolean;
     pageName: string;
 
-    userSettings: PhUserSettings|null;
+    user_settings: PhUserSettings | null;
 
     guests_allowed: boolean;
     enabled_modules: string[];
@@ -36,6 +37,7 @@ type SettingsProps = {
 type SettingsContextProps = SettingsProps & {
     fetch: () => Promise<void>;
     setPageName: (name: string, mercureTopics?: string[]) => void;
+    setUserSettings: (user_settings: PhUserSettings) => void;
 };
 
 const defaultProps: SettingsProps = {
@@ -43,7 +45,7 @@ const defaultProps: SettingsProps = {
     pageName: 'home',
     topics: DEFAULT_TOPICS,
 
-    userSettings: null,
+    user_settings: null,
 
     guests_allowed: false,
     enabled_modules: [],
@@ -56,8 +58,9 @@ const defaultProps: SettingsProps = {
 
 const SettingsContext = createContext<SettingsContextProps>({
     ...defaultProps,
-    fetch: async () => {},
-    setPageName: () => {},
+    fetch: async () => { },
+    setPageName: () => { },
+    setUserSettings: () => { },
 });
 
 export default function SettingsProvider({ children }: { children: ReactNode }) {
@@ -89,10 +92,12 @@ export default function SettingsProvider({ children }: { children: ReactNode }) 
         }));
     };
 
+    const setUserSettings = (user_settings: PhUserSettings) => setCtx(oldCtx => ({...oldCtx, user_settings}));
+
     useAsyncEffect(fetchStatus, []);
 
     return (
-        <SettingsContext.Provider value={{ ...ctx, fetch: fetchStatus, setPageName }}>
+        <SettingsContext.Provider value={{ ...ctx, fetch: fetchStatus, setPageName, setUserSettings }}>
             <Loader loading={!ctx.loaded}>{children}</Loader>
         </SettingsContext.Provider>
     );

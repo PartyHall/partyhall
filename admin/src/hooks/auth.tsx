@@ -116,12 +116,12 @@ const AuthContext = createContext<AuthContextProps>({
 });
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
-    const { topics, hwflash_powered, userSettings } = useSettings();
+    const { topics, hwflash_powered, user_settings } = useSettings();
     const [context, setContext] = useState<AuthProps>({
         ...defaultProps,
         hardwareFlash: {
             powered: hwflash_powered,
-            brightness: userSettings?.photobooth.flashBrightness || 100,
+            brightness: user_settings?.photobooth.flashBrightness || 100,
         },
     });
 

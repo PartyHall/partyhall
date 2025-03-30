@@ -1,8 +1,9 @@
-import { BackdropAlbum, PhEvent, SDK } from '@partyhall/sdk';
+import { BackdropAlbum, PhEvent, PhUserSettings, SDK } from '@partyhall/sdk';
 import { ReactNode, createContext, useContext, useEffect, useRef, useState } from 'react';
 import { DateTime } from 'luxon';
 import { notification } from 'antd';
 import { useAuth } from './auth';
+import { useSettings } from './settings';
 
 type EventListenerCallback = (data: any) => void;
 type EventListenerFn = (eventType: string, callback: EventListenerCallback) => void;
@@ -25,8 +26,8 @@ const defaultProps: MercureProps = {
 
 const MercureContext = createContext<MercureContextProps>({
     ...defaultProps,
-    addMercureListener: () => {},
-    removeMercureListener: () => {},
+    addMercureListener: () => { },
+    removeMercureListener: () => { },
 });
 
 export default function MercureProvider({
@@ -41,6 +42,7 @@ export default function MercureProvider({
     children: ReactNode;
 }) {
     const [ctx, setCtx] = useState<MercureProps>(defaultProps);
+    const { setUserSettings } = useSettings();
     const { setEvent, setMode, isLoggedIn, setSyncInProgress, setHardwareFlash, setBackdrops } = useAuth();
     const [notif, ctxHolder] = notification.useNotification();
 
@@ -115,6 +117,11 @@ export default function MercureProvider({
             const data = JSON.parse(x.data);
 
             setBackdrops(BackdropAlbum.fromJson(data['backdrop_album']), data['selected_backdrop']);
+        });
+
+        es.addEventListener('/user-settings', x => {
+            console.log("User settings from mercure!")
+            setUserSettings(new PhUserSettings(JSON.parse(x.data)));
         });
 
         listenersRef.current.forEach((l) => {

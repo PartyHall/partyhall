@@ -19,7 +19,7 @@ function RenderText({ type, msg }: { type: string; msg: string }) {
     return <span style={style}>{msg}</span>;
 }
 
-export default function Logs() {
+export default function LogsPage() {
     const { setPageName } = useSettings();
     const { api } = useAuth();
     const [logs, setLogs] = useState<Log[]>([]);

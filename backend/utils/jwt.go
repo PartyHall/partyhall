@@ -26,6 +26,7 @@ func GetClaimsFromUser(dbUser *models.User, isGuest bool) models.JwtCustomClaims
 		"/karaoke",
 		"/karaoke-queue",
 		"/karaoke-timecode",
+		"/user-settings",
 	}
 
 	// Admin can subscribe to everything

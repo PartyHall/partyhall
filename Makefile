@@ -43,12 +43,12 @@ create-users:
 
 create-events:
 	@echo "Creating an event"
-	@curl -s -o /dev/null -L -X POST 'http://localhost:8080/api/webapp/events' -H "Authorization: Bearer $(VITE_PARTYHALL_APPLIANCE_JWT)" -H 'Content-Type: application/json' --data-raw '{"name":"New event","author":"Some author","date":"2024-01-10T11:58:00Z","location":"Some place"}'
+	@curl -s -o /dev/null -L -X POST 'http://localhost:8080/api/events' -H "Authorization: Bearer $(VITE_PARTYHALL_APPLIANCE_JWT)" -H 'Content-Type: application/json' --data-raw '{"name":"New event","author":"Some author","date":"2024-01-10T11:58:00Z","location":"Some place"}'
 	@echo "Creating a second event"
-	@curl -s -o /dev/null -L -X POST 'http://localhost:8080/api/webapp/events' -H "Authorization: Bearer $(VITE_PARTYHALL_APPLIANCE_JWT)" -H 'Content-Type: application/json' --data-raw '{"name":"Second event","author":"Another author","date":"2024-01-11T21:12:00Z","location":"At the beach"}'
+	@curl -s -o /dev/null -L -X POST 'http://localhost:8080/api/events' -H "Authorization: Bearer $(VITE_PARTYHALL_APPLIANCE_JWT)" -H 'Content-Type: application/json' --data-raw '{"name":"Second event","author":"Another author","date":"2024-01-11T21:12:00Z","location":"At the beach"}'
 
 	@echo "Setting mode"
-	@curl -s -o /dev/null -L -X POST 'http://localhost:8080/api/webapp/settings/mode/photobooth' -H "Authorization: Bearer $(VITE_PARTYHALL_APPLIANCE_JWT)"
+	@curl -s -o /dev/null -L 'http://localhost:5174/api/state/mode' -X PUT -H 'Content-Type: application/json' -H "Authorization: Bearer $(VITE_PARTYHALL_APPLIANCE_JWT)" --data-raw '{"mode":"photobooth"}'
 
 gen-jwt:
 	# @docker compose exec app go run . dev jwt

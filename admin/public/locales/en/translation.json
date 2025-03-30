@@ -10,7 +10,8 @@
             "events": "Events",
             "photobooth": "Photobooth",
             "karaoke": "Karaoke",
-            "logs": "Logs"
+            "logs": "Logs",
+            "settings": "Settings"
         },
         "event_title": "{{eventName}} by {{eventAuthor}}",
         "id": "ID",
@@ -19,6 +20,7 @@
         "date": "Date",
         "location": "Location",
         "none": "None",
+        "enabled": "Enabled",
         "actions": {
             "noun": "Actions",
             "new": "New",
@@ -34,6 +36,10 @@
             "pause": "Pause",
             "next": "Next",
             "previous": "Previous"
+        },
+        "hw_flash": {
+            "turn_on": "Turn on the flash",
+            "turn_off": "Turn off the flash"
         },
         "error": {
             "title": "Error",
@@ -58,13 +64,6 @@
         "about_you": {
             "title": "About you",
             "your_display_name": "Your displayed name"
-        },
-        "sound_settings": {
-            "title": "Sound settings",
-            "input_device": "Microphone",
-            "output_device": "Speakers",
-            "volume_input": "Microphones volume",
-            "volume_output": "Speakers volume"
         },
         "actions": {
             "title": "Actions",
@@ -158,6 +157,39 @@
             "has_vocals": "Has vocals",
             "yes": "Yes",
             "no": "No"
+        }
+    },
+    "settings": {
+        "title": "Appliance settings",
+        "photobooth": {
+            "title": "Photobooth"
+        },
+        "audio": {
+            "title": "Sound settings",
+            "input_device": "Microphone",
+            "output_device": "Speakers",
+            "volume_input": "Microphones volume",
+            "volume_output": "Speakers volume"
+        },
+        "webcam": {
+            "title": "Webcam",
+            "resolution": {
+                "subtitle": "Resolution",
+                "desc": "Please fill out the resolution of your webcam",
+                "width": "Width",
+                "height": "Height"
+            }
+        },
+        "unattended": {
+            "title": "Timelapse",
+            "desc": "The appliance can take pictures automatically every few minutes and compile a timelapse at the end of the party. The interval should be in seconds.",
+            "interval": "Interval"
+        },
+        "hwflash": {
+            "title": "Hardware flash",
+            "desc": "The appliance can have a physical flash (like a ledstrip). If that's the case you can now configure the brightness of it here.",
+            "desc2": "Go in front of the camera to ensure that the displayed image is not too bright while setting it up.",
+            "brightness": "Brightness"
         }
     }
 }

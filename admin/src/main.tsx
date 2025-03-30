@@ -7,14 +7,17 @@ import { RouterProvider, createHashRouter } from 'react-router-dom';
 import AuthProvider from './hooks/auth';
 import AuthedLayout from './pages/layout/authed_layout';
 import Backend from 'i18next-http-backend';
-import EditEvent from './pages/admin/edit_event';
-import Events from './pages/admin/events';
+import EditEventPage from './pages/admin/edit_event';
+import EventsPage from './pages/admin/events';
 import Index from './pages';
 import Karaoke from './pages/karaoke';
 import LoginPage from './pages/login';
-import Logs from './pages/admin/logs';
-import NewEvent from './pages/admin/new_event';
+import LogsPage from './pages/admin/logs';
+import NewEventPage from './pages/admin/new_event';
 import Photobooth from './pages/photobooth';
+import SettingsAudioPage from './pages/admin/settings/audio';
+import SettingsPage from './pages/admin/settings';
+import SettingsPhotoboothPage from './pages/admin/settings/photobooth';
 import SettingsProvider from './hooks/settings';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -52,7 +55,24 @@ const router = createHashRouter([
             },
             {
                 path: '/logs',
-                element: <Logs />,
+                element: <LogsPage />,
+            },
+            {
+                path: '/settings',
+                children: [
+                    {
+                        path: '',
+                        element: <SettingsPage />,
+                    },
+                    {
+                        path: 'photobooth',
+                        element: <SettingsPhotoboothPage />
+                    },
+                    {
+                        path: 'audio',
+                        element: <SettingsAudioPage />
+                    },
+                ]
             },
             {
                 path: '/karaoke',
@@ -64,15 +84,20 @@ const router = createHashRouter([
             },
             {
                 path: '/events',
-                element: <Events />,
-            },
-            {
-                path: '/events/new',
-                element: <NewEvent />,
-            },
-            {
-                path: '/events/:id',
-                element: <EditEvent />,
+                children: [
+                    {
+                        path: '',
+                        element: <EventsPage />,
+                    },
+                    {
+                        path: 'new',
+                        element: <NewEventPage />,
+                    },
+                    {
+                        path: ':id',
+                        element: <EditEventPage />,
+                    },
+                ],
             },
         ],
     },

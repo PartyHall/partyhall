@@ -26,7 +26,7 @@ type AuthProps = {
     karaoke: PhKaraoke;
     karaokeQueue: PhSongSession[];
 
-    userSettings: PhUserSettings | null;
+    user_settings: PhUserSettings | null;
 
     version: string | null;
     commit: string | null;
@@ -61,7 +61,7 @@ const defaultProps: AuthProps = {
 
     karaokeQueue: [],
 
-    userSettings: null,
+    user_settings: null,
 
     version: null,
     commit: null,
@@ -229,7 +229,7 @@ export default function AuthProvider({ children, token }: { children: ReactNode;
             selectedBackdrop: state.selectedBackdrop,
             karaoke: state.karaoke,
             karaokeQueue: state.karaokeQueue,
-            userSettings: state.userSettings,
+            user_settings: state.userSettings,
             version: state.version,
             commit: state.commit,
         }));

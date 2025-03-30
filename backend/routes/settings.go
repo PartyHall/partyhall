@@ -13,25 +13,40 @@ import (
 	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/mqtt"
 	"github.com/partyhall/partyhall/pipewire"
+	"github.com/partyhall/partyhall/state"
 )
 
 type RoutesSettings struct{}
 
 func (h RoutesSettings) Register(router *gin.RouterGroup) {
 	// Non-onboarded | Admin
-	router.POST(
+	router.PUT(
 		"flash",
 		middlewares.NotOnboardedOrRole("ADMIN"),
 		h.setFlash,
 	)
 
 	// Non-onboarded | Admin
+	router.PUT(
+		"webcam",
+		middlewares.NotOnboardedOrRole("ADMIN"),
+		h.setWebcam,
+	)
+
+	// Non-onboarded | Admin
+	router.PUT(
+		"unattended",
+		middlewares.NotOnboardedOrRole("ADMIN"),
+		h.setUnattended,
+	)
+
+	//region Maybe to rework
+	// Non-onboarded | Admin
 	router.GET(
 		"audio-devices",
 		middlewares.NotOnboardedOrRole("ADMIN"),
 		h.getAudioDevices,
 	)
-
 	// Non-onboarded | Admin
 	router.POST(
 		"audio-devices",
@@ -45,6 +60,29 @@ func (h RoutesSettings) Register(router *gin.RouterGroup) {
 		middlewares.NotOnboardedOrRole("ADMIN"),
 		h.setAudioDeviceVolume,
 	)
+	//endregion
+}
+
+func (h RoutesSettings) setWebcam(c *gin.Context) {
+	var req struct {
+		Width  int `json:"width"`
+		Height int `json:"height"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		api_errors.RenderValidationErr(c, err)
+
+		return
+	}
+
+	config.GET.UserSettings.Photobooth.Resolution.Width = req.Width
+	config.GET.UserSettings.Photobooth.Resolution.Height = req.Height
+	config.GET.UserSettings.Save()
+
+	state.STATE.UserSettings = config.GET.UserSettings
+	mercure_client.CLIENT.SendUserSettings()
+
+	c.JSON(200, config.GET.UserSettings.Photobooth.Resolution)
 }
 
 func (h RoutesSettings) setFlash(c *gin.Context) {
@@ -52,6 +90,7 @@ func (h RoutesSettings) setFlash(c *gin.Context) {
 		Powered    bool `json:"powered"`
 		Brightness int  `json:"brightness"`
 	}
+
 	if err := c.ShouldBindJSON(&req); err != nil {
 		api_errors.RenderValidationErr(c, err)
 
@@ -69,9 +108,53 @@ func (h RoutesSettings) setFlash(c *gin.Context) {
 	if req.Brightness != config.GET.UserSettings.Photobooth.FlashBrightness {
 		config.GET.UserSettings.Photobooth.FlashBrightness = req.Brightness
 		config.GET.UserSettings.Save()
+
+		state.STATE.UserSettings = config.GET.UserSettings
+		mercure_client.CLIENT.SendUserSettings()
 	}
 
 	mqtt.SetFlash(req.Powered, req.Brightness)
+
+	c.Status(200)
+}
+
+func (h RoutesSettings) setUnattended(c *gin.Context) {
+	var req struct {
+		Enabled  bool `json:"enabled"`
+		Interval int  `json:"interval"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		api_errors.RenderValidationErr(c, err)
+
+		return
+	}
+
+	if mqtt.EasyMqtt == nil {
+		api_errors.BAD_REQUEST.WithExtra(map[string]any{
+			"err": "No MQTT server for some reason",
+		}).Render(c.Writer)
+
+		return
+	}
+
+	dirty := false
+	if req.Enabled != config.GET.UserSettings.Photobooth.Unattended.Enabled {
+		dirty = true
+		config.GET.UserSettings.Photobooth.Unattended.Enabled = req.Enabled
+	}
+
+	if req.Interval != config.GET.UserSettings.Photobooth.Unattended.Interval {
+		dirty = true
+		config.GET.UserSettings.Photobooth.Unattended.Interval = req.Interval
+	}
+
+	if dirty {
+		config.GET.UserSettings.Save()
+
+		state.STATE.UserSettings = config.GET.UserSettings
+		mercure_client.CLIENT.SendUserSettings()
+	}
 
 	c.Status(200)
 }

@@ -19,10 +19,17 @@ const loadImage = (src: string): Promise<HTMLImageElement> => {
 };
 
 export default function DefaultView() {
-    const { currentMode, userSettings, shouldTakePicture, setPictureTaken, api, backdropAlbum, selectedBackdrop } =
-        useAuth();
+    const {
+        currentMode,
+        user_settings,
+        shouldTakePicture,
+        setPictureTaken,
+        api,
+        backdropAlbum,
+        selectedBackdrop
+    } = useAuth();
 
-    const photobooth = userSettings?.photobooth;
+    const photobooth = user_settings?.photobooth;
 
     const [countdown, setCountdown] = useState<number>(0);
     const [flash, setFlash] = useState<boolean>(false);

@@ -4,15 +4,40 @@ import { PhSongSession } from './karaoke';
 
 export type VolumeType = 'instrumental' | 'vocals';
 
-export interface ModuleSettings {
-    photobooth: {
-        countdown: number;
-        flash_brightness: number;
-        resolution: {
-            width: number;
-            height: number;
-        };
-    };
+export type WebcamResolution = {
+    width: number;
+    height: number;
+};
+
+export type UnattendedSettings = {
+    enabled: boolean;
+
+}
+
+export class PhUserSettingsPhotobooth {
+    countdown: number;
+    flashBrightness: number;
+    resolution: WebcamResolution;
+    unattended: UnattendedSettings;
+
+    constructor(data: Record<string, any>) {
+        this.countdown = data['countdown'];
+        this.flashBrightness = data['flash_brightness'];
+        this.resolution = data['resolution'];
+        this.unattended = data['unattended'];
+    }
+}
+
+export class PhUserSettings {
+    onboarded: boolean;
+    hardwareId: string;
+    photobooth: PhUserSettingsPhotobooth;
+
+    constructor(data: Record<string, any>) {
+        this.onboarded = data['onboarded'];
+        this.hardwareId = data['hardware_id'];
+        this.photobooth = new PhUserSettingsPhotobooth(data['photobooth']);
+    }
 }
 
 export class PhKaraoke {
@@ -44,10 +69,10 @@ export class PhKaraoke {
     }
 }
 
-export class PhStatus {
+export class PhState {
     currentMode: string;
     currentEvent: PhEvent | null;
-    modulesSettings: ModuleSettings;
+    userSettings: PhUserSettings;
     hardwareFlashPowered: boolean;
     guestsAllowed: boolean;
 
@@ -58,14 +83,13 @@ export class PhStatus {
     karaokeQueue: PhSongSession[];
 
     syncInProgress: boolean;
-    hardwareId: string | null;
     version: string | null;
     commit: string | null;
 
     constructor(data: Record<string, any>) {
         this.currentMode = data['current_mode'];
         this.currentEvent = PhEvent.fromJson(data['current_event']);
-        this.modulesSettings = data['modules_settings'];
+        this.userSettings = new PhUserSettings(data['user_settings']);
         this.hardwareFlashPowered = data['hardware_flash_powered'];
         this.guestsAllowed = data['guests_allowed'];
 
@@ -80,12 +104,11 @@ export class PhStatus {
         }
 
         this.syncInProgress = data['sync_in_progress'];
-        this.hardwareId = data['hwid'];
         this.version = data['version'];
         this.commit = data['commit'];
     }
 
     static fromJson(data: Record<string, any>) {
-        return new PhStatus(data);
+        return new PhState(data);
     }
 }

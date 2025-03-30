@@ -4,9 +4,10 @@ import (
 	"fmt"
 
 	"github.com/partyhall/partyhall/log"
+	"github.com/partyhall/partyhall/models"
 )
 
-func parseLink(obj PipeWireObject) (*Link, error) {
+func parseLink(obj models.PipeWireObject) (*models.PwLink, error) {
 	props := obj.Info.Props
 	if props == nil {
 		return nil, fmt.Errorf("no properties found for link")
@@ -19,14 +20,14 @@ func parseLink(obj PipeWireObject) (*Link, error) {
 		return nil, fmt.Errorf("link node IDs not found")
 	}
 
-	return &Link{
+	return &models.PwLink{
 		ID:           obj.ID,
 		InputNodeId:  int(inputNodeID),
 		OutputNodeId: int(outputNodeID),
 	}, nil
 }
 
-func parsePort(obj PipeWireObject) (*Port, error) {
+func parsePort(obj models.PipeWireObject) (*models.PwPort, error) {
 	props := obj.Info.Props
 	if props == nil {
 		return nil, fmt.Errorf("no properties found for port")
@@ -45,7 +46,7 @@ func parsePort(obj PipeWireObject) (*Port, error) {
 	direction, _ := props["port.direction"].(string)
 	channel, _ := props["audio.channel"].(string)
 
-	return &Port{
+	return &models.PwPort{
 		ID:          obj.ID,
 		Name:        name,
 		Description: description,
@@ -54,8 +55,8 @@ func parsePort(obj PipeWireObject) (*Port, error) {
 	}, nil
 }
 
-func findPortsByNode(objects []PipeWireObject) map[int][]Port {
-	portsByNode := make(map[int][]Port)
+func findPortsByNode(objects []models.PipeWireObject) map[int][]models.PwPort {
+	portsByNode := make(map[int][]models.PwPort)
 
 	for _, obj := range objects {
 		props := obj.Info.Props
@@ -81,8 +82,8 @@ func findPortsByNode(objects []PipeWireObject) map[int][]Port {
 	return portsByNode
 }
 
-func findLinks(objects []PipeWireObject, karaokeSinkDevice, karaokeSourceDevice int) []Link {
-	var links []Link
+func findLinks(objects []models.PipeWireObject, karaokeSinkDevice, karaokeSourceDevice int) []models.PwLink {
+	var links []models.PwLink
 
 	for _, obj := range objects {
 		props := obj.Info.Props
@@ -115,7 +116,7 @@ func findLinks(objects []PipeWireObject, karaokeSinkDevice, karaokeSourceDevice 
 /**
  * Returns the default sink and the default source
  **/
-func findDefaults(objects []PipeWireObject) (string, string) {
+func findDefaults(objects []models.PipeWireObject) (string, string) {
 	var sink string
 	var source string
 

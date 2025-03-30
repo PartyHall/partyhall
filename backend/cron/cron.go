@@ -19,11 +19,8 @@ func RunCron() {
 
 		for {
 			time.Sleep(1 * time.Second)
-			err := mercure_client.CLIENT.PublishEvent("/time", map[string]any{
-				"time": time.Now().Format(time.RFC3339),
-			})
 
-			if err != nil {
+			if err := mercure_client.CLIENT.SendTime(); err != nil {
 				log.Warn("Failed to publish time to mercure hub", "err", err)
 			}
 		}
@@ -31,7 +28,7 @@ func RunCron() {
 
 	// Taking unattended pictures every X minutes
 	go func() {
-		module := config.GET.ModulesSettings.Photobooth.Unattended
+		module := config.GET.UserSettings.Photobooth.Unattended
 
 		if !module.Enabled {
 			return
@@ -43,11 +40,7 @@ func RunCron() {
 				continue
 			}
 
-			err := mercure_client.CLIENT.PublishEvent("/take-picture", map[string]any{
-				"unattended": true,
-			})
-
-			if err != nil {
+			if err := mercure_client.CLIENT.SendTakePicture(true); err != nil {
 				log.Warn("Failed to publish take unattended to mercure hub", "err", err)
 			}
 		}

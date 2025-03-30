@@ -25,7 +25,7 @@ export default function Index() {
 
     useMercureTopic('/audio-devices', (x: any) => setAudioDevices(AudioDevices.fromJson(x)));
 
-    const changeMode = async (val: string) => await api.settings.setMode(val);
+    const changeMode = async (val: string) => await api.state.setMode(val);
 
     useEffect(() => {
         setPageName('home', ['/audio-devices']);
@@ -74,7 +74,7 @@ export default function Index() {
                             <>
                                 <Button
                                     color="danger"
-                                    onClick={() => api.settings.showDebug()}
+                                    onClick={() => api.state.showDebug()}
                                     icon={<IconBug size={20} />}
                                 >
                                     {t('actions.show_debug')}
@@ -82,14 +82,14 @@ export default function Index() {
                                 <Button
                                     color="danger"
                                     disabled={syncInProgress}
-                                    onClick={() => api.global.forceSync()}
+                                    onClick={() => api.nexus.sync()}
                                     icon={<IconCloudUp size={20} />}
                                 >
                                     {t('actions.force_sync')}
                                 </Button>
                                 <Popconfirm
-                                    title={t('shutdown')}
-                                    onConfirm={() => api.settings.shutdown()}
+                                    title={t('actions.shutdown')}
+                                    onConfirm={() => api.admin.shutdown()}
                                     okText={tG('actions.ok')}
                                     cancelText={tG('actions.cancel')}
                                 >

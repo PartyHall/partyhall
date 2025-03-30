@@ -18,7 +18,7 @@ export default function BackdropSelector() {
     }, []);
 
     const setSelectedBackdropAlbum = async (id: number) =>
-        await api.settings.setBackdrops(id !== 0 ? id : null, selectedBackdrop);
+        await api.state.setBackdrops(id !== 0 ? id : null, selectedBackdrop);
 
     return (
         <Spin spinning={loading}>

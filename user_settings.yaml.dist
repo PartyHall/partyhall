@@ -1,0 +1,21 @@
+onboarded: true
+
+photobooth:
+  countdown: 3 # Amount of seconds to countdown before taking a picture
+  flash_brightness: 100
+  resolution: # The resolution of your webcam
+      width: 1280
+      height: 720
+  unattended:
+      enabled: true
+      interval: 30 # Amount of seconds between every unattended shots
+
+nexus_url: 'http://host.docker.internal'
+nexus_ignore_ssl: true
+hardware_id: 'b094786e-5158-4ceb-861b-28cb45b2a2c3'
+api_key: 'my-api-token'
+
+button_mappings: # Button on the arduino: Action taken
+  BTN_0: 'take_picture'
+  BTN_1: 'display_debug'
+  BTN_2: 'shutdown'

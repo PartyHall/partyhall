@@ -1,4 +1,4 @@
-import { BackdropAlbum, ModuleSettings, PhEvent, PhKaraoke, PhSongSession, SDK } from '@partyhall/sdk';
+import { BackdropAlbum, PhEvent, PhKaraoke, PhSongSession, PhUserSettings, SDK } from '@partyhall/sdk';
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
 import { DateTime } from 'luxon';
@@ -26,9 +26,8 @@ type AuthProps = {
     karaoke: PhKaraoke;
     karaokeQueue: PhSongSession[];
 
-    modulesSettings: ModuleSettings;
+    userSettings: PhUserSettings | null;
 
-    hwid: string | null;
     version: string | null;
     commit: string | null;
 
@@ -62,9 +61,8 @@ const defaultProps: AuthProps = {
 
     karaokeQueue: [],
 
-    modulesSettings: {} as ModuleSettings,
+    userSettings: null,
 
-    hwid: null,
     version: null,
     commit: null,
 
@@ -73,7 +71,7 @@ const defaultProps: AuthProps = {
 
 const AuthContext = createContext<AuthContextProps>({
     ...defaultProps,
-    setPictureTaken: () => {},
+    setPictureTaken: () => { },
 });
 
 export default function AuthProvider({ children, token }: { children: ReactNode; token: string }) {
@@ -220,21 +218,20 @@ export default function AuthProvider({ children, token }: { children: ReactNode;
 
         setCtx((oldCtx) => ({ ...oldCtx, loaded: false }));
 
-        const status = await ctx.api.global.getStatus();
+        const state = await ctx.api.state.get();
 
         setCtx((oldCtx) => ({
             ...oldCtx,
             loaded: true,
-            currentEvent: status.currentEvent,
-            currentMode: status.currentMode,
-            backdropAlbum: status.backdropAlbum,
-            selectedBackdrop: status.selectedBackdrop,
-            karaoke: status.karaoke,
-            karaokeQueue: status.karaokeQueue,
-            modulesSettings: status.modulesSettings,
-            hwid: status.hardwareId,
-            version: status.version,
-            commit: status.commit,
+            currentEvent: state.currentEvent,
+            currentMode: state.currentMode,
+            backdropAlbum: state.backdropAlbum,
+            selectedBackdrop: state.selectedBackdrop,
+            karaoke: state.karaoke,
+            karaokeQueue: state.karaokeQueue,
+            userSettings: state.userSettings,
+            version: state.version,
+            commit: state.commit,
         }));
     }, [ctx.api]);
 

@@ -37,7 +37,7 @@ export default function Logs() {
     useAsyncEffect(async () => {
         setPageName('logs', ['/logs']);
 
-        const logs = await api.global.getLogs();
+        const logs = await api.admin.getLogs();
         if (!logs) {
             return;
         }

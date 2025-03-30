@@ -21,10 +21,7 @@ func (k Karaoke) EndCurrentSong(publish bool) {
 
 	if state.STATE.Karaoke.Current.CancelledAt.Valid || state.STATE.Karaoke.Current.EndedAt.Valid {
 		if publish {
-			mercure_client.CLIENT.PublishEvent(
-				"/karaoke",
-				state.STATE.Karaoke,
-			)
+			mercure_client.CLIENT.SendKaraokeState()
 		}
 
 		return
@@ -36,10 +33,7 @@ func (k Karaoke) EndCurrentSong(publish bool) {
 	state.STATE.Karaoke.Current = nil
 
 	if publish {
-		mercure_client.CLIENT.PublishEvent(
-			"/karaoke",
-			state.STATE.Karaoke,
-		)
+		mercure_client.CLIENT.SendKaraokeState()
 	}
 }
 
@@ -66,10 +60,7 @@ func (k Karaoke) StartSong(session *models.SongSession) error {
 				dal.SONGS.UpdateSession(state.STATE.Karaoke.Current)
 			}
 
-			mercure_client.CLIENT.PublishEvent(
-				"/karaoke",
-				state.STATE.Karaoke,
-			)
+			mercure_client.CLIENT.SendKaraokeState()
 		}
 	}()
 
@@ -89,15 +80,8 @@ func (k Karaoke) StartNextSong() error {
 		k.EndCurrentSong(false)
 	}
 
-	mercure_client.CLIENT.PublishEvent(
-		"/karaoke-queue",
-		state.STATE.KaraokeQueue,
-	)
-
-	mercure_client.CLIENT.PublishEvent(
-		"/karaoke",
-		state.STATE.Karaoke,
-	)
+	mercure_client.CLIENT.SendKaraokeQueue()
+	mercure_client.CLIENT.SendKaraokeState()
 
 	return nil
 }

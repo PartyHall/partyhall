@@ -34,7 +34,15 @@
             "pause": "Pause",
             "next": "Next",
             "previous": "Previous"
+        },
+        "error": {
+            "title": "Error",
+            "unexpected": "An unexpected error occured"
         }
+    },
+    "onboarding": {
+        "not_onboarded": "This appliance was not setup",
+        "already_onboarded": "This appliance was already setup"
     },
     "login": {
         "username": "Username",
@@ -44,11 +52,7 @@
         "connect": "Login",
         "username_required": "Username is required",
         "password_required": "Password is required",
-        "notification_failed_login": {
-            "title": "Failed to login",
-            "description": "See console for more infos",
-            "bad_login": "Invalid username/password"
-        }
+        "bad_login": "Invalid username or password"
     },
     "home": {
         "about_you": {

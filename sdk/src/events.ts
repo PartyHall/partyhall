@@ -9,7 +9,7 @@ export default class Global {
     }
 
     public async get(id: number | string): Promise<PhEvent> {
-        const resp = await this.sdk.get(`/api/webapp/events/${id}`);
+        const resp = await this.sdk.get(`/api/events/${id}`);
         const data = await resp.json();
 
         const event = PhEvent.fromJson(data);
@@ -25,7 +25,7 @@ export default class Global {
             page = 1;
         }
 
-        const resp = await this.sdk.get(`/api/webapp/events?page=${page}`);
+        const resp = await this.sdk.get(`/api/events?page=${page}`);
         const data = await resp.json();
 
         const events = Collection.fromJson(data, (x) => {
@@ -44,20 +44,20 @@ export default class Global {
     }
 
     public async create(event: PhEvent) {
-        const resp = await this.sdk.post('/api/webapp/events', event.asJson());
+        const resp = await this.sdk.post('/api/events', event.asJson());
         const data = await resp.json();
 
         return PhEvent.fromJson(data);
     }
 
     public async update(event: PhEvent) {
-        const resp = await this.sdk.put(`/api/webapp/events/${event.id}`, event.asJson());
+        const resp = await this.sdk.put(`/api/events/${event.id}`, event.asJson());
         const data = await resp.json();
 
         return PhEvent.fromJson(data);
     }
 
     public async delete(id: number | string) {
-        await this.sdk.delete(`/api/webapp/events/${id}`);
+        await this.sdk.delete(`/api/events/${id}`);
     }
 }

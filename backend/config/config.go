@@ -17,44 +17,18 @@ type Config struct {
 	Mercure   Mercure `yaml:"-"`
 
 	ListeningAddr string `yaml:"listening_addr"`
-	MosquittoAddr string `yaml:"mqtt_addr"`
 	RootPath      string `yaml:"root_path"`
-	GuestsAllowed bool   `yaml:"guests_allowed"`
 	SendTime      bool   `yaml:"send_time"`
+	MosquittoAddr string `yaml:"mqtt_addr"`
+	GuestsAllowed bool   `yaml:"guests_allowed"`
 
-	NexusURL       string `yaml:"nexus_url"`
-	NexusIgnoreSSL bool   `yaml:"nexus_ignore_ssl"`
-	HardwareID     string `yaml:"hardware_id"`
-	ApiKey         string `yaml:"api_key"`
-
-	ModulesSettings ModulesSettings `yaml:"settings"`
-	HardwareHandler HardwareHandler `yaml:"hardware_handler"`
+	UserSettings UserSettings `yaml:"-"`
 }
 
 type Mercure struct {
 	SubscriberKey []byte
 	PublisherKey  []byte
 	ApplianceJWT  string
-}
-
-type HardwareHandler struct {
-	BaudRate int               `yaml:"baud_rate"`
-	Mappings map[string]string `yaml:"mappings"`
-}
-
-type ModulesSettings struct {
-	Photobooth struct {
-		Countdown       int `yaml:"countdown" json:"countdown"`
-		FlashBrightness int `yaml:"flash_brightness" json:"flash_brightness"`
-		Resolution      struct {
-			Width  int `yaml:"width" json:"width"`
-			Height int `yaml:"height" json:"height"`
-		} `yaml:"resolution" json:"resolution"`
-		Unattended struct {
-			Enabled  bool `yaml:"enabled" json:"enabled"`
-			Interval int  `yaml:"interval" json:"interval"` // In seconds
-		} `yaml:"unattended" json:"unattended"`
-	} `yaml:"photobooth" json:"photobooth"`
 }
 
 func Load(isInDev bool) error {
@@ -73,6 +47,19 @@ func Load(isInDev bool) error {
 	err = yaml.Unmarshal(data, &GET)
 	if err != nil {
 		return err
+	}
+
+	userSettingsPath := filepath.Join(GET.RootPath, "user_settings.yaml")
+	if _, err := os.Stat(userSettingsPath); !os.IsNotExist(err) {
+		userData, err := os.ReadFile(userSettingsPath)
+		if err != nil {
+			return err
+		}
+
+		err = yaml.Unmarshal(userData, &GET.UserSettings)
+		if err != nil {
+			return err
+		}
 	}
 
 	GET.IsInDev = isInDev

@@ -25,7 +25,7 @@ export default function SongSearch() {
 
     useAsyncEffect(async () => {
         setLoading(true);
-        setSongs(await api.karaoke.getCollection(page, search, formats, hasVocals));
+        setSongs(await api.songs.getCollection(page, search, formats, hasVocals));
         setLoading(false);
     }, [page, search, formats, hasVocals]);
 

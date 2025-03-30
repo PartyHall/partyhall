@@ -3,83 +3,138 @@ package routes
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/partyhall/partyhall/middlewares"
-	"github.com/partyhall/partyhall/models"
-	"github.com/partyhall/partyhall/state"
 )
 
-const GET_COLLECTION_LIMIT = 50
+/**
+	Summary of routes and permissions
 
-func RegisterWebappRoutes(router *gin.RouterGroup) {
-	router.POST("/login", routeLogin)
-	router.POST("/guest-login", routeLoginGuest)
-	router.POST("/refresh", routeLoginRefresh)
+	Definitions:
+		- authenticated: Logged in anonymously (temp user) or as a real user
+		- appliance: Only callable from localhost (the appliance itself)
+		- onboarded: The admin has completed the initial setup process
+		- hasEvent: An event was created and is currently selected
 
-	router.GET("/status", routeStatus)
+		Note: The appliance frontend has the USER, ADMIN, APPLIANCE roles
 
-	r := router.Group("/webapp")
-	//#region CRUD Event
-	events := r.Group("/events", middlewares.Authorized(models.ROLE_ADMIN))
-	events.POST("", routeCreateEvent)
-	events.GET("", routeGetEvents)
-	events.GET("/:eventId", routeGetEvent)
-	events.PUT("/:eventId", routeUpdateEvent)
-	events.DELETE("/events/:eventId", routeDeleteEvent)
-	//#endregion
+	#region API:
+	/
+		login          onboarded & unauthenticated
+		guest-login    onboarded & unauthenticated
+		refresh        onboarded & unauthenticated
 
-	//#region Karaoke related stuff
-	songs := r.Group("/songs")
-	songs.GET("", routeGetSongs)
-	songs.GET("/:songId", routeGetSong)
-	songs.GET("/:songId/data/*filepath", routeServeSong)
+	/state
+		GET /                 unauthenticated
+		POST /debug           unauthenticated
+		PUT /event            onboarded & admin
+		PUT /mode             onboarded & admin
+		PUT /backdrops        onboarded & authenticated
+		GET /flash            unauthenticated => Get the state of the flash (brightness + powered)
+		PUT /flash            onboarded & authenticated // Only sets whether it is on or off, used by appliance AND backend
 
-	session := r.Group("/session", middlewares.Authorized(models.ROLE_GUEST, models.ROLE_USER, models.ROLE_APPLIANCE))
-	session.POST("/", routeQueueAdd)
-	session.POST("/:sessionId/start", routeSessionDirectPlay)
-	session.POST("/:sessionId/ended", routeSetEnded)
-	session.POST("/:sessionId/move/:direction", routeMoveInQueue)
-	session.DELETE("/:sessionId", routeQueueRemove)
+	/events
+		GET /          non-onboarded | Admin
+		GET /:id       non-onboarded | Admin
+		POST /         non-onboarded | Admin
+		PATCH /:id     non-onboarded | Admin
+		DELETE /:id    onboarded & Admin
 
-	karaoke := r.Group("/karaoke", middlewares.Authorized(models.ROLE_GUEST, models.ROLE_USER, models.ROLE_APPLIANCE))
-	karaoke.POST("/timecode", routeSetTimecode)
-	karaoke.POST("/playing-status/:status", routeSetPlayingStatus)
-	karaoke.POST("/set-volume/:type/:volume", routeSetVolume)
-	//#endregion
+	/photobooth
+		POST /take-picture    onboarded & hasEvent & authenticated
+		POST /upload-picture  onboarded & hasEvent & Appliance
 
-	//#region Backdrop related stuff
-	backdrops := r.Group("/backdrops")
-	backdrops.GET("", routeGetBackdropAlbums)
-	backdrops.GET(":albumId", routeGetBackdropAlbum)
-	backdrops.GET(":albumId/image/:backdropId/download", routeDownloadBackdrop)
-	//#endregion
+	/backdrops_albums
+		GET /                       onboarded & authenticated
+		GET /:backdropAlbumId       onboarded & authenticated
 
-	r.GET("/logs", middlewares.Authorized(models.ROLE_ADMIN), routeGetLogs)
+	/backdrops
+		GET /:backdropId/download   onboarded // No authenticated check because I'm too lazy to handle the auth in img tags
 
-	r.POST("/picture", middlewares.HasEventLoaded(), middlewares.Authorized(), routeTakePicture)
-	r.POST("/flash", middlewares.HasEventLoaded(), routeSetFlash)
+	/songs
+		GET /                            onboarded & Authenticated
+		GET /:songId                     onboarded & Authenticated
+		GET /:songId/cover               onboarded // No authenticated check because I'm too lazy to handle the auth in img tags
+		GET /:songId/file/:songFilename  onboarded & Appliance
 
-	// Admin
-	settings := r.Group("/settings")
-	settings.POST("/shutdown", middlewares.Authorized("ADMIN"), routeShutdown)
-	settings.POST("/mode/:mode", middlewares.Authorized("ADMIN"), routeSetMode)
-	settings.POST("/event/:event", middlewares.Authorized("ADMIN"), routeSetEvent)
-	settings.POST("/debug", routeSetDebug)
-	settings.POST("/force-sync", middlewares.Authorized("ADMIN"), routeForceSync)
-	settings.POST("/backdrops", routeSetBackdrops)
+	/song_sessions
+		POST   /                               onboarded & hasEvent & Authenticated
+		POST   /:songSessionId/start           onboarded & hasEvent & Authenticated
+		POST   /:songSessionId/ended           onboarded & hasEvent & Appliance (Or Authenticated ? Need to check how I did this)
+		POST   /:songSessionId/move/:direction onboarded & hasEvent & Authenticated
+		DELETE /:songSessionId                 onboarded & hasEvent & Authenticated
 
-	settings.GET("/audio-devices", routeGetAudioDevices)
-	settings.POST("/audio-devices", middlewares.Authorized("ADMIN"), routeSetAudioDevices)
-	settings.POST("/audio-devices/:id/volume", routeSetAudioDeviceVolume)
+	/karaoke
+		PUT /timecode       onboarded & hasEvent & appliance
+		PUT /playing_status onboarded & hasEvent & authenticated
+		PUT /volume         onboarded & hasEvent & authenticated
 
-	nexusRoutes := r.Group("/nexus", middlewares.HasEventLoaded(), middlewares.Authorized("ADMIN"))
-	nexusRoutes.POST("/sync", routeSync)
-	nexusRoutes.POST("/events/:id", routeCreateOnNexus)
-}
+	/nexus
+		POST /sync          onboarded & admin
+		POST /events/:id    onboarded & hasEvent & admin
 
-func RegisterApplianceRoutes(router *gin.RouterGroup) {
-	r := router.Group("/appliance", middlewares.Authorized("APPLIANCE"))
-	r.POST("/picture", middlewares.HasEventLoaded(), routeUploadPicture)
-}
+	/admin
+		GET /logs                    onboarded & admin
+		POST /shutdown               onboarded & admin
 
-func routeStatus(c *gin.Context) {
-	c.JSON(200, state.STATE)
+	/settings non-onboarded | admin
+		GET /ap
+		PUT /ap
+		GET /webcam
+		PUT /webcam
+		POST /flash                  => Set the default brightness value
+		GET /photobooth
+		PUT /photobooth
+		GET /audio-devices
+		POST /audio-devices
+		PUT /audio-devices/:deviceId => Set the volume for a device
+		GET /spotify
+		PUT /spotify
+		GET /nexus
+		PUT /nexus
+		GET /physical-buttons
+		PUT /physical-buttons
+		POST create-admin           non-onboarded only
+		POST conclude-onboarding    non-onboarded only
+	#endregion
+
+	#region Mercure
+	Topic             | Frontends   | Permissions
+	------------------|-------------|-------------
+	/time             | admin front | everyone
+	/event            | admin front | everyone
+	/flash            | admin       | admin
+	/mode             | admin front | Pourquoi pas l'admin?
+	/sync-progress    | admin       | everyone (?)
+	/snackbar         | admin front | everyone
+	/backdrop-state   | admin front | everyone
+	/ip-addresses     |       front | appliance
+	/debug            |       front | appliance
+	/take-picture     |       front | appliance
+	/karaoke-queue    |       front | everyone (Pourquoi l'admin ne l'a pas ?)
+	/audio-devices    | admin       | admin
+	/karaoke          | admin       | everyone
+	/karaoke-queue    | admin       | everyone
+	/karaoke-timecode | admin       | everyone
+	/logs             | admin       | admin
+	#endregion
+**/
+
+func RegisterRoutes(router *gin.RouterGroup) {
+	router.POST("/login", middlewares.Onboarded(true), routeLogin)
+	router.POST("/guest-login", middlewares.Onboarded(true), routeLoginGuest)
+	router.POST("/refresh", middlewares.Onboarded(true), routeLoginRefresh)
+
+	// Special endpoints
+	(RoutesState{}).Register(router.Group("/state"))
+	(RoutesPhotobooth{}).Register(router.Group("/photobooth"))
+	(RoutesKaraoke{}).Register(router.Group("/karaoke"))
+	(RoutesNexus{}).Register(router.Group("/nexus"))
+	(RoutesSettings{}).Register(router.Group("/settings"))
+	(RoutesAdmin{}).Register(router.Group("/admin"))
+
+	// Standard CRUD++ endpoint
+	(RoutesEvent{}).Register(router.Group("/events"))
+	(RoutesBackdropAlbums{}).Register(router.Group("/backdrop_albums"))
+	(RoutesBackdrops{}).Register(router.Group("/backdrops"))
+	(RoutesSong{}).Register(router.Group("/songs"))
+	(RoutesSongSession{}).Register(router.Group("/song_sessions"))
 }

@@ -1,0 +1,2 @@
+export PARTYHALL_CONFIG_FILE='../0_DATA/partyhall.yaml'
+export PARTYHALL_ENV="dev"

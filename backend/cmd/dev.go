@@ -6,6 +6,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/log"
+	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/pipewire"
 	"github.com/partyhall/partyhall/utils"
 	"github.com/spf13/cobra"
@@ -42,7 +43,7 @@ var testCmd = &cobra.Command{
 			return
 		}
 
-		var src *pipewire.Device
+		var src *models.PwDevice
 		fmt.Println("Sources:")
 		for _, s := range devices.Sources {
 			fmt.Println(s)
@@ -53,7 +54,7 @@ var testCmd = &cobra.Command{
 
 		fmt.Println()
 
-		var dst *pipewire.Device
+		var dst *models.PwDevice
 		fmt.Println("Sinks:")
 		for _, s := range devices.Sinks {
 			fmt.Println(s)

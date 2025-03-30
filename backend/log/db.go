@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/partyhall/partyhall/mercure_client"
+	"github.com/partyhall/partyhall/models"
 	"go.uber.org/zap/zapcore"
 )
 
@@ -40,7 +41,7 @@ func Message(level zapcore.Level, msg string, args []any) error {
 				var id int
 				row.Scan(&id)
 
-				mercure_client.CLIENT.PublishEvent("/logs", Log{
+				mercure_client.CLIENT.SendLog(models.Log{
 					Id:        id,
 					Type:      level.CapitalString(),
 					Text:      fullText,
@@ -78,7 +79,7 @@ func CountMessages() (int, error) {
 }
 
 /** @TODO: No limit/offset but limit/lastLogGotten **/
-func GetMessages(limit, offset int) ([]Log, error) {
+func GetMessages(limit, offset int) ([]models.Log, error) {
 	rows, err := DB.Queryx(`
 		SELECT id, type, text, timestamp
 		FROM logs
@@ -91,9 +92,9 @@ func GetMessages(limit, offset int) ([]Log, error) {
 		return nil, err
 	}
 
-	logs := []Log{}
+	logs := []models.Log{}
 	for rows.Next() {
-		var log Log
+		var log models.Log
 
 		err = rows.StructScan(&log)
 		if err != nil {

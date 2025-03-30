@@ -9,7 +9,6 @@ import (
 	"github.com/partyhall/partyhall/cmd"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/log"
-	"github.com/partyhall/partyhall/state"
 )
 
 //go:embed frontend/app
@@ -30,8 +29,6 @@ func main() {
 	}
 
 	log.Load(isInDev)
-
-	state.STATE.ModulesSettings = config.GET.ModulesSettings
 
 	cmd.Execute()
 }

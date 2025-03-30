@@ -15,13 +15,16 @@ import (
 	"github.com/partyhall/partyhall/dal"
 	"github.com/partyhall/partyhall/log"
 	"github.com/partyhall/partyhall/models"
-	routes_requests "github.com/partyhall/partyhall/routes/requests"
 	"github.com/partyhall/partyhall/services"
 	"github.com/partyhall/partyhall/utils"
 )
 
 func routeLogin(c *gin.Context) {
-	var loginRequest routes_requests.LoginRequest
+	var loginRequest struct {
+		Username string `json:"username"`
+		Password string `json:"password"`
+	}
+
 	if err := c.Bind(&loginRequest); err != nil {
 		api_errors.ApiError(
 			c,
@@ -129,7 +132,10 @@ func routeLoginGuest(c *gin.Context) {
 		return
 	}
 
-	var loginRequest routes_requests.LoginGuestRequest
+	var loginRequest struct {
+		Username string `json:"username"`
+	}
+
 	if err := c.Bind(&loginRequest); err != nil {
 		api_errors.ApiError(
 			c,
@@ -169,7 +175,10 @@ func routeLoginGuest(c *gin.Context) {
 }
 
 func routeLoginRefresh(c *gin.Context) {
-	var rt routes_requests.RefreshRequest
+	var rt struct {
+		RefreshToken string `json:"refresh_token"`
+	}
+
 	if err := c.Bind(&rt); err != nil {
 		api_errors.ApiErrorWithData(
 			c,

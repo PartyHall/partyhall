@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useContext, useState } from 'react';
 import Loader from '../components/loader';
+import { PhUserSettings } from '@partyhall/sdk';
 import useAsyncEffect from 'use-async-effect';
 
 const DEFAULT_TOPICS = [
@@ -19,7 +20,7 @@ type SettingsProps = {
     loaded: boolean;
     pageName: string;
 
-    modules_settings: Record<string, any>;
+    userSettings: PhUserSettings|null;
 
     guests_allowed: boolean;
     enabled_modules: string[];
@@ -28,7 +29,6 @@ type SettingsProps = {
 
     version: string;
     commit: string;
-    hwid: string | null;
 
     topics: string[];
 };
@@ -43,7 +43,7 @@ const defaultProps: SettingsProps = {
     pageName: 'home',
     topics: DEFAULT_TOPICS,
 
-    modules_settings: {},
+    userSettings: null,
 
     guests_allowed: false,
     enabled_modules: [],
@@ -52,7 +52,6 @@ const defaultProps: SettingsProps = {
 
     version: 'INDEV',
     commit: 'XXXXXX',
-    hwid: null,
 };
 
 const SettingsContext = createContext<SettingsContextProps>({
@@ -66,7 +65,7 @@ export default function SettingsProvider({ children }: { children: ReactNode }) 
 
     const fetchStatus = async () => {
         setCtx((oldCtx) => ({ ...oldCtx, loaded: false }));
-        const resp = await fetch('/api/status');
+        const resp = await fetch('/api/state');
         const data = await resp.json();
 
         setCtx((oldCtx) => ({

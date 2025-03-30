@@ -9,7 +9,7 @@ export default class Photobooth {
     }
 
     public async takePicture() {
-        await this.sdk.post('/api/webapp/picture');
+        await this.sdk.post('/api/photobooth/take-picture');
     }
 
     public async uploadPicture(b64Image: string, unattended: boolean, b64AlternateImage: string | null) {
@@ -23,7 +23,7 @@ export default class Photobooth {
 
         form.append('unattended', unattended ? 'true' : 'false');
 
-        const resp = await fetch('/api/appliance/picture', {
+        const resp = await fetch('/api/photobooth/upload-picture', {
             method: 'POST',
             body: form,
             headers: {
@@ -32,12 +32,5 @@ export default class Photobooth {
         });
 
         return await resp.blob();
-    }
-
-    public async setFlash(powered: boolean, brightness: number) {
-        await this.sdk.post(`/api/webapp/flash`, {
-            powered: powered,
-            brightness: brightness,
-        });
     }
 }

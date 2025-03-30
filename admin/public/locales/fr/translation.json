@@ -34,7 +34,15 @@
             "pause": "Pause",
             "next": "Suivant",
             "previous": "Précédent"
+        },
+        "error": {
+            "title": "Erreur",
+            "unexpected": "Une erreur inconnue s'est produite"
         }
+    },
+    "onboarding": {
+        "not_onboarded": "Cet appareil n'a pas été configuré",
+        "already_onboarded": "Cet appareil a déjà été configuré"
     },
     "login": {
         "username": "Pseudo",
@@ -44,11 +52,7 @@
         "connect": "Connexion",
         "username_required": "Le pseudo est requis",
         "password_required": "Le mot de passe est requis",
-        "notification_failed_login": {
-            "title": "Échec de la connexion",
-            "description": "Voir la console pour plus d'infos",
-            "bad_login": "Pseudo/mot de passe invalide"
-        }
+        "bad_login": "Pseudo ou mot de passe invalide"
     },
     "home": {
         "about_you": {

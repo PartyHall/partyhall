@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/partyhall/partyhall/log"
+	"github.com/partyhall/partyhall/models"
 )
 
 var KNOWN_CHANNELS = []string{"FR", "FL", "RR", "RL"}
@@ -48,7 +49,7 @@ var KNOWN_CHANNELS = []string{"FR", "FL", "RR", "RL"}
 // Thats something we might change later so that
 // people with more input can enjoy this feature too
 
-func GetVolume(d *Device) error {
+func GetVolume(d *models.PwDevice) error {
 	cmd := exec.Command("wpctl", "get-volume", fmt.Sprintf("%v", d.ID))
 	output, err := cmd.Output()
 	if err != nil {
@@ -78,14 +79,14 @@ func GetVolume(d *Device) error {
  * Note: Yeah we iterate quite a bit on the list of PipewireObjects
  * but meh
  */
-func GetDevices() (*Devices, error) {
+func GetDevices() (*models.PwDevices, error) {
 	cmd := exec.Command("pw-dump")
 	output, err := cmd.Output()
 	if err != nil {
 		return nil, err
 	}
 
-	var objects []PipeWireObject
+	var objects []models.PipeWireObject
 	if err := json.Unmarshal(output, &objects); err != nil {
 		return nil, err
 	}
@@ -94,13 +95,13 @@ func GetDevices() (*Devices, error) {
 
 	defaultSink, defaultSource := findDefaults(objects)
 
-	var karaokeSourceDevice *Device = nil
-	var karaokeSinkDevice *Device = nil
+	var karaokeSourceDevice *models.PwDevice = nil
+	var karaokeSinkDevice *models.PwDevice = nil
 
-	var defaultSourceDevice *Device = nil
-	var defaultSinkDevice *Device = nil
+	var defaultSourceDevice *models.PwDevice = nil
+	var defaultSinkDevice *models.PwDevice = nil
 
-	var sources, sinks []Device
+	var sources, sinks []models.PwDevice
 	for _, obj := range objects {
 		props := obj.Info.Props
 		if props == nil {
@@ -115,7 +116,7 @@ func GetDevices() (*Devices, error) {
 		name, _ := props["node.name"].(string)
 		description, _ := props["node.description"].(string)
 
-		device := Device{
+		device := models.PwDevice{
 			ID:          obj.ID,
 			Name:        name,
 			Description: description,
@@ -157,7 +158,7 @@ func GetDevices() (*Devices, error) {
 		karaokeSourceDevice.ID,
 	)
 
-	return &Devices{
+	return &models.PwDevices{
 		KaraokeSource: *karaokeSourceDevice,
 		KaraokeSink:   *karaokeSinkDevice,
 		DefaultSource: defaultSourceDevice,
@@ -168,7 +169,7 @@ func GetDevices() (*Devices, error) {
 	}, nil
 }
 
-func SetVolume(d *Device, vol float64) error {
+func SetVolume(d *models.PwDevice, vol float64) error {
 	cmd := exec.Command(
 		"wpctl",
 		"set-volume",
@@ -241,7 +242,7 @@ func pwLink(source, dest string) error {
  * this will mess up the spotify client
  **/
 
-func LinkDevice(source, sink *Device) error {
+func LinkDevice(source, sink *models.PwDevice) error {
 	err := unlinkDevices()
 	if err != nil {
 		return err

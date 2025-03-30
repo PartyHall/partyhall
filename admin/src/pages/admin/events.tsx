@@ -31,7 +31,7 @@ export default function Events() {
         resp: null,
     });
 
-    useEffect(() => setPageName('events', ['/ignore']), []);
+    useEffect(() => setPageName('events', []), []);
 
     const fetchPage = async () => {
         setCtx((oldCtx) => ({ ...oldCtx, loading: true }));
@@ -57,7 +57,7 @@ export default function Events() {
 
     const useEvent = async (id: number) => {
         try {
-            const event = await api.settings.setEvent(id);
+            const event = await api.state.setEvent(id);
             if (event) {
                 setEvent(event);
             }

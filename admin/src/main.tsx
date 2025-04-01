@@ -16,9 +16,11 @@ import LogsPage from './pages/admin/logs';
 import NewEventPage from './pages/admin/new_event';
 import Photobooth from './pages/photobooth';
 import SettingsAudioPage from './pages/admin/settings/audio';
+import SettingsNexusPage from './pages/admin/settings/nexus';
 import SettingsPage from './pages/admin/settings';
 import SettingsPhotoboothPage from './pages/admin/settings/photobooth';
 import SettingsProvider from './hooks/settings';
+import SettingsThirdPartyPage from './pages/admin/settings/spotify';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
@@ -58,6 +60,7 @@ const router = createHashRouter([
                 element: <LogsPage />,
             },
             {
+                // @TODO: Admin layout
                 path: '/settings',
                 children: [
                     {
@@ -66,13 +69,21 @@ const router = createHashRouter([
                     },
                     {
                         path: 'photobooth',
-                        element: <SettingsPhotoboothPage />
+                        element: <SettingsPhotoboothPage />,
                     },
                     {
                         path: 'audio',
-                        element: <SettingsAudioPage />
+                        element: <SettingsAudioPage />,
                     },
-                ]
+                    {
+                        path: 'nexus',
+                        element: <SettingsNexusPage />,
+                    },
+                    {
+                        path: 'third-party',
+                        element: <SettingsThirdPartyPage />,
+                    },
+                ],
             },
             {
                 path: '/karaoke',

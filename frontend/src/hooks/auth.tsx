@@ -71,7 +71,7 @@ const defaultProps: AuthProps = {
 
 const AuthContext = createContext<AuthContextProps>({
     ...defaultProps,
-    setPictureTaken: () => { },
+    setPictureTaken: () => {},
 });
 
 export default function AuthProvider({ children, token }: { children: ReactNode; token: string }) {

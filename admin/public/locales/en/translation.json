@@ -161,6 +161,7 @@
     },
     "settings": {
         "title": "Appliance settings",
+        "advanced_settings": "Advanced settings",
         "photobooth": {
             "title": "Photobooth"
         },
@@ -190,6 +191,22 @@
             "desc": "The appliance can have a physical flash (like a ledstrip). If that's the case you can now configure the brightness of it here.",
             "desc2": "Go in front of the camera to ensure that the displayed image is not too bright while setting it up.",
             "brightness": "Brightness"
+        },
+        "nexus": {
+            "title": "PartyNexus",
+            "desc": "PartyNexus is the central hub that let you synchronise everything, like the pictures taken on this device, but also the karaoke songs available on it to this device.",
+            "desc2": "If you don't have a PartyNexus server it's highly advised that you setup one as lots of feature requires it.",
+            "remove_settings": "You are going to remove the PartyNexus settings",
+            "url": "Base URL",
+            "hardware_id": "Hardware ID",
+            "api_key": "API Key",
+            "bypass_ssl": "Bypass SSL certificate validation"
+        },
+        "spotify": {
+            "title": "Spotify Connect",
+            "desc": "The appliance can be used as a Spotify speaker, as long as you have a premium account, you can cast directly from the official app.",
+            "name": "Device name",
+            "name_desc": "This is the name that the device will have in the Spotify app"
         }
     }
 }

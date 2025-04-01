@@ -51,6 +51,52 @@ func (ns NexusSync) setUserAgent(req *http.Request) {
 	)
 }
 
+func ValidateCredentials(baseUrl string, hwid string, apiKey string, bypassSsl bool) (string, bool) {
+	req, err := http.NewRequest(http.MethodGet, baseUrl+"/api/events", nil)
+	if err != nil {
+		return err.Error(), false
+	}
+
+	req.Header.Set("X-HARDWARE-ID", hwid)
+	req.Header.Set("X-API-TOKEN", apiKey)
+
+	transport := http.Transport{
+		Proxy: http.ProxyFromEnvironment,
+		Dial: (&net.Dialer{
+			Timeout:   10 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).Dial,
+		TLSHandshakeTimeout: 10 * time.Second,
+	}
+
+	if bypassSsl {
+		transport.TLSClientConfig = &tls.Config{
+			InsecureSkipVerify: true,
+		}
+	}
+
+	client := &http.Client{
+		Transport: &transport,
+		Timeout:   30 * time.Second,
+	}
+
+	res, err := client.Do(req)
+	if err != nil {
+		return err.Error(), false
+	}
+
+	/**
+	 *	 @TODO: more checks, we should check that the response corresponds at a partynexus server
+	 * not just a 200 HTTP
+	 */
+
+	if res.StatusCode == 401 {
+		return "Invalid credentials", false
+	}
+
+	return "", true
+}
+
 func (ns *NexusSync) doJsonRequest(httpMethod string, endpoint string, data map[string]any) (map[string]any, error) {
 	var reader io.Reader = nil
 

@@ -60,6 +60,22 @@ func Load(isInDev bool) error {
 		if err != nil {
 			return err
 		}
+	} else {
+		// Creating the default settings file
+		us := UserSettings{}
+
+		us.Onboarded = false
+		us.NexusIgnoreSSL = false
+		us.Photobooth.Countdown = 3
+		us.Photobooth.FlashBrightness = 100
+		us.Photobooth.Unattended.Enabled = true
+		us.Photobooth.Unattended.Interval = 180
+		us.Spotify.Enabled = true
+		us.Spotify.Name = "PartyHall"
+
+		us.Save()
+
+		GET.UserSettings = us
 	}
 
 	GET.IsInDev = isInDev

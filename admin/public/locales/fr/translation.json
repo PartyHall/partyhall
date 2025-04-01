@@ -161,6 +161,7 @@
     },
     "settings": {
         "title": "Paramètres de la machine",
+        "advanced_settings": "Paramètres avancés",
         "photobooth": {
             "title": "Photomaton"
         },
@@ -190,6 +191,22 @@
             "desc": "L'appareil peut avoir un flash physique (comme un bandeau de led). Si c'est le cas, vous pouvez maintenant configurer sa luminosité.",
             "desc2": "Allez devant la caméra pour vous assurer que l'image est suffisament éclairée.",
             "brightness": "Luminosité"
+        },
+        "nexus": {
+            "title": "PartyNexus",
+            "desc": "PartyNexus est le hub central vous permettant de tout synchroniser, comme l'envoi des photos prises par cet appareil, mais aussi la récupération des musiques de karaoké disponible sur celui-ci.",
+            "desc2": "Si vous n'avez pas de serveur PartyNexus, il est fortement recommandé d'en installer un, puisque une grande quantité de fonctionnalités le nécessite.",
+            "remove_settings": "Vous allez supprimer la configuration de PartyNexus",
+            "url": "Adresse",
+            "hardware_id": "ID Hardware",
+            "api_key": "Clé API",
+            "bypass_ssl": "Ignorer la validation du certificat SSL"
+        },
+        "spotify": {
+            "title": "Spotify Connect",
+            "desc": "Cet appareil peut servir de haut-parleur Spotify, si vous avez un compte premium, vous pouvez alors caster directement depuis l'application officielle.",
+            "name": "Nom de l'appareil",
+            "name_desc": "C'est le nom qui sera affiché dans la liste des appareils sur Spotify"
         }
     }
 }

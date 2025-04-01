@@ -1,21 +1,21 @@
-import { Button, Spin, Tooltip } from "antd";
-import { IconBulb, IconBulbOff } from "@tabler/icons-react";
-import useAsyncEffect from "use-async-effect";
-import { useAuth } from "../hooks/auth";
-import { useMercureTopic } from "../hooks/mercure";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Button, Spin, Tooltip } from 'antd';
+import { IconBulb, IconBulbOff } from '@tabler/icons-react';
+import useAsyncEffect from 'use-async-effect';
+import { useAuth } from '../hooks/auth';
+import { useMercureTopic } from '../hooks/mercure';
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 type MercureFlashState = {
     powered: boolean;
     brightness: number;
-}
+};
 
 type Props = {
     setPoweredState?: (powered: boolean) => void;
 };
 
-export function HardwareFlashToggle({setPoweredState}: Props) {
+export function HardwareFlashToggle({ setPoweredState }: Props) {
     const { t } = useTranslation();
     const { api } = useAuth();
     const [loading, setLoading] = useState<boolean>(true);
@@ -40,11 +40,13 @@ export function HardwareFlashToggle({setPoweredState}: Props) {
         setLoading(false);
     }, []);
 
-    return <Tooltip title={t('generic.hw_flash.turn_' + (powered ? 'off' : 'on'))}>
-        <Button
-            disabled={loading}
-            icon={loading ? <Spin spinning /> : powered ? <IconBulb /> : <IconBulbOff />}
-            onClick={toggle}
-        />
-    </Tooltip>;
+    return (
+        <Tooltip title={t('generic.hw_flash.turn_' + (powered ? 'off' : 'on'))}>
+            <Button
+                disabled={loading}
+                icon={loading ? <Spin spinning /> : powered ? <IconBulb /> : <IconBulbOff />}
+                onClick={toggle}
+            />
+        </Tooltip>
+    );
 }

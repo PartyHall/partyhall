@@ -28,6 +28,17 @@ type UserSettings struct {
 		} `yaml:"unattended" json:"unattended"`
 	} `yaml:"photobooth" json:"photobooth"`
 
+	Spotify struct {
+		Enabled bool   `yaml:"enabled" json:"enabled"`
+		Name    string `yaml:"name" json:"name"`
+	} `yaml:"spotify" json:"-"`
+
+	WirelessAp struct {
+		Enabled  bool   `yaml:"enabled" json:"enabled"`
+		Ssid     string `yaml:"ssid" json:"ssid"`
+		Password string `yaml:"password" json:"password"`
+	} `yaml:"wireless_ap" json:"-"`
+
 	ButtonMappings map[string]string `yaml:"button_mappings" json:"-"`
 }
 

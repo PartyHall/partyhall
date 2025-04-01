@@ -1,4 +1,4 @@
-import { Collection, PhSong, SDK } from "./index";
+import { Collection, PhSong, SDK } from './index';
 
 export default class Songs {
     private sdk: SDK;

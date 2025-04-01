@@ -1,6 +1,6 @@
-import { DateTime } from "luxon";
-import { Log } from "./models/log";
-import { SDK } from "./index";
+import { DateTime } from 'luxon';
+import { Log } from './models/log';
+import { SDK } from './index';
 
 export default class Admin {
     private sdk: SDK;

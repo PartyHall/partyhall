@@ -58,9 +58,9 @@ const defaultProps: SettingsProps = {
 
 const SettingsContext = createContext<SettingsContextProps>({
     ...defaultProps,
-    fetch: async () => { },
-    setPageName: () => { },
-    setUserSettings: () => { },
+    fetch: async () => {},
+    setPageName: () => {},
+    setUserSettings: () => {},
 });
 
 export default function SettingsProvider({ children }: { children: ReactNode }) {
@@ -92,7 +92,7 @@ export default function SettingsProvider({ children }: { children: ReactNode }) 
         }));
     };
 
-    const setUserSettings = (user_settings: PhUserSettings) => setCtx(oldCtx => ({...oldCtx, user_settings}));
+    const setUserSettings = (user_settings: PhUserSettings) => setCtx((oldCtx) => ({ ...oldCtx, user_settings }));
 
     useAsyncEffect(fetchStatus, []);
 

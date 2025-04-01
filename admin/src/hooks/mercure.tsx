@@ -26,8 +26,8 @@ const defaultProps: MercureProps = {
 
 const MercureContext = createContext<MercureContextProps>({
     ...defaultProps,
-    addMercureListener: () => { },
-    removeMercureListener: () => { },
+    addMercureListener: () => {},
+    removeMercureListener: () => {},
 });
 
 export default function MercureProvider({
@@ -119,8 +119,8 @@ export default function MercureProvider({
             setBackdrops(BackdropAlbum.fromJson(data['backdrop_album']), data['selected_backdrop']);
         });
 
-        es.addEventListener('/user-settings', x => {
-            console.log("User settings from mercure!")
+        es.addEventListener('/user-settings', (x) => {
+            console.log('User settings from mercure!');
             setUserSettings(new PhUserSettings(JSON.parse(x.data)));
         });
 

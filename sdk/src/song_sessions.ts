@@ -1,4 +1,4 @@
-import { PhSongSession, SDK } from "./index";
+import { PhSongSession, SDK } from './index';
 
 export default class SongSessions {
     private sdk: SDK;

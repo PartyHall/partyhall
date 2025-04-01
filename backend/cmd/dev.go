@@ -7,7 +7,7 @@ import (
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/log"
 	"github.com/partyhall/partyhall/models"
-	"github.com/partyhall/partyhall/pipewire"
+	"github.com/partyhall/partyhall/os_mgmt"
 	"github.com/partyhall/partyhall/utils"
 	"github.com/spf13/cobra"
 )
@@ -37,7 +37,7 @@ var testCmd = &cobra.Command{
 	Use:   "test",
 	Short: "Some test in dev, should not be used in prod",
 	Run: func(cmd *cobra.Command, args []string) {
-		devices, err := pipewire.GetDevices()
+		devices, err := os_mgmt.GetDevices()
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -70,7 +70,7 @@ var testCmd = &cobra.Command{
 			fmt.Println(s)
 		}
 
-		err = pipewire.LinkDevice(src, dst)
+		err = os_mgmt.LinkDevice(src, dst)
 		if err != nil {
 			fmt.Println(err)
 		}

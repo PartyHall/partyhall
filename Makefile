@@ -71,7 +71,8 @@ shutdown:
 ################
 
 lint-ts:
-	@cd sdk && npx prettier . --write
+	@docker compose exec sdk npx prettier . --write
+	@docker compose exec sdk npm run lint -- --fix
 	@docker compose exec admin npx prettier . --write
 	@docker compose exec frontend npx prettier . --write
 	@docker compose exec admin npm run lint -- --fix

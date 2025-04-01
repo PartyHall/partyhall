@@ -12,7 +12,8 @@
     "license": "ISC",
     "scripts": {
         "tsc": "tsc",
-        "dev": "tsc --watch"
+        "dev": "tsc --watch",
+        "lint": "eslint ."
     },
     "dependencies": {
         "@types/luxon": "^3.4.2",

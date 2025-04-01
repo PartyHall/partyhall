@@ -1,4 +1,4 @@
-package pipewire
+package os_mgmt
 
 import (
 	"fmt"

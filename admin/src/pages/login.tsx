@@ -38,7 +38,7 @@ export default function LoginPage() {
 
             let description = 'generic.error.unexpected';
             if (e.message?.type === 'bad-login') {
-                description = 'login.bad_login'
+                description = 'login.bad_login';
             }
 
             notifApi.error({

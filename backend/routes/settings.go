@@ -2,6 +2,7 @@ package routes
 
 import (
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -12,9 +13,12 @@ import (
 	"github.com/partyhall/partyhall/middlewares"
 	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/mqtt"
-	"github.com/partyhall/partyhall/pipewire"
+	"github.com/partyhall/partyhall/nexus"
+	"github.com/partyhall/partyhall/os_mgmt"
 	"github.com/partyhall/partyhall/state"
 )
+
+var spotifydNameRegex = regexp.MustCompile(`^[\p{L}0-9]{1,64}$`) // Letters + numbers between 1 & 64 characters (NO SPACE ! See spotifyd/spotifyd#146)
 
 type RoutesSettings struct{}
 
@@ -40,6 +44,43 @@ func (h RoutesSettings) Register(router *gin.RouterGroup) {
 		h.setUnattended,
 	)
 
+	router.GET(
+		"ap",
+		middlewares.NotOnboardedOrRole("ADMIN"),
+		h.getAp,
+	)
+
+	router.PUT(
+		"ap",
+		middlewares.NotOnboardedOrRole("ADMIN"),
+		h.setAp,
+	)
+
+	router.GET(
+		"spotify",
+		middlewares.NotOnboardedOrRole("ADMIN"),
+		h.getSpotify,
+	)
+
+	router.PUT(
+		"spotify",
+		middlewares.NotOnboardedOrRole("ADMIN"),
+		h.setSpotify,
+	)
+
+	// Non-onboarded | Admin
+	router.GET(
+		"nexus",
+		middlewares.NotOnboardedOrRole("ADMIN"),
+		h.getNexus,
+	)
+
+	router.PUT(
+		"nexus",
+		middlewares.NotOnboardedOrRole("ADMIN"),
+		h.setNexus,
+	)
+
 	//region Maybe to rework
 	// Non-onboarded | Admin
 	router.GET(
@@ -61,6 +102,65 @@ func (h RoutesSettings) Register(router *gin.RouterGroup) {
 		h.setAudioDeviceVolume,
 	)
 	//endregion
+}
+
+func (h RoutesSettings) getNexus(c *gin.Context) {
+	us := config.GET.UserSettings
+
+	c.JSON(200, map[string]any{
+		"nexus_url":   us.NexusURL,
+		"hardware_id": us.HardwareID,
+		"bypass_ssl":  us.NexusIgnoreSSL,
+	})
+}
+
+func (h RoutesSettings) setNexus(c *gin.Context) {
+	var req struct {
+		BaseUrl    string `json:"base_url"`
+		HardwareId string `json:"hardware_id"`
+		ApiKey     string `json:"api_key"`
+		BypassSsl  bool   `json:"bypass_ssl"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		api_errors.RenderValidationErr(c, err)
+
+		return
+	}
+
+	baseUrl := strings.TrimSuffix(req.BaseUrl, "/")
+
+	response := map[string]any{
+		"nexus_url":   baseUrl,
+		"hardware_id": req.HardwareId,
+		"bypass_ssl":  req.BypassSsl,
+	}
+
+	var errMessage = ""
+	var successful = true
+
+	if len(baseUrl) > 0 {
+		errMessage, successful = nexus.ValidateCredentials(
+			baseUrl,
+			req.HardwareId,
+			req.ApiKey,
+			req.BypassSsl,
+		)
+	}
+
+	response["error"] = nil
+	if successful {
+		config.GET.UserSettings.NexusURL = baseUrl
+		config.GET.UserSettings.HardwareID = req.HardwareId
+		config.GET.UserSettings.ApiKey = req.ApiKey
+		config.GET.UserSettings.NexusIgnoreSSL = req.BypassSsl
+		config.GET.UserSettings.Save()
+		state.STATE.UserSettings = config.GET.UserSettings
+	} else {
+		response["error"] = errMessage
+	}
+
+	c.JSON(200, response)
 }
 
 func (h RoutesSettings) setWebcam(c *gin.Context) {
@@ -159,8 +259,92 @@ func (h RoutesSettings) setUnattended(c *gin.Context) {
 	c.Status(200)
 }
 
+func (h RoutesSettings) getAp(c *gin.Context) {
+	c.JSON(200, config.GET.UserSettings.WirelessAp)
+}
+
+func (h RoutesSettings) setAp(c *gin.Context) {
+	var req struct {
+		Enabled  bool   `json:"enabled"`
+		Ssid     string `json:"ssid" binding:"required"`
+		Password string `json:"password" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		api_errors.RenderValidationErr(c, err)
+
+		return
+	}
+
+	// @TODO:
+	// Validate the hostname & password
+	// Build the hostapd.conf
+
+	if req.Enabled {
+		// systemctl enable hostapd
+		// systemctl restart hostapd
+	} else {
+		// systemctl disable --now hostapd
+	}
+
+	config.GET.UserSettings.WirelessAp.Enabled = req.Enabled
+	config.GET.UserSettings.WirelessAp.Ssid = req.Ssid
+	config.GET.UserSettings.WirelessAp.Password = req.Password
+	config.GET.UserSettings.Save()
+
+	state.STATE.UserSettings = config.GET.UserSettings
+
+	// @TODO: Ensure that the config is working (No error while running the command, idk where to find the logs though)
+	c.JSON(200, req)
+}
+
+func (h RoutesSettings) getSpotify(c *gin.Context) {
+	c.JSON(200, config.GET.UserSettings.Spotify)
+}
+
+func (h RoutesSettings) setSpotify(c *gin.Context) {
+	var req struct {
+		Enabled bool   `json:"enabled"`
+		Name    string `json:"name" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		api_errors.RenderValidationErr(c, err)
+
+		return
+	}
+
+	if req.Enabled && !(*spotifydNameRegex).MatchString(req.Name) {
+		c.Render(http.StatusBadRequest, api_errors.BAD_REQUEST.WithExtra(map[string]any{
+			"err": "Invalid device name, should only contains letters and numbers (No space!)",
+		}))
+
+		return
+	}
+
+	// Building & saving the Spotifyd config + restarting the service
+	err := os_mgmt.SetSpotifySettings(req.Enabled, req.Name)
+	if err != nil {
+		c.Render(http.StatusInternalServerError, api_errors.BAD_REQUEST.WithExtra(map[string]any{
+			"err": err.Error(),
+		}))
+
+		return
+	}
+
+	// Saving the stuff in PH config (so that we don't have to parse the config)
+	config.GET.UserSettings.Spotify.Enabled = req.Enabled
+	config.GET.UserSettings.Spotify.Name = req.Name
+	config.GET.UserSettings.Save()
+
+	state.STATE.UserSettings = config.GET.UserSettings
+
+	c.JSON(200, req)
+}
+
+// #region
 func (h RoutesSettings) getAudioDevices(c *gin.Context) {
-	devices, err := pipewire.GetDevices()
+	devices, err := os_mgmt.GetDevices()
 	if err != nil {
 		c.Render(http.StatusBadRequest, api_errors.BAD_REQUEST.WithExtra(map[string]any{
 			"err": err.Error(),
@@ -184,7 +368,7 @@ func (h RoutesSettings) setAudioDevices(c *gin.Context) {
 		return
 	}
 
-	err := pipewire.SetDefaultDevices(req.SourceId, req.SinkId)
+	err := os_mgmt.SetDefaultDevices(req.SourceId, req.SinkId)
 	if err != nil {
 		api_errors.BAD_REQUEST.WithExtra(map[string]any{
 			"err": err,
@@ -195,7 +379,7 @@ func (h RoutesSettings) setAudioDevices(c *gin.Context) {
 
 	// Note that the links will not be updated in the response
 	// but we don't care, the font do not have to use them
-	devices, err := pipewire.GetDevices()
+	devices, err := os_mgmt.GetDevices()
 	if err != nil {
 		api_errors.BAD_REQUEST.WithExtra(map[string]any{
 			"err": err,
@@ -206,7 +390,7 @@ func (h RoutesSettings) setAudioDevices(c *gin.Context) {
 
 	mercure_client.CLIENT.SendAudioDevices(devices)
 
-	err = pipewire.LinkDevice(devices.DefaultSource, devices.DefaultSink)
+	err = os_mgmt.LinkDevice(devices.DefaultSource, devices.DefaultSink)
 	if err != nil {
 		api_errors.BAD_REQUEST.WithExtra(map[string]any{
 			"err": err,
@@ -240,7 +424,7 @@ func (h RoutesSettings) setAudioDeviceVolume(c *gin.Context) {
 		return
 	}
 
-	devices, err := pipewire.GetDevices()
+	devices, err := os_mgmt.GetDevices()
 	if err != nil {
 		api_errors.BAD_REQUEST.WithExtra(map[string]any{
 			"err": err,
@@ -262,7 +446,7 @@ func (h RoutesSettings) setAudioDeviceVolume(c *gin.Context) {
 		return
 	}
 
-	err = pipewire.SetVolume(device, float64(req.Volume)/100)
+	err = os_mgmt.SetVolume(device, float64(req.Volume)/100)
 	if err != nil {
 		api_errors.BAD_REQUEST.WithExtra(map[string]any{
 			"err": err,
@@ -271,7 +455,7 @@ func (h RoutesSettings) setAudioDeviceVolume(c *gin.Context) {
 		return
 	}
 
-	devices, err = pipewire.GetDevices()
+	devices, err = os_mgmt.GetDevices()
 	if err != nil {
 		api_errors.BAD_REQUEST.WithExtra(map[string]any{
 			"err": err,
@@ -284,3 +468,5 @@ func (h RoutesSettings) setAudioDeviceVolume(c *gin.Context) {
 
 	c.JSON(200, devices)
 }
+
+//#endregion

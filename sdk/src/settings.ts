@@ -1,11 +1,42 @@
 import { AudioDevice, AudioDevices } from './models/audio';
+import NexusSettings from './models/nexus';
 import { SDK } from './index';
+import SpotifySettings from './models/spotify';
 
 export default class Settings {
     sdk: SDK;
 
     constructor(sdk: SDK) {
         this.sdk = sdk;
+    }
+
+    public async getNexus() {
+        const resp = await this.sdk.get('/api/settings/nexus');
+        return NexusSettings.fromJson(await resp.json());
+    }
+
+    public async setNexus(baseUrl: string, hwid: string, apiKey: string, bypassSsl: boolean) {
+        const resp = await this.sdk.put('/api/settings/nexus', {
+            base_url: baseUrl,
+            hardware_id: hwid,
+            api_key: apiKey,
+            bypass_ssl: bypassSsl,
+        });
+
+        return NexusSettings.fromJson(await resp.json());
+    }
+
+    public async getSpotify() {
+        const resp = await this.sdk.get('/api/settings/spotify');
+
+        return SpotifySettings.fromJson(await resp.json());
+    }
+
+    public async setSpotify(enabled: boolean, name: string) {
+        await this.sdk.put('/api/settings/spotify', {
+            enabled,
+            name,
+        });
     }
 
     public async setWebcam(width: number, height: number) {

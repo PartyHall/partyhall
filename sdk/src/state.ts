@@ -1,4 +1,4 @@
-import { PhEvent, PhState, SDK } from "./index";
+import { PhEvent, PhState, SDK } from './index';
 
 export default class State {
     private sdk: SDK;
@@ -38,7 +38,7 @@ export default class State {
 
     public async setEvent(id: number): Promise<PhEvent | null> {
         const resp = await this.sdk.put(`/api/state/event`, {
-            'event': id,
+            event: id,
         });
         const data = await resp.json();
 

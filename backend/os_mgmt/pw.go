@@ -1,4 +1,4 @@
-package pipewire
+package os_mgmt
 
 /**
 	THE WHOLE PIPEWIRE PACKAGE IS A CLAUDE.AI RADIOACTIVE ZONE

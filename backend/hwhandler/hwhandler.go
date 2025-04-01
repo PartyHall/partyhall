@@ -13,6 +13,15 @@ import (
 	"go.bug.st/serial"
 )
 
+/**
+ @TODO: The button mapping should happen in the main app, not here
+ This will let this thing run at all time
+ then on the front do the mapping so that no reload of the config is needed
+ in this process
+ This will also let the admin show which button is pressed during onboarding
+ instead of actually doing the thing
+**/
+
 type Device struct {
 	Handler             *HardwareHandler
 	PortName            string
@@ -131,7 +140,7 @@ func (d *Device) subscribe() error {
 
 func (hh *HardwareHandler) ProcessSerialConn(d *Device) error {
 	port, err := serial.Open(d.PortName, &serial.Mode{
-		BaudRate: config.GET.HardwareHandler.BaudRate,
+		BaudRate: 57600,
 		Parity:   serial.NoParity,
 		DataBits: 8,
 		StopBits: serial.OneStopBit,
@@ -211,7 +220,7 @@ func (d *Device) ProcessMessage() error {
 	// If its a button press, special case
 	if strings.HasPrefix(msg, "BTN_") {
 		msg = strings.Trim(msg, " \t")
-		val, ok := config.GET.HardwareHandler.Mappings[msg]
+		val, ok := config.GET.UserSettings.ButtonMappings[msg]
 		if !ok {
 			debugMsg(msg)
 

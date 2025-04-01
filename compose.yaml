@@ -13,32 +13,17 @@ services:
       interval: '10s'
       timeout: '10s'
       retries: 6
-  # app:
-  #   image: 'partyhall:dev'
-  #   build:
-  #     context: .
-  #     dockerfile: './docker/dev/Dockerfile'
-  #   working_dir: '/app'
-  #   environment:
-  #     PARTYHALL_ENV: 'dev'
-  #   volumes:
-  #     - './0_DATA/gopkg:/go/pkg'
-  #     - './backend:/app'
-  #     - './0_DATA/partyhall.yaml:/etc/partyhall.yaml'
-  #     - './0_DATA/data:/root/data'
-  #   extra_hosts:
-  #     - 'host.docker.internal:host-gateway'
-  #   healthcheck:
-  #     test: ["CMD", "curl", "--silent", "--fail", "http://localhost:8080/api/status"]
-  #     interval: '30s'
-  #     start_period: '15s'
-  #     retries: 5
-  #   depends_on:
-  #     mosquitto:
-  #       condition: 'service_healthy'
-  #   ports:
-  #     - '127.0.0.1:8745:8080'
-  #     - '127.0.0.1:2345:2345'
+
+  # The main app should be run outside of docker for ease purposes
+
+  sdk:
+    image: 'node:lts'
+    init: true
+    working_dir: '/sdk'
+    command: ['bash', '-c', '[ ! -d node_modules ] && npm install; npm run dev']
+    volumes:
+      - './sdk:/sdk'
+    user: "${UID:-1000}:${GID:-1000}"
 
   frontend:
     image: 'node:lts'
@@ -54,9 +39,6 @@ services:
       - 'host.docker.internal:host-gateway'
     ports:
       - '127.0.0.1:5173:5173'
-    # depends_on:
-    #   app:
-    #     condition: 'service_healthy'
 
   admin:
     image: 'node:lts'
@@ -72,6 +54,3 @@ services:
       - 'host.docker.internal:host-gateway'
     ports:
       - '127.0.0.1:5174:5173'
-    # depends_on:
-    #   app:
-    #     condition: 'service_healthy'

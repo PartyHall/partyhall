@@ -27,6 +27,7 @@ export default function AuthedLayout() {
     if (api.tokenUser?.roles.includes('ADMIN')) {
         pages = [...pages.slice(0, 1), { key: 'events', label: t('events'), target: '/events' }, ...pages.slice(1)];
 
+        pages.push({ key: 'settings', label: t('settings'), target: '/settings' });
         pages.push({ key: 'logs', label: t('logs'), target: '/logs' });
     }
 

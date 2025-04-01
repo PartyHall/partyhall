@@ -28,11 +28,7 @@ export class PhSong {
     }
 
     private getUrl(filename: string) {
-        return `/api/webapp/songs/${this.nexus_id}/data/${filename}`;
-    }
-
-    getCoverUrl() {
-        return this.getUrl('cover.jpg');
+        return `/api/songs/${this.nexus_id}/file/${filename}`;
     }
 
     getInstrumentalUrl() {

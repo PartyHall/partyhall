@@ -11,7 +11,9 @@
     "author": "PartyHall",
     "license": "ISC",
     "scripts": {
-        "tsc": "tsc"
+        "tsc": "tsc",
+        "dev": "tsc --watch",
+        "lint": "eslint ."
     },
     "dependencies": {
         "@types/luxon": "^3.4.2",

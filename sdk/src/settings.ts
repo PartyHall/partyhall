@@ -1,5 +1,7 @@
 import { AudioDevice, AudioDevices } from './models/audio';
-import { PhEvent, SDK } from './index';
+import NexusSettings from './models/nexus';
+import { SDK } from './index';
+import SpotifySettings from './models/spotify';
 
 export default class Settings {
     sdk: SDK;
@@ -8,57 +10,74 @@ export default class Settings {
         this.sdk = sdk;
     }
 
-    public async shutdown(): Promise<void> {
-        await this.sdk.post(`/api/webapp/settings/shutdown`);
+    public async getNexus() {
+        const resp = await this.sdk.get('/api/settings/nexus');
+        return NexusSettings.fromJson(await resp.json());
     }
 
-    public async setMode(mode: string): Promise<void> {
-        await this.sdk.post(`/api/webapp/settings/mode/${mode}`);
+    public async setNexus(baseUrl: string, hwid: string, apiKey: string, bypassSsl: boolean) {
+        const resp = await this.sdk.put('/api/settings/nexus', {
+            base_url: baseUrl,
+            hardware_id: hwid,
+            api_key: apiKey,
+            bypass_ssl: bypassSsl,
+        });
+
+        return NexusSettings.fromJson(await resp.json());
     }
 
-    public async setEvent(id: number): Promise<PhEvent | null> {
-        const resp = await this.sdk.post(`/api/webapp/settings/event/${id}`);
-        const data = await resp.json();
+    public async getSpotify() {
+        const resp = await this.sdk.get('/api/settings/spotify');
 
-        return PhEvent.fromJson(data);
+        return SpotifySettings.fromJson(await resp.json());
     }
 
-    public async showDebug(): Promise<void> {
-        await this.sdk.post('/api/webapp/settings/debug');
+    public async setSpotify(enabled: boolean, name: string) {
+        await this.sdk.put('/api/settings/spotify', {
+            enabled,
+            name,
+        });
+    }
+
+    public async setWebcam(width: number, height: number) {
+        await this.sdk.put('/api/settings/webcam', {
+            width,
+            height,
+        });
+    }
+
+    public async setUnattended(enabled: boolean, interval: number) {
+        await this.sdk.put('/api/settings/unattended', {
+            enabled,
+            interval,
+        });
+    }
+
+    public async setFlash(powered: boolean, brightness: number) {
+        await this.sdk.put('/api/settings/flash', {
+            powered,
+            brightness,
+        });
     }
 
     public async getAudioDevices(): Promise<AudioDevices | null> {
-        const resp = await this.sdk.get('/api/webapp/settings/audio-devices');
-        const data = await resp.json();
+        const resp = await this.sdk.get('/api/settings/audio-devices');
 
-        return AudioDevices.fromJson(data);
+        return AudioDevices.fromJson(await resp.json());
     }
 
     public async setAudioDevices(source: number, sink: number): Promise<AudioDevices | null> {
-        const resp = await this.sdk.post('/api/webapp/settings/audio-devices', {
+        const resp = await this.sdk.post('/api/settings/audio-devices', {
             source_id: source,
             sink_id: sink,
         });
-        const data = await resp.json();
 
-        return AudioDevices.fromJson(data);
+        return AudioDevices.fromJson(await resp.json());
     }
 
     public async setAudioDeviceVolume(device: AudioDevice, volume: number) {
         const resp = await this.sdk.post(`/api/webapp/settings/audio-devices/${device.id}/volume`, { volume });
-        const data = await resp.json();
 
-        return AudioDevices.fromJson(data);
-    }
-
-    public async setBackdrops(albumId: number | null, selectedBackdrop: number | null) {
-        const resp = await this.sdk.post(`/api/webapp/settings/backdrops`, {
-            backdrop_album: albumId,
-            selected_backdrop: selectedBackdrop,
-        });
-
-        const data = await resp.json();
-
-        return data;
+        return AudioDevices.fromJson(await resp.json());
     }
 }

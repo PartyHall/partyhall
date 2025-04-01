@@ -1,14 +1,17 @@
+import Admin from './admin';
 import Auth from './auth';
+import Backdrop from './backdrops';
 import { DateTime } from 'luxon';
 import Events from './events';
-import Global from './global';
 import Karaoke from './karaoke';
 import Nexus from './nexus';
 import { PhTokenUser } from './models/user';
 import Photobooth from './photobooth';
 import { SdkError } from './models/sdk_error';
 import Settings from './settings';
-import Backdrop from './backdrops';
+import SongSessions from './song_sessions';
+import Songs from './songs';
+import State from './state';
 
 export type StoreToken = (token: string | null, refreshToken: string | null) => void;
 export type OnExpired = () => void;
@@ -23,10 +26,14 @@ export class SDK {
 
     public tokenUser: PhTokenUser | null = null;
 
+    public admin: Admin;
     public auth: Auth;
-    public backdrops: Backdrop;
-    public global: Global;
+    public state: State;
     public events: Events;
+    public songs: Songs;
+    public songSessions: SongSessions;
+
+    public backdrops: Backdrop;
     public photobooth: Photobooth;
     public karaoke: Karaoke;
     public nexus: Nexus;
@@ -36,12 +43,16 @@ export class SDK {
         this.token = token;
         this.refreshToken = refreshToken;
 
+        this.admin = new Admin(this);
         this.auth = new Auth(this);
         this.backdrops = new Backdrop(this);
-        this.global = new Global(this);
         this.events = new Events(this);
-        this.photobooth = new Photobooth(this);
         this.karaoke = new Karaoke(this);
+        this.photobooth = new Photobooth(this);
+        this.state = new State(this);
+        this.songs = new Songs(this);
+        this.songSessions = new SongSessions(this);
+
         this.nexus = new Nexus(this);
         this.settings = new Settings(this);
 

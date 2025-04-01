@@ -6,7 +6,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/log"
-	"github.com/partyhall/partyhall/pipewire"
+	"github.com/partyhall/partyhall/models"
+	"github.com/partyhall/partyhall/os_mgmt"
 	"github.com/partyhall/partyhall/utils"
 	"github.com/spf13/cobra"
 )
@@ -36,13 +37,13 @@ var testCmd = &cobra.Command{
 	Use:   "test",
 	Short: "Some test in dev, should not be used in prod",
 	Run: func(cmd *cobra.Command, args []string) {
-		devices, err := pipewire.GetDevices()
+		devices, err := os_mgmt.GetDevices()
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
 
-		var src *pipewire.Device
+		var src *models.PwDevice
 		fmt.Println("Sources:")
 		for _, s := range devices.Sources {
 			fmt.Println(s)
@@ -53,7 +54,7 @@ var testCmd = &cobra.Command{
 
 		fmt.Println()
 
-		var dst *pipewire.Device
+		var dst *models.PwDevice
 		fmt.Println("Sinks:")
 		for _, s := range devices.Sinks {
 			fmt.Println(s)
@@ -69,7 +70,7 @@ var testCmd = &cobra.Command{
 			fmt.Println(s)
 		}
 
-		err = pipewire.LinkDevice(src, dst)
+		err = os_mgmt.LinkDevice(src, dst)
 		if err != nil {
 			fmt.Println(err)
 		}

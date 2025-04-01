@@ -5,16 +5,38 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/partyhall/partyhall/api_errors"
 	"github.com/partyhall/partyhall/mercure_client"
+	"github.com/partyhall/partyhall/middlewares"
 	"github.com/partyhall/partyhall/nexus"
 	"github.com/partyhall/partyhall/state"
+	"github.com/partyhall/partyhall/utils"
 )
 
-func routeCreateOnNexus(c *gin.Context) {
+type RoutesNexus struct{}
+
+func (h RoutesNexus) Register(router *gin.RouterGroup) {
+	// Onboarded & Has an event & Admin
+	router.POST(
+		"create_event/:eventId",
+		middlewares.Onboarded(true),
+		middlewares.HasEventLoaded(),
+		middlewares.Authorized("ADMIN"),
+		h.createEventOnNexus,
+	)
+
+	// Onboarded & Admin
+	router.POST(
+		"sync",
+		middlewares.Onboarded(true),
+		middlewares.Authorized("ADMIN"),
+		h.sync,
+	)
+}
+
+func (h RoutesNexus) createEventOnNexus(c *gin.Context) {
 	if !nexus.INSTANCE.IsSetup {
 		api_errors.ApiError(
 			c,
@@ -27,18 +49,12 @@ func routeCreateOnNexus(c *gin.Context) {
 		return
 	}
 
-	eventIdStr := c.Params.ByName("id")
-
-	eventId, err := strconv.ParseInt(eventIdStr, 10, 64)
-	if err != nil {
-		c.Render(http.StatusBadRequest, api_errors.BAD_REQUEST.WithExtra(map[string]any{
-			"err": "Bad event id",
-		}))
-
+	eventId, parseFailed := utils.ParamAsIntOrError(c, "eventId")
+	if parseFailed {
 		return
 	}
 
-	err = nexus.INSTANCE.CreateEvent(eventId)
+	err := nexus.INSTANCE.CreateEvent(eventId)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			api_errors.ApiError(
@@ -61,11 +77,15 @@ func routeCreateOnNexus(c *gin.Context) {
 		return
 	}
 
-	mercure_client.CLIENT.PublishEvent("/event", state.STATE.CurrentEvent)
+	// @WARN wtf is that ?
+	// Do we really want that creating an event on nexus sets it as the current event?
+	// I don't think so but I won't touch it yet
+	// We probably just want to send the JSON of the given event
+	mercure_client.CLIENT.SetCurrentEvent(state.STATE.CurrentEvent)
 	c.JSON(http.StatusOK, state.STATE.CurrentEvent)
 }
 
-func routeSync(c *gin.Context) {
+func (h RoutesNexus) sync(c *gin.Context) {
 	if !nexus.INSTANCE.IsSetup {
 		api_errors.ApiError(
 			c,
@@ -78,6 +98,8 @@ func routeSync(c *gin.Context) {
 		return
 	}
 
+	// Do we really want to sync only the current event?
+	// Should an admin not be able to force-sync another event?
 	err := nexus.INSTANCE.Sync(state.STATE.CurrentEvent)
 	if err != nil {
 		api_errors.ApiError(

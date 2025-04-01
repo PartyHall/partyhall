@@ -8,9 +8,12 @@ export default class Nexus {
     }
 
     async createEvent(eventId: number) {
-        const resp = await this.sdk.post(`/api/webapp/nexus/events/${eventId}`, {});
-        const data = await resp.json();
+        const resp = await this.sdk.post(`/api/nexus/create_event/${eventId}`, {});
 
-        return PhEvent.fromJson(data);
+        return PhEvent.fromJson(await resp.json());
+    }
+
+    async sync() {
+        await this.sdk.post('/api/nexus/sync');
     }
 }

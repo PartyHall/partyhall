@@ -25,7 +25,7 @@ export default function KaraokeHud() {
             return;
         }
 
-        await api.karaoke.songEnded(karaoke.current.id);
+        await api.songSessions.songEnded(karaoke.current.id);
     };
 
     return (

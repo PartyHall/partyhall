@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { useAuth } from '../../hooks/auth';
 
-export const FORCE_DEBUG = true;
+export const FORCE_DEBUG = false;
 
 const D = (title: string, child: ReactNode) => (
     <div>
@@ -39,7 +39,7 @@ export function DebugLeft() {
 }
 
 export function DebugRight() {
-    const { hwid, version, commit, debug } = useAuth();
+    const { user_settings, version, commit, debug } = useAuth();
 
     if (!debug && !FORCE_DEBUG) {
         return <></>;
@@ -47,7 +47,7 @@ export function DebugRight() {
 
     return (
         <div className="debug">
-            {D('HWID', hwid)}
+            {D('HWID', user_settings?.hardwareId)}
             {D('Version', version)}
             {D('Commit', commit)}
         </div>

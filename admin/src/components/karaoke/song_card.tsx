@@ -29,7 +29,7 @@ export default function SongCard({ song, type }: Props) {
         }
 
         try {
-            await api.karaoke.addToQueue(song.nexus_id, name, directPlay);
+            await api.songSessions.addToQueue(song.nexus_id, name, directPlay);
             notif.success({
                 message: t('notification_added_queue.title'),
                 description: t('notification_added_queue.description', {
@@ -52,7 +52,7 @@ export default function SongCard({ song, type }: Props) {
                 <Image
                     hasImage={song.has_cover}
                     alt={t('cover_alt', { title: song.title })}
-                    src={song.getCoverUrl()}
+                    src={api.songs.getCoverUrl(song.nexus_id)}
                     className="SongCard__Cover"
                 />
 

@@ -15,7 +15,7 @@ type FormType = {
 };
 
 export default function LoginPage() {
-    const { t } = useTranslation('', { keyPrefix: 'login' });
+    const { t } = useTranslation();
     const { guests_allowed } = useSettings();
     const [admin, setAdmin] = useState<boolean>(!guests_allowed);
     const [notifApi, notifCtx] = notification.useNotification();
@@ -36,17 +36,21 @@ export default function LoginPage() {
         } catch (e: any) {
             console.error(e);
 
-            const isBadLogin = e.message?.type === 'https://github.com/partyhall/partyhall/bad-login';
+            let description = 'generic.error.unexpected';
+            if (e.message?.type === 'bad-login') {
+                description = 'login.bad_login';
+            }
 
             notifApi.error({
-                message: t('notification_failed_login.title'),
-                description: t(
-                    'notification_failed_login.' + (e.status === 400 && isBadLogin ? 'bad_login' : 'description')
-                ),
+                message: t('generic.error.title'),
+                description: t(description),
             });
         }
     };
 
+    /**
+     * Not sure it even happens
+     */
     const onFinishFailed: FormProps<FormType>['onFinishFailed'] = (errorInfo) => {
         notifApi.error({
             message: 'Failed to login',
@@ -78,12 +82,12 @@ export default function LoginPage() {
                 >
                     <Flex vertical style={{ marginTop: '2em', marginBottom: '2em' }}>
                         <Form.Item<FormType>
-                            label={t('username')}
+                            label={t('login.username')}
                             name="username"
                             rules={[
                                 {
                                     required: true,
-                                    message: t('username_required'),
+                                    message: t('login.username_required'),
                                 },
                             ]}
                         >
@@ -92,12 +96,12 @@ export default function LoginPage() {
 
                         {(!guests_allowed || admin) && (
                             <Form.Item<FormType>
-                                label={t('password')}
+                                label={t('login.password')}
                                 name="password"
                                 rules={[
                                     {
                                         required: true,
-                                        message: t('password_required'),
+                                        message: t('login.password_required'),
                                     },
                                 ]}
                             >
@@ -115,14 +119,14 @@ export default function LoginPage() {
                     >
                         {guests_allowed && (
                             <Switch
-                                checkedChildren={t('admin')}
-                                unCheckedChildren={t('anonymous')}
+                                checkedChildren={t('login.admin')}
+                                unCheckedChildren={t('login.anonymous')}
                                 onChange={(x) => setAdmin(x.valueOf())}
                                 checked={admin}
                             />
                         )}
                         <Button type="primary" htmlType="submit">
-                            {t('connect')}
+                            {t('login.connect')}
                         </Button>
                     </Flex>
                 </Form>

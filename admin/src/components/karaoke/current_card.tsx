@@ -33,7 +33,7 @@ export default function CurrentCard() {
             return;
         }
 
-        await api.karaoke.cancelSession(karaoke.current.id);
+        await api.songSessions.cancelSession(karaoke.current.id);
     };
 
     return (
@@ -45,7 +45,7 @@ export default function CurrentCard() {
                         alt={t('cover_alt', {
                             title: karaoke.current.song.title,
                         })}
-                        src={karaoke.current.song.getCoverUrl()}
+                        src={api.songs.getCoverUrl(karaoke.current.song.nexus_id)}
                         className="SongCard__Cover"
                     />
 

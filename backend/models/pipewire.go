@@ -1,11 +1,11 @@
-package pipewire
+package models
 
 import (
 	"fmt"
 	"strings"
 )
 
-type Port struct {
+type PwPort struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
 	Description string `json:"description"`
@@ -13,7 +13,7 @@ type Port struct {
 	Channel     string `json:"channel"`
 }
 
-func (p Port) String() string {
+func (p PwPort) String() string {
 	return fmt.Sprintf(
 		"[Port %v] %v (%v) DIR: %v, CH: %v",
 		p.ID,
@@ -24,26 +24,26 @@ func (p Port) String() string {
 	)
 }
 
-type Link struct {
+type PwLink struct {
 	ID           int `json:"id"`
 	InputNodeId  int `json:"input_node_id"`
 	OutputNodeId int `json:"output_node_id"`
 }
 
-func (l Link) String() string {
+func (l PwLink) String() string {
 	return fmt.Sprintf("[Link %v] %v => %v", l.ID, l.InputNodeId, l.OutputNodeId)
 }
 
-type Device struct {
-	ID          int     `json:"id"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Class       string  `json:"-"`
-	Volume      float64 `json:"volume"`
-	Ports       []Port  `json:"ports"`
+type PwDevice struct {
+	ID          int      `json:"id"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Class       string   `json:"-"`
+	Volume      float64  `json:"volume"`
+	Ports       []PwPort `json:"ports"`
 }
 
-func (d Device) String() string {
+func (d PwDevice) String() string {
 	ports := []string{}
 
 	for _, p := range d.Ports {
@@ -61,14 +61,14 @@ func (d Device) String() string {
 	)
 }
 
-type Devices struct {
-	KaraokeSource Device   `json:"karaoke_source"`
-	KaraokeSink   Device   `json:"karaoke_sink"`
-	DefaultSource *Device  `json:"default_source"`
-	DefaultSink   *Device  `json:"default_sink"`
-	Sources       []Device `json:"sources"`
-	Sinks         []Device `json:"sinks"`
-	Links         []Link   `json:"links"`
+type PwDevices struct {
+	KaraokeSource PwDevice   `json:"karaoke_source"`
+	KaraokeSink   PwDevice   `json:"karaoke_sink"`
+	DefaultSource *PwDevice  `json:"default_source"`
+	DefaultSink   *PwDevice  `json:"default_sink"`
+	Sources       []PwDevice `json:"sources"`
+	Sinks         []PwDevice `json:"sinks"`
+	Links         []PwLink   `json:"links"`
 }
 
 type PipeWireMetadata struct {

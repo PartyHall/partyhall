@@ -18,18 +18,24 @@ func GetClaimsFromUser(dbUser *models.User, isGuest bool) models.JwtCustomClaims
 	topics := []string{
 		"/time",
 		"/event",
+		"/flash",
 		"/mode",
-		"/snackbar",
-		"/debug",
-		"/karaoke-queue",
-		"/karaoke",
 		"/sync-progress",
+		"/snackbar",
+		"/backdrop-state",
+		"/karaoke",
+		"/karaoke-queue",
+		"/karaoke-timecode",
+		"/user-settings",
 	}
 
 	// Admin can subscribe to everything
 	for _, r := range dbUser.Roles {
 		if r == "ADMIN" {
-			topics = []string{"*"}
+			topics = append(topics, []string{
+				"/audio-devices",
+				"/logs",
+			}...)
 			break
 		}
 	}

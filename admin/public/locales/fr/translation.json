@@ -10,7 +10,8 @@
             "events": "Évènements",
             "photobooth": "Photomaton",
             "karaoke": "Karaoké",
-            "logs": "Logs"
+            "logs": "Logs",
+            "settings": "Paramètres"
         },
         "event_title": "{{eventName}} par {{eventAuthor}}",
         "id": "ID",
@@ -19,6 +20,7 @@
         "date": "Date",
         "location": "Lieux",
         "none": "Aucun",
+        "enabled": "Activé",
         "actions": {
             "noun": "Actions",
             "new": "Nouveau",
@@ -34,7 +36,19 @@
             "pause": "Pause",
             "next": "Suivant",
             "previous": "Précédent"
+        },
+        "hw_flash": {
+            "turn_on": "Allumer le flash",
+            "turn_off": "Éteindre le flash"
+        },
+        "error": {
+            "title": "Erreur",
+            "unexpected": "Une erreur inconnue s'est produite"
         }
+    },
+    "onboarding": {
+        "not_onboarded": "Cet appareil n'a pas été configuré",
+        "already_onboarded": "Cet appareil a déjà été configuré"
     },
     "login": {
         "username": "Pseudo",
@@ -44,23 +58,12 @@
         "connect": "Connexion",
         "username_required": "Le pseudo est requis",
         "password_required": "Le mot de passe est requis",
-        "notification_failed_login": {
-            "title": "Échec de la connexion",
-            "description": "Voir la console pour plus d'infos",
-            "bad_login": "Pseudo/mot de passe invalide"
-        }
+        "bad_login": "Pseudo ou mot de passe invalide"
     },
     "home": {
         "about_you": {
             "title": "Mon compte",
             "your_display_name": "Pseudo affiché"
-        },
-        "sound_settings": {
-            "title": "Audio",
-            "input_device": "Microphone",
-            "output_device": "Haut-parleurs",
-            "volume_input": "Volume micros",
-            "volume_output": "Volume haut-parleurs"
         },
         "actions": {
             "title": "Actions",
@@ -154,6 +157,56 @@
             "has_vocals": "Voix",
             "yes": "Oui",
             "no": "Non"
+        }
+    },
+    "settings": {
+        "title": "Paramètres de la machine",
+        "advanced_settings": "Paramètres avancés",
+        "photobooth": {
+            "title": "Photomaton"
+        },
+        "audio": {
+            "title": "Audio",
+            "input_device": "Microphone",
+            "output_device": "Haut-parleurs",
+            "volume_input": "Volume micros",
+            "volume_output": "Volume haut-parleurs"
+        },
+        "webcam": {
+            "title": "Webcam",
+            "resolution": {
+                "subtitle": "Résolution",
+                "desc": "Merci de remplir la résolution de votre webcam",
+                "width": "Largeur",
+                "height": "Hauteur"
+            }
+        },
+        "unattended": {
+            "title": "Timelapse",
+            "desc": "Il est possible de prendre automatiquement une photo régulièrement et de compiler un timelapse à la fin de l'évènement. L'interval est spécifié en secondes.",
+            "interval": "Interval"
+        },
+        "hwflash": {
+            "title": "Flash physique",
+            "desc": "L'appareil peut avoir un flash physique (comme un bandeau de led). Si c'est le cas, vous pouvez maintenant configurer sa luminosité.",
+            "desc2": "Allez devant la caméra pour vous assurer que l'image est suffisament éclairée.",
+            "brightness": "Luminosité"
+        },
+        "nexus": {
+            "title": "PartyNexus",
+            "desc": "PartyNexus est le hub central vous permettant de tout synchroniser, comme l'envoi des photos prises par cet appareil, mais aussi la récupération des musiques de karaoké disponible sur celui-ci.",
+            "desc2": "Si vous n'avez pas de serveur PartyNexus, il est fortement recommandé d'en installer un, puisque une grande quantité de fonctionnalités le nécessite.",
+            "remove_settings": "Vous allez supprimer la configuration de PartyNexus",
+            "url": "Adresse",
+            "hardware_id": "ID Hardware",
+            "api_key": "Clé API",
+            "bypass_ssl": "Ignorer la validation du certificat SSL"
+        },
+        "spotify": {
+            "title": "Spotify Connect",
+            "desc": "Cet appareil peut servir de haut-parleur Spotify, si vous avez un compte premium, vous pouvez alors caster directement depuis l'application officielle.",
+            "name": "Nom de l'appareil",
+            "name_desc": "C'est le nom qui sera affiché dans la liste des appareils sur Spotify"
         }
     }
 }

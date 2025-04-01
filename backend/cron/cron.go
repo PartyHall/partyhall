@@ -10,6 +10,15 @@ import (
 	"github.com/partyhall/partyhall/state"
 )
 
+var lastUnattendedPicture time.Time
+
+/**
+ * Note:
+ * Cron method runs at all time and diff with the previous run time
+ * because we want them to update snappily when they change their
+ * settings
+ **/
+
 func RunCron() {
 	// Sending time every seconds
 	go func() {
@@ -19,35 +28,32 @@ func RunCron() {
 
 		for {
 			time.Sleep(1 * time.Second)
-			err := mercure_client.CLIENT.PublishEvent("/time", map[string]any{
-				"time": time.Now().Format(time.RFC3339),
-			})
 
-			if err != nil {
+			if err := mercure_client.CLIENT.SendTime(); err != nil {
 				log.Warn("Failed to publish time to mercure hub", "err", err)
 			}
 		}
 	}()
 
 	// Taking unattended pictures every X minutes
+	lastUnattendedPicture = time.Now()
 	go func() {
-		module := config.GET.ModulesSettings.Photobooth.Unattended
-
-		if !module.Enabled {
-			return
-		}
-
 		for {
-			time.Sleep(time.Duration(module.Interval) * time.Second)
-			if state.STATE.CurrentEvent == nil {
+			time.Sleep(1 * time.Second)
+
+			module := config.GET.UserSettings.Photobooth.Unattended
+
+			if !module.Enabled || state.STATE.CurrentEvent == nil {
 				continue
 			}
 
-			err := mercure_client.CLIENT.PublishEvent("/take-picture", map[string]any{
-				"unattended": true,
-			})
+			diff := time.Since(lastUnattendedPicture)
+			if diff <= (time.Duration(module.Interval) * time.Second) {
+				continue
+			}
 
-			if err != nil {
+			lastUnattendedPicture = time.Now()
+			if err := mercure_client.CLIENT.SendTakePicture(true); err != nil {
 				log.Warn("Failed to publish take unattended to mercure hub", "err", err)
 			}
 		}

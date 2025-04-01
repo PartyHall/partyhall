@@ -15,11 +15,7 @@ func OnTakePicture(client emqtt.Client, msg emqtt.Message) {
 
 	log.Debug("Taking a picture from MQTT")
 
-	err := mercure_client.CLIENT.PublishEvent("/take-picture", map[string]any{
-		"unattended": false,
-	})
-
-	if err != nil {
+	if err := mercure_client.CLIENT.SendTakePicture(false); err != nil {
 		log.Error("Failed to publish take-picture on mercure")
 	}
 }

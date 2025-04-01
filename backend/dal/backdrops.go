@@ -292,7 +292,7 @@ func (ba Backdrops) GetCollection(
 	return &resp, nil
 }
 
-func (b Backdrops) Get(albumId, backdropId int64) (models.Backdrop, error) {
+func (b Backdrops) Get(backdropId int64) (models.Backdrop, error) {
 	backdrop := models.Backdrop{}
 
 	row := DB.QueryRowx(`
@@ -303,8 +303,8 @@ func (b Backdrops) Get(albumId, backdropId int64) (models.Backdrop, error) {
 			title,
 			filename
 		FROM backdrop
-		WHERE id = ? AND album_id = ?
-	`, backdropId, albumId)
+		WHERE id = ?
+	`, backdropId)
 
 	if row.Err() != nil {
 		return backdrop, row.Err()

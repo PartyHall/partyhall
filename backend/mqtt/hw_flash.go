@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/partyhall/partyhall/api_errors"
+	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/log"
 	"github.com/partyhall/partyhall/mercure_client"
 	"github.com/partyhall/partyhall/state"
@@ -16,20 +17,11 @@ func SetFlash(powered bool, brightness int) {
 		powered = false
 	}
 
-	state.STATE.ModulesSettings.Photobooth.FlashBrightness = brightness
-
-	if !powered {
-		brightness = 0
-	}
-
 	state.STATE.HardwareFlashPowered = powered
 
-	mercure_client.CLIENT.PublishEvent(
-		"/flash",
-		map[string]any{
-			"powered":    powered,
-			"brightness": brightness,
-		},
+	mercure_client.CLIENT.SetFlash(
+		powered,
+		config.GET.UserSettings.Photobooth.FlashBrightness,
 	)
 
 	err := EasyMqtt.Send("partyhall/flash", fmt.Sprintf("%v", brightness))

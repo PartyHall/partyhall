@@ -19,8 +19,10 @@ const loadImage = (src: string): Promise<HTMLImageElement> => {
 };
 
 export default function DefaultView() {
-    const { currentMode, modulesSettings, shouldTakePicture, setPictureTaken, api, backdropAlbum, selectedBackdrop } =
+    const { currentMode, user_settings, shouldTakePicture, setPictureTaken, api, backdropAlbum, selectedBackdrop } =
         useAuth();
+
+    const photobooth = user_settings?.photobooth;
 
     const [countdown, setCountdown] = useState<number>(0);
     const [flash, setFlash] = useState<boolean>(false);
@@ -30,20 +32,20 @@ export default function DefaultView() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
 
     useAsyncEffect(async () => {
-        if (!shouldTakePicture || !webcamRef || !webcamRef.current || !canvasRef.current) {
+        if (!shouldTakePicture || !webcamRef || !webcamRef.current || !canvasRef.current || !photobooth) {
             return;
         }
 
         if (shouldTakePicture == 'normal') {
             // Display the countdown
-            for (let x = modulesSettings.photobooth.countdown; x > 0; x--) {
+            for (let x = photobooth.countdown; x > 0; x--) {
                 setCountdown(x);
                 await timeout(1000);
             }
 
             setCountdown(0);
 
-            await api.photobooth.setFlash(true, modulesSettings.photobooth.flash_brightness);
+            await api.state.setFlash(true);
             setFlash(true);
             await timeout(1000); // We wait for the webcam to pick-up the flash
         }
@@ -53,7 +55,7 @@ export default function DefaultView() {
         setFlash(false);
 
         if (shouldTakePicture === 'normal') {
-            await api.photobooth.setFlash(false, modulesSettings.photobooth.flash_brightness);
+            await api.state.setFlash(false);
         }
 
         if (picture) {
@@ -61,8 +63,8 @@ export default function DefaultView() {
                 const canvas = canvasRef.current;
                 const camCanvas = webcamRef.current.getCanvas();
 
-                canvas.width = camCanvas?.width ?? modulesSettings.photobooth.resolution.width;
-                canvas.height = camCanvas?.height ?? modulesSettings.photobooth.resolution.height;
+                canvas.width = camCanvas?.width ?? photobooth.resolution.width;
+                canvas.height = camCanvas?.height ?? photobooth.resolution.height;
 
                 const ctx = canvas.getContext('2d');
                 if (ctx) {
@@ -74,7 +76,7 @@ export default function DefaultView() {
 
                     // Then we draw the backdrop
                     const backdropImage = await loadImage(
-                        `/api/webapp/backdrops/${backdropAlbum.id}/image/${backdropAlbum.backdrops[selectedBackdrop - 1].id}/download`
+                        api.backdrops.getImageLink(backdropAlbum.backdrops[selectedBackdrop - 1].id)
                     );
                     ctx.drawImage(backdropImage, 0, 0, canvas.width, canvas.height);
 
@@ -98,6 +100,10 @@ export default function DefaultView() {
         setPictureTaken();
     }, [shouldTakePicture]);
 
+    if (!photobooth) {
+        return <div>loading</div>;
+    }
+
     return (
         <>
             <canvas
@@ -110,12 +116,12 @@ export default function DefaultView() {
             <div id="webcam">
                 <Webcam
                     ref={webcamRef}
-                    width={modulesSettings.photobooth.resolution.width}
-                    height={modulesSettings.photobooth.resolution.height}
+                    width={photobooth.resolution.width}
+                    height={photobooth.resolution.height}
                     screenshotFormat="image/jpeg"
                     videoConstraints={{
                         facingMode: 'user',
-                        ...modulesSettings.photobooth.resolution,
+                        ...photobooth.resolution,
                     }}
                     mirrored={true}
                     forceScreenshotSourceSize
@@ -124,7 +130,7 @@ export default function DefaultView() {
                 {backdropAlbum && selectedBackdrop > 0 && (
                     <img
                         id="webcam--backdrop"
-                        src={`/api/webapp/backdrops/${backdropAlbum.id}/image/${backdropAlbum.backdrops[selectedBackdrop - 1].id}/download`}
+                        src={api.backdrops.getImageLink(backdropAlbum.backdrops[selectedBackdrop - 1].id)}
                         alt="Backdrop"
                     />
                 )}

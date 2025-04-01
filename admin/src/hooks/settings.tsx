@@ -1,5 +1,6 @@
 import { ReactNode, createContext, useContext, useState } from 'react';
 import Loader from '../components/loader';
+import { PhUserSettings } from '@partyhall/sdk';
 import useAsyncEffect from 'use-async-effect';
 
 const DEFAULT_TOPICS = [
@@ -12,6 +13,7 @@ const DEFAULT_TOPICS = [
     '/sync-progress',
     '/flash',
     '/backdrop-state',
+    '/user-settings',
 ];
 
 /** @TODO: Implement APIs */
@@ -19,7 +21,7 @@ type SettingsProps = {
     loaded: boolean;
     pageName: string;
 
-    modules_settings: Record<string, any>;
+    user_settings: PhUserSettings | null;
 
     guests_allowed: boolean;
     enabled_modules: string[];
@@ -28,7 +30,6 @@ type SettingsProps = {
 
     version: string;
     commit: string;
-    hwid: string | null;
 
     topics: string[];
 };
@@ -36,6 +37,7 @@ type SettingsProps = {
 type SettingsContextProps = SettingsProps & {
     fetch: () => Promise<void>;
     setPageName: (name: string, mercureTopics?: string[]) => void;
+    setUserSettings: (user_settings: PhUserSettings) => void;
 };
 
 const defaultProps: SettingsProps = {
@@ -43,7 +45,7 @@ const defaultProps: SettingsProps = {
     pageName: 'home',
     topics: DEFAULT_TOPICS,
 
-    modules_settings: {},
+    user_settings: null,
 
     guests_allowed: false,
     enabled_modules: [],
@@ -52,13 +54,13 @@ const defaultProps: SettingsProps = {
 
     version: 'INDEV',
     commit: 'XXXXXX',
-    hwid: null,
 };
 
 const SettingsContext = createContext<SettingsContextProps>({
     ...defaultProps,
     fetch: async () => {},
     setPageName: () => {},
+    setUserSettings: () => {},
 });
 
 export default function SettingsProvider({ children }: { children: ReactNode }) {
@@ -66,7 +68,7 @@ export default function SettingsProvider({ children }: { children: ReactNode }) 
 
     const fetchStatus = async () => {
         setCtx((oldCtx) => ({ ...oldCtx, loaded: false }));
-        const resp = await fetch('/api/status');
+        const resp = await fetch('/api/state');
         const data = await resp.json();
 
         setCtx((oldCtx) => ({
@@ -90,10 +92,12 @@ export default function SettingsProvider({ children }: { children: ReactNode }) 
         }));
     };
 
+    const setUserSettings = (user_settings: PhUserSettings) => setCtx((oldCtx) => ({ ...oldCtx, user_settings }));
+
     useAsyncEffect(fetchStatus, []);
 
     return (
-        <SettingsContext.Provider value={{ ...ctx, fetch: fetchStatus, setPageName }}>
+        <SettingsContext.Provider value={{ ...ctx, fetch: fetchStatus, setPageName, setUserSettings }}>
             <Loader loading={!ctx.loaded}>{children}</Loader>
         </SettingsContext.Provider>
     );

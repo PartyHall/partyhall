@@ -19,7 +19,7 @@ function RenderText({ type, msg }: { type: string; msg: string }) {
     return <span style={style}>{msg}</span>;
 }
 
-export default function Logs() {
+export default function LogsPage() {
     const { setPageName } = useSettings();
     const { api } = useAuth();
     const [logs, setLogs] = useState<Log[]>([]);
@@ -37,7 +37,7 @@ export default function Logs() {
     useAsyncEffect(async () => {
         setPageName('logs', ['/logs']);
 
-        const logs = await api.global.getLogs();
+        const logs = await api.admin.getLogs();
         if (!logs) {
             return;
         }

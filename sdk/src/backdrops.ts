@@ -19,7 +19,7 @@ export default class Backdrop {
             query.set('search', search);
         }
 
-        const resp = await this.sdk.get(`/api/webapp/backdrops?${query.toString()}`);
+        const resp = await this.sdk.get(`/api/backdrop_albums?${query.toString()}`);
         const data = await resp.json();
 
         const events = Collection.fromJson(data, (x) => {
@@ -35,5 +35,9 @@ export default class Backdrop {
         }
 
         return events;
+    }
+
+    public getImageLink(backdropId: number): string {
+        return `/api/backdrops/${backdropId}/download`;
     }
 }

@@ -16,7 +16,7 @@ type Data = {
     event: PhEvent | null;
 };
 
-export default function EditEvent() {
+export default function EditEventPage() {
     const { t } = useTranslation('', { keyPrefix: 'events.editor' });
     const { setPageName } = useSettings();
 

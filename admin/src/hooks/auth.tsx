@@ -47,7 +47,6 @@ type AuthProps = {
     karaokeQueue: PhSongSession[];
 
     syncInProgress: boolean;
-    hwid: string | null;
     version: string | null;
     commit: string | null;
 };
@@ -92,7 +91,6 @@ const defaultProps: AuthProps = {
     karaokeQueue: [],
 
     syncInProgress: false,
-    hwid: null,
     version: null,
     commit: null,
 };
@@ -118,12 +116,12 @@ const AuthContext = createContext<AuthContextProps>({
 });
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
-    const { topics, hwflash_powered, modules_settings } = useSettings();
+    const { topics, hwflash_powered, user_settings } = useSettings();
     const [context, setContext] = useState<AuthProps>({
         ...defaultProps,
         hardwareFlash: {
             powered: hwflash_powered,
-            brightness: modules_settings.photobooth.flash_brightness,
+            brightness: user_settings?.photobooth.flashBrightness || 100,
         },
     });
 
@@ -217,7 +215,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             return;
         }
 
-        const status = await context.api.global.getStatus();
+        const status = await context.api.state.get();
 
         setContext((oldCtx) => ({
             ...oldCtx,

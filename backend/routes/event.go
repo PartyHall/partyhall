@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"net/http"
-	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -12,30 +11,65 @@ import (
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/dal"
 	"github.com/partyhall/partyhall/mercure_client"
+	"github.com/partyhall/partyhall/middlewares"
 	"github.com/partyhall/partyhall/models"
-	routes_requests "github.com/partyhall/partyhall/routes/requests"
 	"github.com/partyhall/partyhall/state"
 	"github.com/partyhall/partyhall/utils"
 )
 
-func routeGetEvents(c *gin.Context) {
-	offset := 0
+type upsertEventRequest struct {
+	Id       int                        `json:"id"`
+	Name     string                     `json:"name" binding:"required"`
+	Author   string                     `json:"author"`
+	Date     string                     `json:"date" binding:"iso8601,required"`
+	Location string                     `json:"location"`
+	NexusID  models.JsonnableNullstring `json:"nexus_id"`
+}
 
-	page := c.Query("page")
+type RoutesEvent struct{}
 
-	var pageInt int = 1
-	var err error
-	if len(page) > 0 {
-		pageInt, err = strconv.Atoi(page)
-		if err != nil {
-			c.Render(http.StatusBadRequest, api_errors.INVALID_PARAMETERS.WithExtra(map[string]any{
-				"page": "The page should be an integer",
-			}))
+func (h RoutesEvent) Register(router *gin.RouterGroup) {
+	// Not onboarded or Admin
+	router.GET(
+		"",
+		middlewares.NotOnboardedOrRole("ADMIN"),
+		h.getCollection,
+	)
 
-			return
-		}
+	// Not onboarded or Admin
+	router.GET(
+		":eventId",
+		middlewares.NotOnboardedOrRole("ADMIN"),
+		h.get,
+	)
 
-		offset = (pageInt - 1) * config.AMT_RESULTS_PER_PAGE
+	// Not onboarded or Admin
+	router.POST(
+		"",
+		middlewares.NotOnboardedOrRole("ADMIN"),
+		h.create,
+	)
+
+	// Not onboarded or Admin
+	router.PUT(
+		":eventId",
+		middlewares.NotOnboardedOrRole("ADMIN"),
+		h.update,
+	)
+
+	// Onboarded and Admin
+	router.DELETE(
+		":eventId",
+		middlewares.Onboarded(true),
+		middlewares.Authorized("ADMIN"),
+		h.delete,
+	)
+}
+
+func (h RoutesEvent) getCollection(c *gin.Context) {
+	page, offset, err := utils.ParsePageOffset(c)
+	if err != nil {
+		return
 	}
 
 	events, err := dal.EVENTS.GetCollection(config.AMT_RESULTS_PER_PAGE, offset)
@@ -47,12 +81,12 @@ func routeGetEvents(c *gin.Context) {
 		return
 	}
 
-	events.Page = pageInt
+	events.Page = page
 
 	c.JSON(http.StatusOK, events)
 }
 
-func routeGetEvent(c *gin.Context) {
+func (h RoutesEvent) get(c *gin.Context) {
 	id, parseErr := utils.ParamAsIntOrError(c, "eventId")
 	if parseErr {
 		return
@@ -75,7 +109,78 @@ func routeGetEvent(c *gin.Context) {
 	c.JSON(http.StatusOK, evt)
 }
 
-func routeDeleteEvent(c *gin.Context) {
+func (h RoutesEvent) create(c *gin.Context) {
+	var req upsertEventRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		api_errors.RenderValidationErr(c, err)
+		return
+	}
+
+	date, _ := time.Parse(time.RFC3339, req.Date)
+
+	evt := models.Event{
+		Name:     req.Name,
+		Author:   req.Author,
+		Date:     date,
+		Location: req.Location,
+	}
+
+	err := dal.EVENTS.Create(&evt)
+	if err != nil {
+		c.Render(http.StatusInternalServerError, api_errors.DATABASE_ERROR.WithExtra(map[string]any{
+			"err": err.Error(),
+		}))
+
+		return
+	}
+
+	/** If no event was set-up, then this event is the current one */
+	if state.STATE.CurrentEvent == nil {
+		state.STATE.CurrentEvent = &evt
+
+		mercure_client.CLIENT.SetCurrentEvent(state.STATE.CurrentEvent)
+		dal.EVENTS.Set(state.STATE.CurrentEvent)
+	}
+
+	c.JSON(200, evt)
+}
+
+func (h RoutesEvent) update(c *gin.Context) {
+	var req upsertEventRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		api_errors.RenderValidationErr(c, err)
+		return
+	}
+
+	date, _ := time.Parse(time.RFC3339, req.Date)
+
+	/** @TODO: No, the id should come from the queryParams, not the body **/
+	evt := models.Event{
+		Id:       int64(req.Id),
+		Name:     req.Name,
+		Author:   req.Author,
+		Date:     date,
+		Location: req.Location,
+		NexusId:  req.NexusID,
+	}
+
+	err := dal.EVENTS.Update(&evt)
+	if err != nil {
+		c.Render(http.StatusInternalServerError, api_errors.DATABASE_ERROR.WithExtra(map[string]any{
+			"err": err.Error(),
+		}))
+
+		return
+	}
+
+	if state.STATE.CurrentEvent != nil && state.STATE.CurrentEvent.Id == evt.Id {
+		state.STATE.CurrentEvent = &evt
+	}
+
+	c.JSON(200, evt)
+}
+
+func (h RoutesEvent) delete(c *gin.Context) {
 	id, parseErr := utils.ParamAsIntOrError(c, "eventId")
 	if parseErr {
 		return
@@ -106,73 +211,4 @@ func routeDeleteEvent(c *gin.Context) {
 	}
 
 	c.Status(http.StatusNoContent)
-}
-
-func routeCreateEvent(c *gin.Context) {
-	var req routes_requests.CreateEvent
-	if err := c.ShouldBindJSON(&req); err != nil {
-		api_errors.RenderValidationErr(c, err)
-		return
-	}
-
-	date, _ := time.Parse(time.RFC3339, req.Date)
-
-	evt := models.Event{
-		Name:     req.Name,
-		Author:   req.Author,
-		Date:     date,
-		Location: req.Location,
-	}
-
-	err := dal.EVENTS.Create(&evt)
-	if err != nil {
-		c.Render(http.StatusInternalServerError, api_errors.DATABASE_ERROR.WithExtra(map[string]any{
-			"err": err.Error(),
-		}))
-
-		return
-	}
-
-	/** If no event was set-up, then this event is the current one */
-	if state.STATE.CurrentEvent == nil {
-		state.STATE.CurrentEvent = &evt
-		mercure_client.CLIENT.PublishEvent("/event", evt)
-		dal.EVENTS.Set(&evt)
-	}
-
-	c.JSON(200, evt)
-}
-
-func routeUpdateEvent(c *gin.Context) {
-	var req routes_requests.CreateEvent
-	if err := c.ShouldBindJSON(&req); err != nil {
-		api_errors.RenderValidationErr(c, err)
-		return
-	}
-
-	date, _ := time.Parse(time.RFC3339, req.Date)
-
-	evt := models.Event{
-		Id:       int64(req.Id),
-		Name:     req.Name,
-		Author:   req.Author,
-		Date:     date,
-		Location: req.Location,
-		NexusId:  req.NexusID,
-	}
-
-	err := dal.EVENTS.Update(&evt)
-	if err != nil {
-		c.Render(http.StatusInternalServerError, api_errors.DATABASE_ERROR.WithExtra(map[string]any{
-			"err": err.Error(),
-		}))
-
-		return
-	}
-
-	if state.STATE.CurrentEvent != nil && state.STATE.CurrentEvent.Id == evt.Id {
-		state.STATE.CurrentEvent = &evt
-	}
-
-	c.JSON(200, evt)
 }

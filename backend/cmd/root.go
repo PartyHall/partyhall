@@ -98,8 +98,8 @@ var rootCmd = &cobra.Command{
 			utils.CURRENT_COMMIT = utils.CURRENT_COMMIT[:7]
 		}
 
+		state.STATE.UserSettings = config.GET.UserSettings
 		state.STATE.GuestsAllowed = config.GET.GuestsAllowed
-		state.STATE.HardwareId = config.GET.HardwareID
 		state.STATE.Version = utils.CURRENT_VERSION
 		state.STATE.Commit = utils.CURRENT_COMMIT
 
@@ -116,10 +116,10 @@ var rootCmd = &cobra.Command{
 		services.SetEvent(event)
 
 		nexus.NewClient(
-			config.GET.NexusURL,
-			config.GET.HardwareID,
-			config.GET.ApiKey,
-			config.GET.NexusIgnoreSSL,
+			config.GET.UserSettings.NexusURL,
+			config.GET.UserSettings.HardwareID,
+			config.GET.UserSettings.ApiKey,
+			config.GET.UserSettings.NexusIgnoreSSL,
 		)
 
 		if config.GET.IsInDev {
@@ -214,8 +214,7 @@ var rootCmd = &cobra.Command{
 
 		apiRouter := r.Group("/api")
 
-		routes.RegisterApplianceRoutes(apiRouter)
-		routes.RegisterWebappRoutes(apiRouter)
+		routes.RegisterRoutes(apiRouter)
 
 		// Running the appliance
 		log.LOG.Infow("Now listening...", "addr", config.GET.ListeningAddr)

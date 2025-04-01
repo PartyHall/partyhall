@@ -20,17 +20,17 @@ export default function SessionCard({ session, isFirst, isLast }: Props) {
     const [notif, notifCtx] = useNotification();
 
     const directPlay = async () => {
-        await api.karaoke.directPlay(session.id);
+        await api.songSessions.directPlay(session.id);
     };
 
     const moveSession = async (direction: 'up' | 'down') => {
-        const data = await api.karaoke.moveInQueue(session.id, direction);
+        const data = await api.songSessions.moveInQueue(session.id, direction);
         setKaraokeQueue(data);
     };
 
     const cancelSession = async () => {
         try {
-            await api.karaoke.cancelSession(session.id);
+            await api.songSessions.cancelSession(session.id);
             notif.success({
                 message: t('notification_remove_queue.title'),
                 description: t('notification_remove_queue.description', {
@@ -67,7 +67,7 @@ export default function SessionCard({ session, isFirst, isLast }: Props) {
                     <Image
                         hasImage={session.song.has_cover}
                         alt={t('cover_alt', { title: session.title })}
-                        src={session.song.getCoverUrl()}
+                        src={api.songs.getCoverUrl(session.song.nexus_id)}
                         className="SongCard__Cover"
                     />
 

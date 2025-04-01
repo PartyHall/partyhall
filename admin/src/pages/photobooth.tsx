@@ -36,7 +36,7 @@ export default function Photobooth() {
             newIdx = 0;
         }
 
-        await api.settings.setBackdrops(backdropAlbum.id, newIdx);
+        await api.state.setBackdrops(backdropAlbum.id, newIdx);
     };
 
     return (
@@ -64,7 +64,7 @@ export default function Photobooth() {
                             </Typography.Text>
                             {selectedBackdrop > 0 && (
                                 <img
-                                    src={`/api/webapp/backdrops/${backdropAlbum.id}/image/${backdropAlbum.backdrops[selectedBackdrop - 1].id}/download`}
+                                    src={api.backdrops.getImageLink(backdropAlbum.backdrops[selectedBackdrop - 1].id)}
                                     alt={`Current backdrop: ${backdropAlbum.backdrops[selectedBackdrop - 1].title}`}
                                     style={{
                                         maxWidth: '150px',

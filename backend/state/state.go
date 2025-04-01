@@ -20,8 +20,8 @@ type State struct {
 	CurrentMode  string              `json:"current_mode"`
 	IpAddresses  map[string][]string `json:"ip_addresses"`
 
-	ModulesSettings      config.ModulesSettings `json:"modules_settings"`
-	HardwareFlashPowered bool                   `json:"hardware_flash_powered"`
+	UserSettings         config.UserSettings `json:"user_settings"`
+	HardwareFlashPowered bool                `json:"hardware_flash_powered"`
 
 	BackdropAlbum    *models.BackdropAlbum `json:"backdrop_album"`
 	SelectedBackdrop int                   `json:"selected_backdrop"`
@@ -33,9 +33,8 @@ type State struct {
 
 	GuestsAllowed bool `json:"guests_allowed"`
 
-	HardwareId string `json:"hwid"`
-	Version    string `json:"version"`
-	Commit     string `json:"commit"`
+	Version string `json:"version"`
+	Commit  string `json:"commit"`
 }
 
 type KaraokeState struct {

@@ -20,15 +20,15 @@ export default function SettingsButtonMappings({ showTitle, onSettingsChanged }:
 
     const [availableActions, setAvailableActions] = useState<string[]>([]);
 
-    const [lastButtonPress, setLastButtonPress] = useState<number|null>(null);
+    const [lastButtonPress, setLastButtonPress] = useState<number | null>(null);
     const [mappings, setMappings] = useState<SettingsButtonMappingsValues>({});
 
-    useMercureTopic('/btn-press', x => setLastButtonPress(x as number));
+    useMercureTopic('/btn-press', (x) => setLastButtonPress(x as number));
 
     useAsyncEffect(async () => {
         setLoading(true);
         setMappings(await api.settings.getButtonMappings());
-        setAvailableActions(await api.settings.getButtonMappingsActions())
+        setAvailableActions(await api.settings.getButtonMappingsActions());
         setLoading(false);
     }, []);
 
@@ -54,11 +54,11 @@ export default function SettingsButtonMappings({ showTitle, onSettingsChanged }:
         setMappings({
             ...mappings,
             [lastButtonPress]: '',
-        })
+        });
     }, [lastButtonPress]);
 
     if (loading) {
-        return <Spin spinning />
+        return <Spin spinning />;
     }
 
     return (
@@ -73,29 +73,35 @@ export default function SettingsButtonMappings({ showTitle, onSettingsChanged }:
             <Typography.Paragraph>{t('settings.btn_mappings.desc2')}</Typography.Paragraph>
 
             <Flex vertical gap={8}>
-                {
-                    mappings && Object.keys(mappings).map(x => <Row gutter={8} align="middle" key={x}>
-                        <Col flex="30%">
-                            <Typography.Text className={`${lastButtonPress}` === x ? 'blue' : ''}>BTN_{x}</Typography.Text>
-                        </Col>
-                        <Col flex="auto">
-                            <Select
-                                style={{width: '100%'}}
-                                value={mappings[parseInt(x)]}
-                                options={availableActions.map(x => ({label: t(`settings.btn_mappings.actions.${x}`), value: x}))}
-                                onChange={val => {
-                                    const newMappings = {
-                                        ...mappings,
-                                        [x]: val,
-                                    };
+                {mappings &&
+                    Object.keys(mappings).map((x) => (
+                        <Row gutter={8} align="middle" key={x}>
+                            <Col flex="30%">
+                                <Typography.Text className={`${lastButtonPress}` === x ? 'blue' : ''}>
+                                    BTN_{x}
+                                </Typography.Text>
+                            </Col>
+                            <Col flex="auto">
+                                <Select
+                                    style={{ width: '100%' }}
+                                    value={mappings[parseInt(x)]}
+                                    options={availableActions.map((x) => ({
+                                        label: t(`settings.btn_mappings.actions.${x}`),
+                                        value: x,
+                                    }))}
+                                    onChange={(val) => {
+                                        const newMappings = {
+                                            ...mappings,
+                                            [x]: val,
+                                        };
 
-                                    setMappings(newMappings);
-                                    onSettingsChanged(newMappings);
-                                }}
-                            />
-                        </Col>
-                    </Row>)
-                }
+                                        setMappings(newMappings);
+                                        onSettingsChanged(newMappings);
+                                    }}
+                                />
+                            </Col>
+                        </Row>
+                    ))}
             </Flex>
         </Flex>
     );

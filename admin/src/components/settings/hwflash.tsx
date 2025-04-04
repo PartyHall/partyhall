@@ -1,9 +1,9 @@
 import { Col, Flex, Row, Slider, Typography } from 'antd';
 import { useEffect, useState } from 'react';
 import { HardwareFlashToggle } from '../hwflash_toggle';
+import { useAuth } from '../../hooks/auth';
 import { useSettings } from '../../hooks/settings';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../../hooks/auth';
 
 export type SettingsHardwareFlashValues = {
     powered: boolean;
@@ -24,7 +24,7 @@ export default function SettingsHardwareFlash({ showTitle, onSettingsChanged }: 
     const [brightness, setBrightness] = useState<number>(userSettings?.photobooth.flashBrightness ?? 100);
 
     useEffect(() => {
-        setBrightness(userSettings?.photobooth.flashBrightness ?? 100)
+        setBrightness(userSettings?.photobooth.flashBrightness ?? 100);
     }, [userSettings]);
 
     return (

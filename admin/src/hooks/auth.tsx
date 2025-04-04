@@ -91,22 +91,22 @@ const defaultProps: AuthProps = {
 
 const AuthContext = createContext<AuthContextProps>({
     ...defaultProps,
-    login: async () => { },
-    loginGuest: async () => { },
-    setToken: () => { },
+    login: async () => {},
+    loginGuest: async () => {},
+    setToken: () => {},
     isLoggedIn: () => false,
-    logout: () => { },
+    logout: () => {},
 
-    setMode: () => { },
-    setEvent: () => { },
-    setKaraoke: () => { },
-    setTimecode: () => { },
-    setKaraokeQueue: () => { },
-    setSyncInProgress: () => { },
-    setBackdrops: () => { },
-    setHardwareFlashPowered: () => { },
+    setMode: () => {},
+    setEvent: () => {},
+    setKaraoke: () => {},
+    setTimecode: () => {},
+    setKaraokeQueue: () => {},
+    setSyncInProgress: () => {},
+    setBackdrops: () => {},
+    setHardwareFlashPowered: () => {},
 
-    setDisplayName: () => { },
+    setDisplayName: () => {},
 });
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
@@ -192,10 +192,11 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             selectedBackdrop,
         }));
 
-    const setHardwareFlashPowered = (powered: boolean) => setContext(oldCtx => ({
-        ...oldCtx,
-        hardwareFlashPowered: powered,
-    }));
+    const setHardwareFlashPowered = (powered: boolean) =>
+        setContext((oldCtx) => ({
+            ...oldCtx,
+            hardwareFlashPowered: powered,
+        }));
 
     useAsyncEffect(async () => {
         context.api.setOnExpired(() => setToken());

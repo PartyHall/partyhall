@@ -12,10 +12,7 @@ export function HardwareFlashToggle() {
 
     return (
         <Tooltip title={t('generic.hw_flash.turn_' + (hardwareFlashPowered ? 'off' : 'on'))}>
-            <Button
-                icon={hardwareFlashPowered ? <IconBulb /> : <IconBulbOff />}
-                onClick={toggle}
-            />
+            <Button icon={hardwareFlashPowered ? <IconBulb /> : <IconBulbOff />} onClick={toggle} />
         </Tooltip>
     );
 }

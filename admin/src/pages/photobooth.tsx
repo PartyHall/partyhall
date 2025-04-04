@@ -82,7 +82,7 @@ export default function Photobooth() {
                         </Flex>
                     )}
 
-                    <Flex gap={8} align="center" justify='space-between'>
+                    <Flex gap={8} align="center" justify="space-between">
                         <span className="red">{t('flash')}: </span>
                         <Tooltip title={t(hardwareFlashPowered ? 'toggle_off' : 'toggle_on')}>
                             <Button

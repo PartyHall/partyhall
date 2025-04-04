@@ -11,11 +11,11 @@ export default function SettingsButtonMappingsPage() {
     const { setPageName } = useSettings();
     const { api } = useAuth();
 
-    const [buttonMappings, setButtonMappings] = useState<SettingsButtonMappingsValues|null>(null);
+    const [buttonMappings, setButtonMappings] = useState<SettingsButtonMappingsValues | null>(null);
 
     useEffect(() => setPageName('settings'), []);
 
-    const save = async() => {
+    const save = async () => {
         if (!buttonMappings) {
             return;
         }
@@ -28,12 +28,16 @@ export default function SettingsButtonMappingsPage() {
         <Flex vertical gap={16} style={{ maxWidth: '60ch' }}>
             <Card
                 title={t('settings.btn_mappings.title')}
-                extra={<Button type="primary" icon={<IconDeviceFloppy size={18} />} disabled={!buttonMappings} onClick={save}/>
+                extra={
+                    <Button
+                        type="primary"
+                        icon={<IconDeviceFloppy size={18} />}
+                        disabled={!buttonMappings}
+                        onClick={save}
+                    />
                 }
             >
-                <SettingsButtonMappings
-                    onSettingsChanged={(x) => setButtonMappings(x)}
-                />
+                <SettingsButtonMappings onSettingsChanged={(x) => setButtonMappings(x)} />
             </Card>
         </Flex>
     );

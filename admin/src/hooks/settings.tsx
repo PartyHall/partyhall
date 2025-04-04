@@ -1,6 +1,6 @@
+import { PhState, PhUserSettings } from '@partyhall/sdk';
 import { ReactNode, createContext, useContext, useState } from 'react';
 import Loader from '../components/loader';
-import { PhState, PhUserSettings } from '@partyhall/sdk';
 import useAsyncEffect from 'use-async-effect';
 
 const DEFAULT_TOPICS = [
@@ -112,7 +112,9 @@ export default function SettingsProvider({ children }: { children: ReactNode }) 
     useAsyncEffect(fetchStatus, []);
 
     return (
-        <SettingsContext.Provider value={{ ...ctx, fetch: fetchStatus, setPageName, setUserSettings, setHardwareFlashBrightness }}>
+        <SettingsContext.Provider
+            value={{ ...ctx, fetch: fetchStatus, setPageName, setUserSettings, setHardwareFlashBrightness }}
+        >
             <Loader loading={!ctx.loaded}>{children}</Loader>
         </SettingsContext.Provider>
     );

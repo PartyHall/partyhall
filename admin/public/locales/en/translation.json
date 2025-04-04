@@ -162,6 +162,7 @@
     "settings": {
         "title": "Appliance settings",
         "advanced_settings": "Advanced settings",
+        "third_party": "Intégrations tierces",
         "photobooth": {
             "title": "Photobooth"
         },
@@ -191,6 +192,19 @@
             "desc": "The appliance can have a physical flash (like a ledstrip). If that's the case you can now configure the brightness of it here.",
             "desc2": "Go in front of the camera to ensure that the displayed image is not too bright while setting it up.",
             "brightness": "Brightness"
+        },
+        "btn_mappings": {
+            "title": "Physical button mappings",
+            "desc": "Here you can customize what the different physical buttons are doing.",
+            "desc2": "Press them on the appliance to add them here, and choose the action you want it to make.",
+            "last_pressed": "Last button pressed",
+            "actions": {
+                "take_picture": "Take picture",
+                "display_debug": "Display debug infos",
+                "shutdown": "Shutdown appliance",
+                "left": "Left",
+                "right": "Right (or Next backdrop)"
+            }
         },
         "nexus": {
             "title": "PartyNexus",

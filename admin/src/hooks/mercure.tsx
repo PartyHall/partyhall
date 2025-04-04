@@ -42,8 +42,8 @@ export default function MercureProvider({
     children: ReactNode;
 }) {
     const [ctx, setCtx] = useState<MercureProps>(defaultProps);
-    const { setUserSettings } = useSettings();
-    const { setEvent, setMode, isLoggedIn, setSyncInProgress, setHardwareFlash, setBackdrops } = useAuth();
+    const { setUserSettings, setHardwareFlashBrightness } = useSettings();
+    const { setEvent, setMode, isLoggedIn, setSyncInProgress, setHardwareFlashPowered, setBackdrops } = useAuth();
     const [notif, ctxHolder] = notification.useNotification();
 
     const eventSource = useRef<EventSource>();
@@ -97,7 +97,8 @@ export default function MercureProvider({
 
         es.addEventListener('/flash', (x) => {
             const data = JSON.parse(x.data);
-            setHardwareFlash(data.powered, data.brightness);
+            setHardwareFlashBrightness(data.brightness);
+            setHardwareFlashPowered(data.powered);
         });
 
         es.addEventListener('/mode', (x) => setMode(JSON.parse(x.data).mode));
@@ -120,7 +121,6 @@ export default function MercureProvider({
         });
 
         es.addEventListener('/user-settings', (x) => {
-            console.log('User settings from mercure!');
             setUserSettings(new PhUserSettings(JSON.parse(x.data)));
         });
 

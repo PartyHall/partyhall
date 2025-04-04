@@ -16,6 +16,7 @@ import LogsPage from './pages/admin/logs';
 import NewEventPage from './pages/admin/new_event';
 import Photobooth from './pages/photobooth';
 import SettingsAudioPage from './pages/admin/settings/audio';
+import SettingsButtonMappingsPage from './pages/admin/settings/button_mappings';
 import SettingsNexusPage from './pages/admin/settings/nexus';
 import SettingsPage from './pages/admin/settings';
 import SettingsPhotoboothPage from './pages/admin/settings/photobooth';
@@ -74,6 +75,10 @@ const router = createHashRouter([
                     {
                         path: 'audio',
                         element: <SettingsAudioPage />,
+                    },
+                    {
+                        path: 'button-mappings',
+                        element: <SettingsButtonMappingsPage />,
                     },
                     {
                         path: 'nexus',

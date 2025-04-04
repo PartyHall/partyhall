@@ -1,6 +1,7 @@
 package hwhandler
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -140,7 +141,7 @@ func (d *Device) subscribe() error {
 
 func (hh *HardwareHandler) ProcessSerialConn(d *Device) error {
 	port, err := serial.Open(d.PortName, &serial.Mode{
-		BaudRate: 57600,
+		BaudRate: 115200,
 		Parity:   serial.NoParity,
 		DataBits: 8,
 		StopBits: serial.OneStopBit,
@@ -220,23 +221,31 @@ func (d *Device) ProcessMessage() error {
 	// If its a button press, special case
 	if strings.HasPrefix(msg, "BTN_") {
 		msg = strings.Trim(msg, " \t")
-		val, ok := config.GET.UserSettings.ButtonMappings[msg]
-		if !ok {
-			debugMsg(msg)
-
-			return nil
-		}
 
 		currTime := time.Now()
 		diff := currTime.Sub(d.LastButtonPressTime).Seconds()
 
 		// Debounce
-		if d.LastButtonPress != val || diff > 1 {
-			topic := "partyhall/" + strings.ToLower(val)
-			print("Button pressed: %v, sending %v", msg, topic)
-			d.Handler.Mqtt.Publish(topic, 2, false, "press")
+		if d.LastButtonPress != msg || diff > 1 {
+			btnPressed := strings.TrimPrefix(msg, "BTN_")
+			btnId, err := strconv.Atoi(btnPressed)
+			if err != nil {
+				return err
+			}
 
-			d.LastButtonPress = val
+			print("Button pressed: %v", msg)
+			data, _ := json.Marshal(map[string]int{
+				"button": btnId,
+			})
+
+			token := d.Handler.Mqtt.Publish("partyhall/button_press", 2, false, data)
+
+			token.Wait()
+			if err := token.Error(); err != nil {
+				print("Failed to send button press to mosquitto: %v", err)
+			}
+
+			d.LastButtonPress = msg
 			d.LastButtonPressTime = currTime
 		}
 

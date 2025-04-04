@@ -162,6 +162,7 @@
     "settings": {
         "title": "Paramètres de la machine",
         "advanced_settings": "Paramètres avancés",
+        "third_party": "Intégrations tierces",
         "photobooth": {
             "title": "Photomaton"
         },
@@ -191,6 +192,19 @@
             "desc": "L'appareil peut avoir un flash physique (comme un bandeau de led). Si c'est le cas, vous pouvez maintenant configurer sa luminosité.",
             "desc2": "Allez devant la caméra pour vous assurer que l'image est suffisament éclairée.",
             "brightness": "Luminosité"
+        },
+        "btn_mappings": {
+            "title": "Mappings des boutons physiques",
+            "desc": "Vous pouvez ici personnaliser ce que fait chaque bouton de l'appareil.",
+            "desc2": "Appuyez dessus pour l'ajouter ici, puis définissez l'action.",
+            "last_pressed": "Dernier bouton pressé",
+            "actions": {
+                "take_picture": "Prendre une photo",
+                "display_debug": "Afficher les infos de debug",
+                "shutdown": "Éteindre l'appareil",
+                "left": "Gauche",
+                "right": "Droite (ou Passe-tête suivant)"
+            }
         },
         "nexus": {
             "title": "PartyNexus",

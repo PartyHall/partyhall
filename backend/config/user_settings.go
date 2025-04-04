@@ -39,7 +39,7 @@ type UserSettings struct {
 		Password string `yaml:"password" json:"password"`
 	} `yaml:"wireless_ap" json:"-"`
 
-	ButtonMappings map[string]string `yaml:"button_mappings" json:"-"`
+	ButtonMappings map[int]string `yaml:"button_mappings" json:"-"`
 }
 
 func (us UserSettings) Save() error {

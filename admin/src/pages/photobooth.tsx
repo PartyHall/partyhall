@@ -1,10 +1,10 @@
-import { Button, Flex, Slider, Tooltip, Typography, notification } from 'antd';
+import { Button, Flex, Tooltip, Typography, notification } from 'antd';
 import { IconSun, IconSunOff } from '@tabler/icons-react';
-import { useEffect, useState } from 'react';
 import BackdropSelector from '../components/backdrop_selector';
 import KeyVal from '../components/keyval';
 import Title from 'antd/es/typography/Title';
 import { useAuth } from '../hooks/auth';
+import { useEffect } from 'react';
 import { useSettings } from '../hooks/settings';
 import { useTranslation } from 'react-i18next';
 
@@ -14,16 +14,9 @@ export default function Photobooth() {
 
     const [notif, ctxHolder] = notification.useNotification();
     const { setPageName } = useSettings();
-    const { event, api, hardwareFlash, backdropAlbum, selectedBackdrop } = useAuth();
-
-    const [hwFlashBrightness, setHwFlashBrightness] = useState<number>(hardwareFlash.brightness);
+    const { event, api, hardwareFlashPowered, backdropAlbum, selectedBackdrop } = useAuth();
 
     useEffect(() => setPageName('photobooth'), []);
-
-    const flashChange = async (powered: boolean, brightness: number) => {
-        setHwFlashBrightness(brightness);
-        await api.photobooth.setFlash(powered, brightness);
-    };
 
     const changeSelectedBackdrop = async (newIdx: number) => {
         if (!backdropAlbum) {
@@ -89,22 +82,12 @@ export default function Photobooth() {
                         </Flex>
                     )}
 
-                    <span className="red">{t('flash')}: </span>
-                    <Flex gap={8} align="center">
-                        <span>{hwFlashBrightness}%</span>
-
-                        <Slider
-                            style={{ flex: 1 }}
-                            min={0}
-                            max={100}
-                            value={hwFlashBrightness}
-                            onChange={(x) => flashChange(hardwareFlash.powered, x)}
-                        />
-
-                        <Tooltip title={t(hardwareFlash.powered ? 'toggle_off' : 'toggle_on')}>
+                    <Flex gap={8} align="center" justify="space-between">
+                        <span className="red">{t('flash')}: </span>
+                        <Tooltip title={t(hardwareFlashPowered ? 'toggle_off' : 'toggle_on')}>
                             <Button
-                                icon={hardwareFlash.powered ? <IconSunOff /> : <IconSun />}
-                                onClick={() => flashChange(!hardwareFlash.powered, hwFlashBrightness)}
+                                icon={hardwareFlashPowered ? <IconSunOff /> : <IconSun />}
+                                onClick={async () => await api.state.setFlash(!hardwareFlashPowered)}
                             />
                         </Tooltip>
                     </Flex>

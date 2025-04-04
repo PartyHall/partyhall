@@ -35,10 +35,7 @@ type AuthProps = {
     event: PhEvent | null;
     time: DateTime | null;
 
-    hardwareFlash: {
-        powered: boolean;
-        brightness: number;
-    };
+    hardwareFlashPowered: boolean;
 
     backdropAlbum: BackdropAlbum | null;
     selectedBackdrop: number;
@@ -60,12 +57,12 @@ type AuthContextProps = AuthProps & {
 
     setMode: (mode: string) => void;
     setEvent: (evt: PhEvent) => void;
-    setHardwareFlash: (powered: boolean, brightness: number) => void;
     setKaraoke: (karaoke: PhKaraoke) => void;
     setTimecode: (timecode: number) => void;
     setKaraokeQueue: (queue: PhSongSession[]) => void;
     setSyncInProgress: (syncInProgress: boolean) => void;
     setBackdrops: (backdropAlbum: BackdropAlbum | null, selectedBackdrop: number) => void;
+    setHardwareFlashPowered: (powered: boolean) => void;
 
     setDisplayName: (displayName: string) => void;
 };
@@ -79,10 +76,7 @@ const defaultProps: AuthProps = {
     event: null,
     time: null,
 
-    hardwareFlash: {
-        powered: false,
-        brightness: 100,
-    },
+    hardwareFlashPowered: false,
 
     backdropAlbum: null,
     selectedBackdrop: 0,
@@ -105,24 +99,20 @@ const AuthContext = createContext<AuthContextProps>({
 
     setMode: () => {},
     setEvent: () => {},
-    setHardwareFlash: () => {},
     setKaraoke: () => {},
     setTimecode: () => {},
     setKaraokeQueue: () => {},
     setSyncInProgress: () => {},
     setBackdrops: () => {},
+    setHardwareFlashPowered: () => {},
 
     setDisplayName: () => {},
 });
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
-    const { topics, hwflash_powered, user_settings } = useSettings();
+    const { topics } = useSettings();
     const [context, setContext] = useState<AuthProps>({
         ...defaultProps,
-        hardwareFlash: {
-            powered: hwflash_powered,
-            brightness: user_settings?.photobooth.flashBrightness || 100,
-        },
     });
 
     const login = async (username: string, password: string) => {
@@ -195,17 +185,17 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
         setContext((oldCtx) => ({ ...oldCtx, displayName: displayName }));
     };
 
-    const setHardwareFlash = (powered: boolean, brightness: number) =>
-        setContext((oldCtx) => ({
-            ...oldCtx,
-            hardwareFlash: { powered, brightness },
-        }));
-
     const setBackdrops = (backdropAlbum: BackdropAlbum | null, selectedBackdrop: number) =>
         setContext((oldCtx) => ({
             ...oldCtx,
             backdropAlbum,
             selectedBackdrop,
+        }));
+
+    const setHardwareFlashPowered = (powered: boolean) =>
+        setContext((oldCtx) => ({
+            ...oldCtx,
+            hardwareFlashPowered: powered,
         }));
 
     useAsyncEffect(async () => {
@@ -226,6 +216,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             karaoke: status.karaoke,
             karaokeQueue: status.karaokeQueue,
             syncInProgress: status.syncInProgress,
+            hardwareFlashPowered: status.hardwareFlashPowered,
         }));
     }, [context.api]);
 
@@ -239,7 +230,6 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
                 isLoggedIn,
                 logout,
                 setEvent,
-                setHardwareFlash,
                 setMode,
                 setKaraoke,
                 setTimecode,
@@ -247,6 +237,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
                 setDisplayName,
                 setSyncInProgress,
                 setBackdrops,
+                setHardwareFlashPowered,
             }}
         >
             <MercureProvider

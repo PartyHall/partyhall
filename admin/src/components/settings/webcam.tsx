@@ -14,19 +14,19 @@ type Props = {
 };
 
 export default function SettingsWebcam({ showTitle, onSettingsChanged }: Props) {
-    const { user_settings } = useSettings();
+    const { userSettings } = useSettings();
 
-    const [width, setWidth] = useState<number>(user_settings?.photobooth.resolution.width ?? 1920);
-    const [height, setHeight] = useState<number>(user_settings?.photobooth.resolution.height ?? 1080);
+    const [width, setWidth] = useState<number>(userSettings?.photobooth.resolution.width ?? 1920);
+    const [height, setHeight] = useState<number>(userSettings?.photobooth.resolution.height ?? 1080);
 
     const { t } = useTranslation();
 
     useEffect(() => {
-        if (user_settings?.photobooth.resolution) {
-            setWidth(user_settings?.photobooth.resolution.width);
-            setHeight(user_settings?.photobooth.resolution.height);
+        if (userSettings?.photobooth.resolution) {
+            setWidth(userSettings?.photobooth.resolution.width);
+            setHeight(userSettings?.photobooth.resolution.height);
         }
-    }, [user_settings]);
+    }, [userSettings]);
 
     return (
         <Flex vertical gap={8}>

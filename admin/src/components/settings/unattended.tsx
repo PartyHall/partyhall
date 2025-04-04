@@ -14,19 +14,19 @@ type Props = {
 };
 
 export default function SettingsUnattended({ showTitle, onSettingsChanged }: Props) {
-    const { user_settings } = useSettings();
+    const { userSettings } = useSettings();
 
-    const [enabled, setEnabled] = useState<boolean>(user_settings?.photobooth.unattended.enabled ?? false);
-    const [interval, setInterval] = useState<number>(user_settings?.photobooth.unattended.interval ?? 300);
+    const [enabled, setEnabled] = useState<boolean>(userSettings?.photobooth.unattended.enabled ?? false);
+    const [interval, setInterval] = useState<number>(userSettings?.photobooth.unattended.interval ?? 300);
 
     const { t } = useTranslation();
 
     useEffect(() => {
-        if (user_settings?.photobooth.resolution) {
-            setEnabled(user_settings?.photobooth.unattended.enabled ?? false);
-            setInterval(user_settings?.photobooth.unattended.interval ?? 300);
+        if (userSettings?.photobooth.resolution) {
+            setEnabled(userSettings?.photobooth.unattended.enabled ?? false);
+            setInterval(userSettings?.photobooth.unattended.interval ?? 300);
         }
-    }, [user_settings]);
+    }, [userSettings]);
 
     return (
         <Flex vertical gap={8}>

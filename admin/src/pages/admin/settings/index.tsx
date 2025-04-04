@@ -18,10 +18,11 @@ export default function SettingsPage() {
             <Flex vertical gap={16} align="center">
                 <LinkButton to="/settings/photobooth">{t('settings.photobooth.title')}</LinkButton>
                 <LinkButton to="/settings/audio">{t('settings.audio.title')}</LinkButton>
-                Physical button mappings
-                <LinkButton to="/settings/nexus">PartyNexus</LinkButton>
-                Users management Wifi access point
-                <LinkButton to="/settings/third-party">Third-party integrations</LinkButton>
+                <LinkButton to="/settings/button-mappings">{t('settings.btn_mappings.title')}</LinkButton>
+                <LinkButton to="/settings/nexus">{t('settings.nexus.title')}</LinkButton>
+                <span>Users management</span>
+                <span>Wifi access point</span>
+                <LinkButton to="/settings/third-party">{t('settings.third_party')}</LinkButton>
             </Flex>
         </Flex>
     );

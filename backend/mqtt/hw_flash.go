@@ -12,6 +12,10 @@ import (
 )
 
 func SetFlash(powered bool, brightness int) {
+	if !powered {
+		brightness = 0
+	}
+
 	brightness = utils.ClampInt(brightness, 0, 100)
 	if brightness == 0 {
 		powered = false

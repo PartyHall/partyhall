@@ -14,15 +14,8 @@ export default class State {
         return PhState.fromJson(data);
     }
 
-    public async getFlash(): Promise<boolean> {
-        const resp = await this.sdk.get(`/api/state/flash`);
-        const data = await resp.json();
-
-        return data.powered;
-    }
-
     /**
-     * @TODO: This only handles ON/OFF. Brightness will be in the settings
+     * This only handles ON/OFF. Brightness is in the settings
      */
     public async setFlash(powered: boolean) {
         await this.sdk.put(`/api/state/flash`, { powered });

@@ -33,10 +33,7 @@ export default function SettingsThirdPartyPage() {
         }
     };
 
-    useAsyncEffect(async () => {
-        // await api.settings.setFlash(hardwareFlashSettings.powered, hardwareFlashSettings.brightness);
-        setSpotifySettings(null);
-    }, []);
+    useAsyncEffect(async () => setSpotifySettings(null), []);
 
     return (
         <Flex vertical gap={16} style={{ maxWidth: '60ch' }}>

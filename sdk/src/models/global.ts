@@ -83,8 +83,8 @@ export class PhState {
     karaokeQueue: PhSongSession[];
 
     syncInProgress: boolean;
-    version: string | null;
-    commit: string | null;
+    version: string;
+    commit: string;
 
     constructor(data: Record<string, any>) {
         this.currentMode = data['current_mode'];

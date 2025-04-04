@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { HardwareFlashToggle } from '../hwflash_toggle';
 import { useSettings } from '../../hooks/settings';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../hooks/auth';
 
 export type SettingsHardwareFlashValues = {
     powered: boolean;
@@ -16,18 +17,15 @@ type Props = {
 };
 
 export default function SettingsHardwareFlash({ showTitle, onSettingsChanged }: Props) {
-    const { user_settings } = useSettings();
-
-    const [powered, setPowered] = useState<boolean>(false);
-    const [brightness, setBrightness] = useState<number>(user_settings?.photobooth.flashBrightness ?? 100);
-
     const { t } = useTranslation();
+    const { userSettings } = useSettings();
+    const { hardwareFlashPowered } = useAuth();
+
+    const [brightness, setBrightness] = useState<number>(userSettings?.photobooth.flashBrightness ?? 100);
 
     useEffect(() => {
-        if (user_settings?.photobooth.resolution) {
-            setBrightness(user_settings?.photobooth.flashBrightness ?? 100);
-        }
-    }, [user_settings]);
+        setBrightness(userSettings?.photobooth.flashBrightness ?? 100)
+    }, [userSettings]);
 
     return (
         <Flex vertical gap={8}>
@@ -51,7 +49,7 @@ export default function SettingsHardwareFlash({ showTitle, onSettingsChanged }: 
                         tooltip={{ open: false }}
                         onChange={(x) => {
                             setBrightness(x);
-                            onSettingsChanged({ powered, brightness: x });
+                            onSettingsChanged({ powered: hardwareFlashPowered, brightness: x });
                         }}
                     />
                 </Col>
@@ -59,7 +57,7 @@ export default function SettingsHardwareFlash({ showTitle, onSettingsChanged }: 
                     <Typography.Text>{brightness}%</Typography.Text>
                 </Col>
                 <Col>
-                    <HardwareFlashToggle setPoweredState={(pw) => setPowered(pw)} />
+                    <HardwareFlashToggle />
                 </Col>
             </Row>
         </Flex>

@@ -35,6 +35,42 @@ func RunCron() {
 		}
 	}()
 
+	// Reset the mode to Photobooth if the appliance is in "BTN_SETUP"
+	// and has not been pinged for 4 seconds
+	go func() {
+		for {
+			time.Sleep(1 * time.Second)
+			if state.STATE.CurrentMode != state.MODE_BTN_SETUP {
+				continue
+			}
+
+			if time.Since(state.STATE.ModeSetAt) >= (4 * time.Second) {
+				if state.STATE.CurrentEvent != nil {
+					state.STATE.SetMode(state.MODE_PHOTOBOOTH)
+				} else {
+					state.STATE.SetMode(state.MODE_DISABLED)
+				}
+
+				mercure_client.CLIENT.SetMode(state.STATE.CurrentMode)
+			}
+		}
+	}()
+
+	// Reset the backdrop automatically every 60 seconds
+	go func() {
+		for {
+			time.Sleep(1 * time.Second)
+			if state.STATE.SelectedBackdrop == 0 {
+				continue
+			}
+
+			if time.Since(state.STATE.BackdropSelectedAt) >= 60*time.Second {
+				state.STATE.SelectedBackdrop = 0
+				mercure_client.CLIENT.SendBackdropState()
+			}
+		}
+	}()
+
 	// Taking unattended pictures every X minutes
 	lastUnattendedPicture = time.Now()
 	go func() {

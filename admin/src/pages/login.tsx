@@ -16,8 +16,8 @@ type FormType = {
 
 export default function LoginPage() {
     const { t } = useTranslation();
-    const { guests_allowed } = useSettings();
-    const [admin, setAdmin] = useState<boolean>(!guests_allowed);
+    const { guestsAllowed } = useSettings();
+    const [admin, setAdmin] = useState<boolean>(!guestsAllowed);
     const [notifApi, notifCtx] = notification.useNotification();
     const { api, isLoggedIn, login, loginGuest } = useAuth();
     const navigate = useNavigate();
@@ -94,7 +94,7 @@ export default function LoginPage() {
                             <Input />
                         </Form.Item>
 
-                        {(!guests_allowed || admin) && (
+                        {(!guestsAllowed || admin) && (
                             <Form.Item<FormType>
                                 label={t('login.password')}
                                 name="password"
@@ -117,7 +117,7 @@ export default function LoginPage() {
                             justifyContent: 'space-around',
                         }}
                     >
-                        {guests_allowed && (
+                        {guestsAllowed && (
                             <Switch
                                 checkedChildren={t('login.admin')}
                                 unCheckedChildren={t('login.anonymous')}

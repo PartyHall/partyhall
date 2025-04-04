@@ -26,7 +26,8 @@ type AuthProps = {
     karaoke: PhKaraoke;
     karaokeQueue: PhSongSession[];
 
-    user_settings: PhUserSettings | null;
+    userSettings: PhUserSettings | null;
+    lastBtnPressed: number|null;
 
     version: string | null;
     commit: string | null;
@@ -61,7 +62,8 @@ const defaultProps: AuthProps = {
 
     karaokeQueue: [],
 
-    user_settings: null,
+    userSettings: null,
+    lastBtnPressed: null,
 
     version: null,
     commit: null,
@@ -91,6 +93,7 @@ export default function AuthProvider({ children, token }: { children: ReactNode;
             '/karaoke',
             '/karaoke-queue',
             '/backdrop-state',
+            '/btn-press'
         ].forEach((x) => url.searchParams.append('topic', x));
 
         const es = new EventSource(url, { withCredentials: true });
@@ -198,6 +201,13 @@ export default function AuthProvider({ children, token }: { children: ReactNode;
             }));
         });
 
+        es.addEventListener('/btn-press', x => {
+            setCtx(oldCtx => ({
+                ...oldCtx,
+                lastBtnPressed: JSON.parse(x.data),
+            }))
+        })
+
         return es;
     };
 
@@ -229,7 +239,7 @@ export default function AuthProvider({ children, token }: { children: ReactNode;
             selectedBackdrop: state.selectedBackdrop,
             karaoke: state.karaoke,
             karaokeQueue: state.karaokeQueue,
-            user_settings: state.userSettings,
+            userSettings: state.userSettings,
             version: state.version,
             commit: state.commit,
         }));

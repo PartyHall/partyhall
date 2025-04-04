@@ -16,6 +16,7 @@ Some stuff are truely ugly in the architecture of the app. I know, I need to fix
 - Frontend apps should have a global handling of errors (e.g. 401, 403, 500) through React Router
 - All errors should be catched and AT LEAST display a snackbar notification
 - The appliance settings / onboarding components should be remade properly, those are ugly and prone to issues I don't like it. (Like they should get all the data they need by themself and not rely on passed props, they should be able to decide whether the user CAN submit or not the form, ...)
+- Make an eventbus (e.g. instead of doing mercure sendstate + other stuff by hand just say "bus.trigger("backdrop_updated")" and each packages register their events so that it handles everything by itself)
 
 ## Links
 

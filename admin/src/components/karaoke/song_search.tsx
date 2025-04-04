@@ -47,7 +47,7 @@ export default function SongSearch() {
 
     return (
         <>
-            <Flex align="center" justify="center" gap={8} style={{ width: 'min(100%, 500px)', margin: 'auto' }}>
+            <Flex align="center" justify="center" gap={8} style={{ width: 'min(100%, 500px)', margin: '0 auto' }}>
                 <Input
                     placeholder={tG('actions.search') + '...'}
                     value={search}

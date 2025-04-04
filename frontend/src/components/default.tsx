@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import ButtonSetupModal from './hud/btn_setup';
 import Countdown from './hud/countdown';
 import Disabled from './hud/disabled';
 import Flash from './hud/flash';
@@ -19,10 +20,10 @@ const loadImage = (src: string): Promise<HTMLImageElement> => {
 };
 
 export default function DefaultView() {
-    const { currentMode, user_settings, shouldTakePicture, setPictureTaken, api, backdropAlbum, selectedBackdrop } =
+    const { currentMode, userSettings, shouldTakePicture, setPictureTaken, api, backdropAlbum, selectedBackdrop } =
         useAuth();
 
-    const photobooth = user_settings?.photobooth;
+    const photobooth = userSettings?.photobooth;
 
     const [countdown, setCountdown] = useState<number>(0);
     const [flash, setFlash] = useState<boolean>(false);
@@ -139,6 +140,7 @@ export default function DefaultView() {
             <KaraokeHud />
 
             {currentMode === 'disabled' && <Disabled />}
+            {currentMode === 'btn_setup' && <ButtonSetupModal />}
 
             {countdown > 0 && <Countdown seconds={countdown} />}
             {flash && <Flash />}

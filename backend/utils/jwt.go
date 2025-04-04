@@ -35,6 +35,7 @@ func GetClaimsFromUser(dbUser *models.User, isGuest bool) models.JwtCustomClaims
 			topics = append(topics, []string{
 				"/audio-devices",
 				"/logs",
+				"/btn-press",
 			}...)
 			break
 		}

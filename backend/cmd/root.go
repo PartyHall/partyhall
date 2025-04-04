@@ -70,7 +70,7 @@ var rootCmd = &cobra.Command{
 			return
 		}
 
-		state.STATE.CurrentMode = state.MODE_PHOTOBOOTH
+		state.STATE.SetMode(state.MODE_PHOTOBOOTH)
 
 		dal.DB = services.DB
 
@@ -88,7 +88,7 @@ var rootCmd = &cobra.Command{
 			}
 
 			if evt == nil {
-				state.STATE.CurrentMode = state.MODE_DISABLED
+				state.STATE.SetMode(state.MODE_DISABLED)
 			} else {
 				event = evt
 			}

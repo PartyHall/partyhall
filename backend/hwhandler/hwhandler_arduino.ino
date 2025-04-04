@@ -1,14 +1,16 @@
 // PARTYHALL HWHANDLER
-// ESP32 Version
-
+// This is the arduino version
+// I won't be maintaining it as I moved to an esp32
 // VERSION 2.0
 
-#define LEDS_RELAY_PIN 15  // D9
-
-// Those are the pin that the ESP will listen to
-// Messages will be sent in the form of "BTN_[IDX OF THE PRESSED BUTTON]"
-#define AMT_BUTTONS 5
-int BUTTON_PINS[AMT_BUTTONS] = {0, 2, 4, 5, 14};
+#define AMT_BUTTONS 3
+#define STARTING_PIN 2
+#define LEDS_RELAY_PIN 9  // D9
+//   9 -> CE  (nRF24)
+//  10 -> CSN (nRF24)
+//  11 -> MO  (nRF24)
+//  12 -> MI  (nRF24)
+//  13 -> SCK (nRF24)
 
 // Non-locking serial read from http://www.gammon.com.au/serial
 #define MAX_INPUT 50
@@ -29,12 +31,12 @@ void setInitialState() {
 
   for (int i = 0; i < AMT_BUTTONS; i++) {
     currentState.button_pressed[i] = false;
-    pinMode(BUTTON_PINS[i], INPUT_PULLUP);
+    pinMode(i + STARTING_PIN, INPUT_PULLUP);
   }
 }
 
 void checkButton(int btn) {
-  bool is_pressed = digitalRead(BUTTON_PINS[btn]) == LOW;
+  bool is_pressed = digitalRead(btn + STARTING_PIN) == LOW;
   if (is_pressed && currentState.button_pressed[btn] == false) {
     Serial.write("BTN_");
     Serial.println(btn);

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"slices"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/partyhall/partyhall/api_errors"
@@ -47,12 +48,6 @@ func (h RoutesState) Register(router *gin.RouterGroup) {
 		middlewares.Onboarded(true),
 		middlewares.Authorized(),
 		h.setBackdrops,
-	)
-
-	// Non authenticated
-	router.GET(
-		"flash",
-		h.getFlash,
 	)
 
 	// Onboarded & Authenticated
@@ -142,7 +137,7 @@ func (h RoutesState) setMode(c *gin.Context) {
 	}
 
 	if state.STATE.CurrentEvent == nil {
-		state.STATE.CurrentMode = state.MODE_DISABLED
+		state.STATE.SetMode(state.MODE_DISABLED)
 
 		mercure_client.CLIENT.SetMode(state.STATE.CurrentMode)
 
@@ -158,7 +153,7 @@ func (h RoutesState) setMode(c *gin.Context) {
 	}
 
 	if state.STATE.CurrentMode != mode {
-		state.STATE.CurrentMode = mode
+		state.STATE.SetMode(mode)
 
 		if err := mercure_client.CLIENT.SetMode(mode); err != nil {
 			c.Render(http.StatusInternalServerError, api_errors.MERCURE_PUBLISH_FAILURE)
@@ -202,17 +197,13 @@ func (h RoutesState) setBackdrops(c *gin.Context) {
 		state.STATE.SelectedBackdrop = 0
 	}
 
+	state.STATE.BackdropSelectedAt = time.Now()
+
 	mercure_client.CLIENT.SendBackdropState()
 
 	c.JSON(200, map[string]any{
 		"backdrop_album":    state.STATE.BackdropAlbum,
 		"selected_backdrop": state.STATE.SelectedBackdrop,
-	})
-}
-
-func (h RoutesState) getFlash(c *gin.Context) {
-	c.JSON(200, map[string]any{
-		"powered": state.STATE.HardwareFlashPowered,
 	})
 }
 

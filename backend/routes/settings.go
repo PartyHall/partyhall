@@ -31,6 +31,28 @@ func (h RoutesSettings) Register(router *gin.RouterGroup) {
 	)
 
 	// Non-onboarded | Admin
+	// In post as it also sets the mode
+	router.POST(
+		"button-mappings",
+		middlewares.NotOnboardedOrRole("ADMIN"),
+		h.getButtonMappings,
+	)
+
+	// Non-onboarded | Admin
+	router.PUT(
+		"button-mappings",
+		middlewares.NotOnboardedOrRole("ADMIN"),
+		h.setButtonMappings,
+	)
+
+	// Non-onboarded | Admin
+	router.GET(
+		"button-mappings/actions",
+		middlewares.NotOnboardedOrRole("ADMIN"),
+		h.getButtonMappingsActions,
+	)
+
+	// Non-onboarded | Admin
 	router.PUT(
 		"webcam",
 		middlewares.NotOnboardedOrRole("ADMIN"),
@@ -102,6 +124,35 @@ func (h RoutesSettings) Register(router *gin.RouterGroup) {
 		h.setAudioDeviceVolume,
 	)
 	//endregion
+}
+
+func (h RoutesSettings) getButtonMappings(c *gin.Context) {
+	state.STATE.SetMode(state.MODE_BTN_SETUP)
+	mercure_client.CLIENT.SetMode(state.STATE.CurrentMode)
+
+	c.JSON(200, state.STATE.UserSettings.ButtonMappings)
+}
+
+func (h RoutesSettings) getButtonMappingsActions(c *gin.Context) {
+	c.JSON(200, mqtt.BUTTON_ACTIONS)
+}
+
+func (h RoutesSettings) setButtonMappings(c *gin.Context) {
+	var mappings map[int]string
+
+	if err := c.ShouldBindJSON(&mappings); err != nil {
+		api_errors.RenderValidationErr(c, err)
+
+		return
+	}
+
+	config.GET.UserSettings.ButtonMappings = mappings
+	config.GET.UserSettings.Save()
+
+	state.STATE.UserSettings = config.GET.UserSettings
+	mercure_client.CLIENT.SendUserSettings()
+
+	c.JSON(200, mappings)
 }
 
 func (h RoutesSettings) getNexus(c *gin.Context) {

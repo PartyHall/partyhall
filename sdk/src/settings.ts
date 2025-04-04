@@ -10,6 +10,21 @@ export default class Settings {
         this.sdk = sdk;
     }
 
+    public async getButtonMappings(): Promise<Record<number, string>> {
+        const resp = await this.sdk.post('/api/settings/button-mappings');
+        return await resp.json();
+    }
+
+    public async getButtonMappingsActions(): Promise<string[]> {
+        const resp = await this.sdk.get('/api/settings/button-mappings/actions');
+        return await resp.json();
+    }
+
+    public async setButtonMappings(mappings: Record<number, string>): Promise<Record<number, string>> {
+        const resp = await this.sdk.put('/api/settings/button-mappings', mappings);
+        return await resp.json();
+    }
+
     public async getNexus() {
         const resp = await this.sdk.get('/api/settings/nexus');
         return NexusSettings.fromJson(await resp.json());

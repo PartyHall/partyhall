@@ -1,6 +1,6 @@
 import { ReactNode, createContext, useContext, useState } from 'react';
 import Loader from '../components/loader';
-import { PhUserSettings } from '@partyhall/sdk';
+import { PhState, PhUserSettings } from '@partyhall/sdk';
 import useAsyncEffect from 'use-async-effect';
 
 const DEFAULT_TOPICS = [
@@ -14,6 +14,7 @@ const DEFAULT_TOPICS = [
     '/flash',
     '/backdrop-state',
     '/user-settings',
+    '/btn-press',
 ];
 
 /** @TODO: Implement APIs */
@@ -21,12 +22,9 @@ type SettingsProps = {
     loaded: boolean;
     pageName: string;
 
-    user_settings: PhUserSettings | null;
+    userSettings: PhUserSettings | null;
 
-    guests_allowed: boolean;
-    enabled_modules: string[];
-
-    hwflash_powered: boolean;
+    guestsAllowed: boolean;
 
     version: string;
     commit: string;
@@ -37,7 +35,8 @@ type SettingsProps = {
 type SettingsContextProps = SettingsProps & {
     fetch: () => Promise<void>;
     setPageName: (name: string, mercureTopics?: string[]) => void;
-    setUserSettings: (user_settings: PhUserSettings) => void;
+    setUserSettings: (userSettings: PhUserSettings) => void;
+    setHardwareFlashBrightness: (b: number) => void;
 };
 
 const defaultProps: SettingsProps = {
@@ -45,12 +44,9 @@ const defaultProps: SettingsProps = {
     pageName: 'home',
     topics: DEFAULT_TOPICS,
 
-    user_settings: null,
+    userSettings: null,
 
-    guests_allowed: false,
-    enabled_modules: [],
-
-    hwflash_powered: false,
+    guestsAllowed: false,
 
     version: 'INDEV',
     commit: 'XXXXXX',
@@ -61,6 +57,7 @@ const SettingsContext = createContext<SettingsContextProps>({
     fetch: async () => {},
     setPageName: () => {},
     setUserSettings: () => {},
+    setHardwareFlashBrightness: () => {},
 });
 
 export default function SettingsProvider({ children }: { children: ReactNode }) {
@@ -71,10 +68,15 @@ export default function SettingsProvider({ children }: { children: ReactNode }) 
         const resp = await fetch('/api/state');
         const data = await resp.json();
 
+        const state = PhState.fromJson(data);
+
         setCtx((oldCtx) => ({
             ...oldCtx,
             loaded: true,
-            ...data,
+            userSettings: state.userSettings,
+            guestsAllowed: state.guestsAllowed,
+            version: state.version,
+            commit: state.commit,
         }));
     };
 
@@ -92,12 +94,25 @@ export default function SettingsProvider({ children }: { children: ReactNode }) 
         }));
     };
 
-    const setUserSettings = (user_settings: PhUserSettings) => setCtx((oldCtx) => ({ ...oldCtx, user_settings }));
+    const setUserSettings = (userSettings: PhUserSettings) => setCtx((oldCtx) => ({ ...oldCtx, userSettings }));
+
+    const setHardwareFlashBrightness = (b: number) => {
+        const settings = ctx.userSettings;
+        if (!settings) {
+            return;
+        }
+
+        const photoboothSettings = settings.photobooth;
+        photoboothSettings.flashBrightness = b;
+        settings.photobooth = photoboothSettings;
+
+        setUserSettings(settings);
+    };
 
     useAsyncEffect(fetchStatus, []);
 
     return (
-        <SettingsContext.Provider value={{ ...ctx, fetch: fetchStatus, setPageName, setUserSettings }}>
+        <SettingsContext.Provider value={{ ...ctx, fetch: fetchStatus, setPageName, setUserSettings, setHardwareFlashBrightness }}>
             <Loader loading={!ctx.loaded}>{children}</Loader>
         </SettingsContext.Provider>
     );

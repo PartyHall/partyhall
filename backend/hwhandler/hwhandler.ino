@@ -1,14 +1,15 @@
 // PARTYHALL HWHANDLER
-// ESP32 Version
+// ESP32-C6 Version
 
 // VERSION 2.0
 
-#define LEDS_RELAY_PIN 15  // D9
+#define LEDS_RELAY_PIN 15
 
 // Those are the pin that the ESP will listen to
 // Messages will be sent in the form of "BTN_[IDX OF THE PRESSED BUTTON]"
-#define AMT_BUTTONS 5
-int BUTTON_PINS[AMT_BUTTONS] = {0, 2, 4, 5, 14};
+// @see https://docs.espressif.com/projects/esp-dev-kits/en/latest/esp32c6/_images/esp32-c6-devkitc-1-pin-layout.png
+#define AMT_BUTTONS 14
+int BUTTON_PINS[AMT_BUTTONS] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
 
 // Non-locking serial read from http://www.gammon.com.au/serial
 #define MAX_INPUT 50

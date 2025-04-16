@@ -14,15 +14,6 @@ import (
 	"go.bug.st/serial"
 )
 
-/**
- @TODO: The button mapping should happen in the main app, not here
- This will let this thing run at all time
- then on the front do the mapping so that no reload of the config is needed
- in this process
- This will also let the admin show which button is pressed during onboarding
- instead of actually doing the thing
-**/
-
 type Device struct {
 	Handler             *HardwareHandler
 	PortName            string
@@ -57,7 +48,8 @@ func Load() (*HardwareHandler, error) {
 
 	devices := []*Device{}
 	for _, p := range ports {
-		if !strings.HasPrefix(p, "/dev/ttyUSB") {
+		// Arduino & ESP8266 shows up as ttyUSB, ESP32 shows up as ttyACM
+		if !strings.HasPrefix(p, "/dev/ttyUSB") && !strings.HasPrefix(p, "/dev/ttyACM") {
 			continue
 		}
 
@@ -67,6 +59,10 @@ func Load() (*HardwareHandler, error) {
 			LastButtonPressTime: time.Now(),
 			LastButtonPress:     "",
 		})
+	}
+
+	if len(devices) == 0 {
+		return nil, errors.New("no hardware handler devices found")
 	}
 
 	return &HardwareHandler{
@@ -100,6 +96,7 @@ func (hh *HardwareHandler) Start() error {
 
 	hh.Mqtt = client
 
+	fmt.Printf("- %v potential hardware handler devices found\n", len(hh.Devices))
 	for _, d := range hh.Devices {
 		d.Handler = hh
 
@@ -223,10 +220,10 @@ func (d *Device) ProcessMessage() error {
 		msg = strings.Trim(msg, " \t")
 
 		currTime := time.Now()
-		diff := currTime.Sub(d.LastButtonPressTime).Seconds()
+		diff := currTime.Sub(d.LastButtonPressTime).Milliseconds()
 
 		// Debounce
-		if d.LastButtonPress != msg || diff > 1 {
+		if d.LastButtonPress != msg || diff > 250 {
 			btnPressed := strings.TrimPrefix(msg, "BTN_")
 			btnId, err := strconv.Atoi(btnPressed)
 			if err != nil {

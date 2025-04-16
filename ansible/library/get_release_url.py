@@ -23,8 +23,8 @@ def main():
         arch = CUSTOM_ARCH_NAMES[arch]
 
     release = 'latest'
-    if module['release']:
-        release = f'tags/{module["release"]}'
+    if module.params['release']:
+        release = f'tags/{module.params["release"]}'
 
     resp = requests.get(f'https://api.github.com/repos/{module.params["repository"]}/releases/{release}')
     

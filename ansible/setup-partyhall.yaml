@@ -42,11 +42,23 @@
         dest: '/etc/partyhall.yaml'
         mode: 0664
 
+    - name: 'Creating the partyhall main dirs'
+      file:
+        path: '/home/{{ ansible_user }}/partyhall'
+        state: 'directory'
+        mode: '0777'
+
+    - name: 'Pushing the partyhall user_settings config'
+      template:
+        src: 'templates/user_settings.yaml.j2'
+        dest: '/home/{{ ansible_user }}/partyhall/user_settings.yaml'
+        mode: 0664
+
     - name: 'Pushing the services (Partyhall)'
       become: yes
       template:
-        src: 'templates/{{item}}.service.j2'
-        dest: '/usr/lib/systemd/user/{{item}}.service'
+        src: 'templates/{{ item }}.service.j2'
+        dest: '/usr/lib/systemd/user/{{ item }}.service'
         mode: '0644'
       loop: ['partyhall', 'hardware_handler']
 

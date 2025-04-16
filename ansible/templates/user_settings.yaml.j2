@@ -1,0 +1,22 @@
+onboarded: true # Temp, until we have the onboarding process
+
+nexus_url: {{ nexus_url }}
+nexus_ignore_ssl: {{ nexus_ignore_ssl if nexus_ignore_ssl is defined else false }}
+hardware_id: {{ nexus_hwid }}
+api_key: {{ nexus_apikey }}
+
+photobooth:
+  countdown: 3
+  flash_brightness: 100
+  resolution:
+    width: 1280
+    height: 720
+  unattended:
+    enabled: false
+    interval: 300
+
+spotify:
+  enabled: true
+  name: 'PartyHall'
+
+button_mappings: {}

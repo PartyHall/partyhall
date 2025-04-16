@@ -3,24 +3,16 @@ all:
     appliance:
       ansible_host: 192.168.14.85
       ansible_user: 'partyhall'
+      
+      # Extra software config
+      grub_resolution: '1280x720'
 
       # PartyHall config
       partyhall_admin_username: 'admin'
       partyhall_admin_password: 'admin_password'
       partyhall_admin_fullname: 'Administrator'
 
-      partyhall_photobooth_flash_brightness: 100 # Hardware flash brightness, in percentage
-      partyhall_photobooth_webcam_width: 1280
-      partyhall_photobooth_webcam_height: 720
-
-      partyhall_photobooth_unattended: true
-      partyhall_photobooth_unattended_interval: 300
-
       ## PartyNexus config (Keep empty if not enabled)
-      partyhall_nexus_url: ''
-      partyhall_nexus_hardware_id: ''
-      partyhall_nexus_api_key: ''
-
-      # Extra software config
-      spotify_name: 'PartyHall'
-      grub_resolution: '1280x720'
+      nexus_url: ''
+      nexus_hwid: ''
+      nexus_apikey: ''

@@ -21,7 +21,7 @@ export default function SettingsPage() {
                 <LinkButton to="/settings/button-mappings">{t('settings.btn_mappings.title')}</LinkButton>
                 <LinkButton to="/settings/nexus">{t('settings.nexus.title')}</LinkButton>
                 <span>Users management</span>
-                <span>Wifi access point</span>
+                <LinkButton to="/settings/wireless-ap">{t('settings.wireless_ap.title')}</LinkButton>
                 <LinkButton to="/settings/third-party">{t('settings.third_party')}</LinkButton>
             </Flex>
         </Flex>

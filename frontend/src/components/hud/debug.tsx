@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import WifiRenderer from './wifi_renderer';
 import { useAuth } from '../../hooks/auth';
 
 export const FORCE_DEBUG = false;
@@ -34,6 +35,7 @@ export function DebugLeft() {
                             ))}
                     </ul>
                 )}
+            <WifiRenderer />
         </div>
     );
 }

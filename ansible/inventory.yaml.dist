@@ -7,6 +7,11 @@ all:
       # Extra software config
       grub_resolution: '1280x720'
 
+      # Extra software config
+      grub_resolution: '1280x720'
+
+      ## TEMP SETTINGS (Until onboarding)
+
       # PartyHall config
       partyhall_admin_username: 'admin'
       partyhall_admin_password: 'admin_password'

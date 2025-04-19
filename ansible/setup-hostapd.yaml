@@ -1,0 +1,64 @@
+---
+- hosts: 'all'
+  become: yes
+  tags: ['hostapd']
+
+  tasks:
+    - name: 'Install Hostapd'
+      apt:
+        name: [ 'hostapd' ]
+
+    - name: 'Unmask Hostapd'
+      systemd:
+        name: 'hostapd'
+        masked: no
+
+    - name: 'Enable IP forwarding'
+      sysctl:
+        name: 'net.ipv4.ip_forward'
+        value: '1'
+        state: 'present'
+        reload: yes
+        sysctl_file: '/etc/sysctl.d/99-ip-forwarding.conf'
+        sysctl_set: yes
+
+    - name: 'Reset and create custom iptables chains'
+      block:
+        - name: 'Flush and remove existing custom chains'
+          shell: |
+            iptables -F wifiApRules 2>/dev/null || true
+            iptables -D FORWARD -j wifiApRules 2>/dev/null || true
+            iptables -X wifiApRules 2>/dev/null || true
+            iptables -t nat -F wifiApNatRules 2>/dev/null || true
+            iptables -t nat -D POSTROUTING -j wifiApNatRules 2>/dev/null || true
+            iptables -t nat -X wifiApNatRules 2>/dev/null || true
+          
+        - name: 'Create new custom chains'
+          shell: |
+            iptables -N wifiApRules
+            iptables -t nat -N wifiApNatRules
+            
+        - name: 'Attach custom chains to main tables'
+          shell: |
+            iptables -A FORWARD -j wifiApRules
+            iptables -t nat -A POSTROUTING -j wifiApNatRules
+
+        - name: 'Make iptables chains persistent'
+          shell: 'netfilter-persistent save'
+
+    - name: 'Copy the hotspot setup script'
+      copy:
+        src: 'files/setup-hotspot.sh'
+        dest: '/usr/bin/setup-hotspot'
+        mode: '0700'
+        owner: 'root'
+        group: 'root'
+
+    - name: 'Configure sudoers for setup-hotspot'
+      copy:
+        dest: '/etc/sudoers.d/{{ ansible_user }}_setup_hotspot'
+        content: '{{ ansible_user }} ALL=(root) NOPASSWD: /usr/bin/setup-hotspot'
+        owner: 'root'
+        group: 'root'
+        mode: '0440'
+        validate: '/usr/sbin/visudo -cf %s'

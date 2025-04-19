@@ -311,14 +311,21 @@ func (h RoutesSettings) setUnattended(c *gin.Context) {
 }
 
 func (h RoutesSettings) getAp(c *gin.Context) {
-	c.JSON(200, config.GET.UserSettings.WirelessAp)
+	ifaces := os_mgmt.FindInterfaces()
+
+	c.JSON(200, map[string]any{
+		"interfaces":  ifaces,
+		"ap_settings": config.GET.UserSettings.WirelessAp,
+	})
 }
 
 func (h RoutesSettings) setAp(c *gin.Context) {
 	var req struct {
-		Enabled  bool   `json:"enabled"`
-		Ssid     string `json:"ssid" binding:"required"`
-		Password string `json:"password" binding:"required"`
+		WiredInterface    string `json:"wired_interface"`
+		WirelessInterface string `json:"wireless_interface"`
+		Enabled           bool   `json:"enabled"`
+		Ssid              string `json:"ssid"`
+		Password          string `json:"password"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -327,17 +334,50 @@ func (h RoutesSettings) setAp(c *gin.Context) {
 		return
 	}
 
-	// @TODO:
-	// Validate the hostname & password
-	// Build the hostapd.conf
+	ifaces := os_mgmt.FindInterfaces()
 
-	if req.Enabled {
-		// systemctl enable hostapd
-		// systemctl restart hostapd
-	} else {
-		// systemctl disable --now hostapd
+	errors := map[string]any{}
+
+	ethIfaceFound := false
+	for _, ethIface := range ifaces.Ethernet {
+		if ethIface.Name == req.WiredInterface {
+			ethIfaceFound = true
+			break
+		}
 	}
 
+	if !ethIfaceFound {
+		errors["wired_interface"] = "Wired interface " + req.WiredInterface + " not found."
+	}
+
+	wifiIfaceFound := false
+	for _, wifiIface := range ifaces.Wifi {
+		if wifiIface.Name == req.WirelessInterface {
+			wifiIfaceFound = true
+			break
+		}
+	}
+
+	if !wifiIfaceFound {
+		errors["wireless_interface"] = "Wireless interface " + req.WirelessInterface + " not found."
+	}
+
+	// Validate the SSID and password
+	if !regexp.MustCompile(`^[a-zA-Z0-9\ ]{1,32}$`).MatchString(req.Ssid) {
+		errors["ssid"] = "Invalid SSID (1-32 alphanumerical characters + spaces)."
+	}
+
+	if !regexp.MustCompile(`^[a-zA-Z0-9]{12,63}$`).MatchString(req.Password) {
+		errors["password"] = "Invalid password (12-63 alphanumerical characters)."
+	}
+
+	if len(errors) > 0 {
+		api_errors.BAD_REQUEST.WithExtra(errors).Render(c.Writer)
+
+		return
+	}
+
+	// Save configuration
 	config.GET.UserSettings.WirelessAp.Enabled = req.Enabled
 	config.GET.UserSettings.WirelessAp.Ssid = req.Ssid
 	config.GET.UserSettings.WirelessAp.Password = req.Password
@@ -345,7 +385,25 @@ func (h RoutesSettings) setAp(c *gin.Context) {
 
 	state.STATE.UserSettings = config.GET.UserSettings
 
-	// @TODO: Ensure that the config is working (No error while running the command, idk where to find the logs though)
+	// Everything is ok and saved? Now and only now we can
+	// trigger the config update
+	ap := config.GET.UserSettings.WirelessAp
+
+	err := os_mgmt.SetHostapdConfig(
+		ap.WiredInterface,
+		ap.WirelessInterface,
+		ap.Enabled,
+		ap.Ssid,
+		ap.Password,
+	)
+
+	if err != nil {
+		api_errors.BAD_REQUEST.WithExtra(map[string]any{
+			"err": err.Error(),
+		}).Render(c.Writer)
+		return
+	}
+
 	c.JSON(200, req)
 }
 

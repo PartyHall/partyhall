@@ -1,0 +1,53 @@
+---
+- hosts: 'all'
+  become: yes
+  tags: ['dnsmasq']
+
+  tasks:
+    - name: 'Install some softwares'
+      apt:
+        name: ['dnsmasq']
+
+    - name: 'Ensure dnsmasq.d directory exists'
+      file:
+        path: '/etc/dnsmasq.d'
+        state: 'directory'
+        mode: '0755'
+
+    - name: 'Configure main dnsmasq.conf to use conf.d directory'
+      lineinfile:
+        path: '/etc/dnsmasq.conf'
+        line: "conf-dir=/etc/dnsmasq.d,*.conf"
+        create: yes
+        mode: '0644'
+        backup: yes
+
+    - name: 'Create global configuration file'
+      copy:
+        dest: '/etc/dnsmasq.d/00-global.conf'
+        content: |
+          domain-needed
+          bogus-priv
+          no-resolv
+          server=8.8.8.8
+          server=1.1.1.1
+          cache-size=1000
+          log-queries
+          log-facility=/var/log/dnsmasq.log
+        mode: '0644'
+
+    - name: 'Create hostapd-specific configuration'
+      copy:
+        dest: '/etc/dnsmasq.d/01-interface.conf'
+        content: |
+          # Dummy file, this will be setup by /usr/bin/setup-hotspot
+          # Be sure to enable the Wireless AP in PartyHall settings
+        mode: '0644'
+
+    # The service is not only used by hostapd so it need
+    # to be running automatically at startup
+    - name: 'Restart dnsmasq service'
+      systemd:
+        name: 'dnsmasq'
+        state: 'restarted'
+        enabled: yes

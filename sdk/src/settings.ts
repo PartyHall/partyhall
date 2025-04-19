@@ -1,3 +1,4 @@
+import { ApSettings, InterfacesSettings } from './models/interfaces';
 import { AudioDevice, AudioDevices } from './models/audio';
 import NexusSettings from './models/nexus';
 import { SDK } from './index';
@@ -94,5 +95,29 @@ export default class Settings {
         const resp = await this.sdk.post(`/api/webapp/settings/audio-devices/${device.id}/volume`, { volume });
 
         return AudioDevices.fromJson(await resp.json());
+    }
+
+    public async getWirelessAp() {
+        const resp = await this.sdk.get('/api/settings/ap');
+
+        return InterfacesSettings.fromJson(await resp.json());
+    }
+
+    public async setWirelessAp(
+        wiredInterface: string,
+        wirelessInterface: string,
+        enabled: boolean,
+        ssid: string,
+        password: string
+    ) {
+        const resp = await this.sdk.put('/api/settings/ap', {
+            wired_interface: wiredInterface,
+            wireless_interface: wirelessInterface,
+            enabled,
+            ssid,
+            password,
+        });
+
+        return ApSettings.fromJson(await resp.json());
     }
 }

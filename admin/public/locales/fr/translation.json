@@ -216,6 +216,20 @@
             "api_key": "Clé API",
             "bypass_ssl": "Ignorer la validation du certificat SSL"
         },
+        "wireless_ap": {
+            "title": "Point d'accès Wifi",
+            "desc": "Un point d'accès Wifi vous permettant de se connecter à cette app, cela permet aussi d'accéder à internet.",
+            "desc_2": "Le but est de ne pas avoir à fournir tous les mots de passes wifi à tous le monde. Avec ce point d'accès, vous donnez ce mot de passe à vos utilisateurs et ils y auront accès à tous les évènements où cet appareil sera présent.",
+            "desc_3": "Vous ne devriez pas changer ces paramètres si vous n'avez pas de méthode de secours pour accéder à cet interface (ex: via ethernet).",
+            "wireless_iface": "Interface Wifi",
+            "wired_iface": "Interface Ethernet",
+            "ap_name": "SSID",
+            "ap_password": "Mot de passe",
+            "ap_password_caution": "Attention, le mot de passe doit faire entre 8 et 63 caractères.",
+            "settings_saved": "Point d'accès Wifi mis à jour",
+            "settings_saved_desc": "Le point d'accès Wifi va redémarrer pour définir les nouveaux paramètres.",
+            "settings_save_error": "Erreur lors de la sauvegarde des paramètres du point d'accès Wifi, voir la console pour plus d'infos."
+        },
         "spotify": {
             "title": "Spotify Connect",
             "desc": "Cet appareil peut servir de haut-parleur Spotify, si vous avez un compte premium, vous pouvez alors caster directement depuis l'application officielle.",

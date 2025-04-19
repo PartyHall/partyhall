@@ -1,8 +1,11 @@
 ---
 - import_playbook: setup-init.yaml
 - import_playbook: setup-mosquitto.yaml
-- import_playbook: setup-partyhall.yaml
+- import_playbook: setup-dnsmasq.yaml
+- import_playbook: setup-iptables.yaml
+- import_playbook: setup-hostapd.yaml
 - import_playbook: setup-spotify.yaml
+- import_playbook: setup-partyhall.yaml
 - import_playbook: setup-nginx.yaml
 - import_playbook: setup-xorg.yaml
 - import_playbook: reboot.yaml
@@ -10,10 +13,4 @@
 # @TODO: Add a network manager that will try to connect to ethernet
 # and use DHCP to get its IP
 # It should choose the interface automatically and not have any
-# config
-
-# @TODO: add setup for microphones
-
-# @TODO: Add a Wifi hotspot server for when no ethernet
-
-# @TODO: Cleanup partyhall.yaml
+# config (But this iface should be used for hostapd!)

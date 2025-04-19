@@ -216,6 +216,20 @@
             "api_key": "API Key",
             "bypass_ssl": "Bypass SSL certificate validation"
         },
+        "wireless_ap": {
+            "title": "Wifi Access Point",
+            "desc": "A wifi access point that let you connect to this app, it also shares internet.",
+            "desc_2": "The goal is to not have to share every wifi password with everyone. With this access point, you gives this passord to your user and they will be connected at every party this appliances is.",
+            "desc_3": "You should probably not change those settings if you don't have a fallback way of getting to this admin (e.g. through ethernet).",
+            "wireless_iface": "Wifi AP interface",
+            "wired_iface": "Ethernet interface",
+            "ap_name": "SSID",
+            "ap_password": "Password",
+            "ap_password_caution": "Caution, the passeword must be between 8-63 characters.",
+            "settings_saved": "Wifi hotspot updated",
+            "settings_saved_desc": "The wifi access point will restart to set the new settings.",
+            "settings_save_error": "Error while saving the wifi access point settings, see console for more infos"
+        },
         "spotify": {
             "title": "Spotify Connect",
             "desc": "The appliance can be used as a Spotify speaker, as long as you have a premium account, you can cast directly from the official app.",

@@ -22,6 +22,7 @@ import (
 	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/mqtt"
 	"github.com/partyhall/partyhall/nexus"
+	"github.com/partyhall/partyhall/os_mgmt"
 	"github.com/partyhall/partyhall/routes"
 	"github.com/partyhall/partyhall/services"
 	"github.com/partyhall/partyhall/state"
@@ -56,6 +57,26 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			log.LOG.Error(err)
 			return
+		}
+
+		us := config.GET.UserSettings
+
+		// If the wireless access point is configured
+		// we can start hostapd + dnsmasq properly
+		if us.WirelessAp.Enabled {
+			err := os_mgmt.SetHostapdConfig(
+				us.WirelessAp.WiredInterface,
+				us.WirelessAp.WirelessInterface,
+				true,
+				us.WirelessAp.Ssid,
+				us.WirelessAp.Password,
+			)
+
+			if err != nil {
+				log.Error("Failed to init hotspot", "err", err)
+			} else {
+				log.LOG.Info("Wireless hotspot setup!")
+			}
 		}
 
 		err = mqtt.Load()

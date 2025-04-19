@@ -23,6 +23,7 @@ import SettingsPhotoboothPage from './pages/admin/settings/photobooth';
 import SettingsProvider from './hooks/settings';
 import SettingsThirdPartyPage from './pages/admin/settings/spotify';
 import { StrictMode } from 'react';
+import WirelessApPage from './pages/admin/settings/wireless_ap';
 import { createRoot } from 'react-dom/client';
 
 import detector from 'i18next-browser-languagedetector';
@@ -83,6 +84,10 @@ const router = createHashRouter([
                     {
                         path: 'nexus',
                         element: <SettingsNexusPage />,
+                    },
+                    {
+                        path: 'wireless-ap',
+                        element: <WirelessApPage />,
                     },
                     {
                         path: 'third-party',

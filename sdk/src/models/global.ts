@@ -28,15 +28,29 @@ export class PhUserSettingsPhotobooth {
     }
 }
 
+export class PhWirelessAp {
+    enabled: boolean;
+    ssid: string;
+    password: string;
+
+    constructor(data: Record<string, any>) {
+        this.enabled = data['enabled'];
+        this.ssid = data['ssid'];
+        this.password = data['password'];
+    }
+}
+
 export class PhUserSettings {
     onboarded: boolean;
     hardwareId: string;
     photobooth: PhUserSettingsPhotobooth;
+    wirelessAp: PhWirelessAp;
 
     constructor(data: Record<string, any>) {
         this.onboarded = data['onboarded'];
         this.hardwareId = data['hardware_id'];
         this.photobooth = new PhUserSettingsPhotobooth(data['photobooth']);
+        this.wirelessAp = new PhWirelessAp(data['wireless_ap']);
     }
 }
 

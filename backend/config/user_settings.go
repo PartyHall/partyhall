@@ -34,10 +34,12 @@ type UserSettings struct {
 	} `yaml:"spotify" json:"-"`
 
 	WirelessAp struct {
-		Enabled  bool   `yaml:"enabled" json:"enabled"`
-		Ssid     string `yaml:"ssid" json:"ssid"`
-		Password string `yaml:"password" json:"password"`
-	} `yaml:"wireless_ap" json:"-"`
+		WiredInterface    string `yaml:"wired_interface" json:"wired_interface"`
+		WirelessInterface string `yaml:"wireless_interface" json:"wireless_interface"`
+		Enabled           bool   `yaml:"enabled" json:"enabled"`
+		Ssid              string `yaml:"ssid" json:"ssid"`
+		Password          string `yaml:"password" json:"password"`
+	} `yaml:"wireless_ap" json:"wireless_ap"`
 
 	ButtonMappings map[int]string `yaml:"button_mappings" json:"-"`
 }

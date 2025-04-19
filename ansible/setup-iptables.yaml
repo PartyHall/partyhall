@@ -1,0 +1,28 @@
+---
+- hosts: 'all'
+  become: yes
+  tags: ['iptables']
+
+  tasks:
+    - name: 'Set iptables-persistent default answers'
+      debconf:
+        name: 'iptables-persistent'
+        question: "{{ item.question }}"
+        value: "{{ item.value }}"
+        vtype: 'boolean'
+      loop:
+        - { question: 'iptables-persistent/autosave_v4', value: 'true' }
+        - { question: 'iptables-persistent/autosave_v6', value: 'true' }
+
+    - name: 'Install some softwares'
+      apt:
+        name: ['iptables', 'iptables-persistent']
+
+    - name: 'Ensure /etc/iptables directory exists'
+      file:
+        path: '/etc/iptables'
+        state: 'directory'
+        mode: '0755'
+
+    - name: 'Make iptables chains persistent'
+      shell: 'netfilter-persistent save'

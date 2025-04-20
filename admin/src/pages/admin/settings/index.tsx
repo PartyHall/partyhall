@@ -13,7 +13,7 @@ export default function SettingsPage() {
     }, []);
 
     return (
-        <Flex vertical style={{ width: '400px' }} gap="2em">
+        <Flex vertical style={{ maxWidth: '400px' }} gap="2em">
             <Typography.Title>{t('settings.title')}</Typography.Title>
             <Flex vertical gap={16} align="center">
                 <LinkButton to="/settings/photobooth">{t('settings.photobooth.title')}</LinkButton>

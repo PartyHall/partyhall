@@ -25,7 +25,7 @@ export default function Index() {
 
     /** @TODO: Make responsive for < 400 => width=95% or something like that */
     return (
-        <Flex vertical style={{ width: '400px' }} gap="2em">
+        <Flex vertical style={{ maxWidth: '400px' }} gap="2em">
             <Card title={t('about_you.title')}>
                 <Flex vertical gap=".5em">
                     <KeyVal label={t('about_you.your_display_name')}>

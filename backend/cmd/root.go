@@ -33,6 +33,7 @@ import (
 
 var AppFS embed.FS
 var ApplianceFS embed.FS
+var AssetsFS embed.FS
 
 func closeDb() {
 	if services.DB != nil {
@@ -52,6 +53,8 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		defer log.LOG.Sync()
 		defer closeDb()
+
+		utils.AssetsFS = AssetsFS
 
 		err := services.Load()
 		if err != nil {

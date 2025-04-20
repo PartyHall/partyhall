@@ -203,7 +203,8 @@
                 "display_debug": "Afficher les infos de debug",
                 "shutdown": "Éteindre l'appareil",
                 "left": "Gauche",
-                "right": "Droite (ou Passe-tête suivant)"
+                "right": "Droite (ou Passe-tête suivant)",
+                "next_backdrop_album": "Album de passe-tête suivant"
             }
         },
         "nexus": {

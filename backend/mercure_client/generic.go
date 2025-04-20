@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/partyhall/partyhall/models"
-	"github.com/partyhall/partyhall/utils"
 )
 
 func (mc Client) SendTime() error {
@@ -19,9 +18,9 @@ func (mc Client) SetMode(mode string) error {
 	})
 }
 
-func (mc Client) ShowDebug() error {
+func (mc Client) ShowDebug(ipAddresses map[string][]string) error {
 	return mc.PublishEvent("/debug", map[string]any{
-		"ip_addresses": utils.GetIPs(),
+		"ip_addresses": ipAddresses,
 	})
 }
 

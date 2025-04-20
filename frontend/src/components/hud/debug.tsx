@@ -35,7 +35,6 @@ export function DebugLeft() {
                             ))}
                     </ul>
                 )}
-            <WifiRenderer />
         </div>
     );
 }
@@ -52,6 +51,14 @@ export function DebugRight() {
             {D('HWID', userSettings?.hardwareId)}
             {D('Version', version)}
             {D('Commit', commit)}
+        </div>
+    );
+}
+
+export function DebugBottomLeft() {
+    return (
+        <div className="debug">
+            <WifiRenderer />
         </div>
     );
 }

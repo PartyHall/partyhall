@@ -8,8 +8,13 @@ export default function WifiRenderer() {
     }
 
     return (
-        <span>
-            Wifi: {userSettings?.wirelessAp.ssid} / {userSettings?.wirelessAp.password}
-        </span>
+        <div>
+            <div className="wifi-renderer">
+                <h1>Wifi</h1>
+                <span>{userSettings?.wirelessAp.ssid}</span>
+                <span>{userSettings?.wirelessAp.password}</span>
+                <img src="/api/state/ap-qr" alt="Wifi QR Code" />
+            </div>
+        </div>
     );
 }

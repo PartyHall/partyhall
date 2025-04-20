@@ -12,15 +12,17 @@ import (
 )
 
 const (
-	ACTION_TAKE_PICTURE  = "take_picture"
-	ACTION_LEFT          = "left"
-	ACTION_RIGHT         = "right"
-	ACTION_SHUTDOWN      = "shutdown"
-	ACTION_DISPLAY_DEBUG = "display_debug"
+	ACTION_TAKE_PICTURE        = "take_picture"
+	ACTION_NEXT_BACKDROP_ALBUM = "next_backdrop_album"
+	ACTION_LEFT                = "left"
+	ACTION_RIGHT               = "right"
+	ACTION_SHUTDOWN            = "shutdown"
+	ACTION_DISPLAY_DEBUG       = "display_debug"
 )
 
 var BUTTON_ACTIONS = []string{
 	ACTION_TAKE_PICTURE,
+	ACTION_NEXT_BACKDROP_ALBUM,
 	ACTION_DISPLAY_DEBUG,
 	ACTION_SHUTDOWN,
 	ACTION_LEFT,
@@ -82,6 +84,8 @@ func OnButtonPress(client emqtt.Client, msg emqtt.Message) {
 		OnShutdown(client, msg)
 	case ACTION_DISPLAY_DEBUG:
 		OnDisplayDebug(client, msg)
+	case ACTION_NEXT_BACKDROP_ALBUM:
+		OnNextBackdropAlbum(client, msg)
 	case ACTION_RIGHT:
 		OnNextBackdrop(client, msg)
 	default:

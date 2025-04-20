@@ -76,3 +76,19 @@ func FindInterfaces() Interfaces {
 
 	return interfaces
 }
+
+func GetCleanIps() map[string][]string {
+	ifaces := FindInterfaces()
+
+	ipAddresses := map[string][]string{}
+
+	for _, iface := range ifaces.Ethernet {
+		ipAddresses[iface.FriendlyName] = iface.Ips
+	}
+
+	for _, iface := range ifaces.Wifi {
+		ipAddresses[iface.FriendlyName] = iface.Ips
+	}
+
+	return ipAddresses
+}

@@ -203,7 +203,8 @@
                 "display_debug": "Display debug infos",
                 "shutdown": "Shutdown appliance",
                 "left": "Left",
-                "right": "Right (or Next backdrop)"
+                "right": "Right (or Next backdrop)",
+                "next_backdrop_album": "Next backdrop album"
             }
         },
         "nexus": {

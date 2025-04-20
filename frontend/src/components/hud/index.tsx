@@ -1,13 +1,21 @@
 import '../../assets/hud.scss';
-
 import DateTimeRender from './datetime';
 import EventRenderer from './event';
+import { FORCE_DEBUG } from './debug';
+import WifiRenderer from './wifi_renderer';
+import { useAuth } from '../../hooks/auth';
 
 export default function Hud() {
+    const { debug } = useAuth();
+
     return (
         <div id="hud">
-            <EventRenderer />
-            <DateTimeRender />
+            <div className="hud-top">
+                <EventRenderer />
+                <DateTimeRender />
+            </div>
+
+            <div className="hud-bottom">{(debug || FORCE_DEBUG) && <WifiRenderer />}</div>
         </div>
     );
 }

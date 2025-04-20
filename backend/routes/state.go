@@ -10,11 +10,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/partyhall/partyhall/api_errors"
+	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/dal"
 	"github.com/partyhall/partyhall/mercure_client"
 	"github.com/partyhall/partyhall/middlewares"
 	"github.com/partyhall/partyhall/mqtt"
+	"github.com/partyhall/partyhall/os_mgmt"
 	"github.com/partyhall/partyhall/state"
+	"github.com/partyhall/partyhall/utils"
 )
 
 type RoutesState struct{}
@@ -25,6 +28,9 @@ func (h RoutesState) Register(router *gin.RouterGroup) {
 
 	// Unauthenticated
 	router.POST("debug", h.showDebug)
+
+	// Unauthenticated
+	router.GET("ap-qr", h.getApQrCode)
 
 	// Onboarded & Admin
 	router.PUT(
@@ -64,7 +70,7 @@ func (h RoutesState) getState(c *gin.Context) {
 }
 
 func (h RoutesState) showDebug(c *gin.Context) {
-	err := mercure_client.CLIENT.ShowDebug()
+	err := mercure_client.CLIENT.ShowDebug(os_mgmt.GetCleanIps())
 	if err != nil {
 		c.Render(http.StatusInternalServerError, api_errors.MERCURE_PUBLISH_FAILURE)
 
@@ -72,6 +78,23 @@ func (h RoutesState) showDebug(c *gin.Context) {
 	}
 
 	c.Status(http.StatusOK)
+}
+
+func (h RoutesState) getApQrCode(c *gin.Context) {
+	wap := config.GET.UserSettings.WirelessAp
+
+	if !wap.Enabled {
+		api_errors.BAD_REQUEST.WithExtra(map[string]any{
+			"err": "The hotspot is not enabled, thus you cannot get a QR Code to connect to it.",
+		}).Render(c.Writer)
+
+		return
+	}
+
+	utils.GenerateQrCode(
+		"WIFI:T:WPA;S:"+wap.Ssid+";P:"+wap.Password+";;",
+		c,
+	)
 }
 
 func (h RoutesState) setEvent(c *gin.Context) {

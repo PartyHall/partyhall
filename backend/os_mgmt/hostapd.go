@@ -44,13 +44,9 @@ func SetHostapdConfig(
 		fmt.Sprintf("/usr/bin/setup-hotspot %s %s %s %s", ethIface, wifiIface, ssid, password),
 	)
 
-	// err := setupCmd.Run()
-
-	out, err := setupCmd.CombinedOutput()
+	err := setupCmd.Run()
 
 	if err != nil {
-		log.Error("Failed to setup hotspot", "output", string(out))
-
 		exitError, ok := err.(*exec.ExitError)
 		if ok {
 			switch exitError.ExitCode() {

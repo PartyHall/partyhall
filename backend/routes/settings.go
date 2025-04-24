@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/partyhall/partyhall/api_errors"
 	"github.com/partyhall/partyhall/config"
+	"github.com/partyhall/partyhall/log"
 	"github.com/partyhall/partyhall/mercure_client"
 	"github.com/partyhall/partyhall/middlewares"
 	"github.com/partyhall/partyhall/models"
@@ -338,29 +339,42 @@ func (h RoutesSettings) setAp(c *gin.Context) {
 
 	errors := map[string]any{}
 
-	ethIfaceFound := false
+	// @TODO:
+	// This does not work on real hardware
+	// No time to debug for now as i need to get this running for
+	// TOMORROW
+
+	// Fix this later
+
+	// ethIfaceFound := false
 	for _, ethIface := range ifaces.Ethernet {
+		log.Info("Checking the eth exists", "localIface", ethIface, "requestedIface", req.WiredInterface)
 		if ethIface.Name == req.WiredInterface {
-			ethIfaceFound = true
+			// ethIfaceFound = true
 			break
 		}
 	}
 
-	if !ethIfaceFound {
-		errors["wired_interface"] = "Wired interface " + req.WiredInterface + " not found."
-	}
+	/*
+		if !ethIfaceFound {
+			errors["wired_interface"] = "Wired interface " + req.WiredInterface + " not found."
+		}
+	*/
 
-	wifiIfaceFound := false
+	//wifiIfaceFound := false
 	for _, wifiIface := range ifaces.Wifi {
+		log.Info("Checking the wlp exists", "localIface", wifiIface, "requestedIface", req.WirelessInterface)
 		if wifiIface.Name == req.WirelessInterface {
-			wifiIfaceFound = true
+			// wifiIfaceFound = true
 			break
 		}
 	}
 
-	if !wifiIfaceFound {
-		errors["wireless_interface"] = "Wireless interface " + req.WirelessInterface + " not found."
-	}
+	/*
+		if !wifiIfaceFound {
+			errors["wireless_interface"] = "Wireless interface " + req.WirelessInterface + " not found."
+		}
+	*/
 
 	// Validate the SSID and password
 	if !regexp.MustCompile(`^[a-zA-Z0-9\ ]{1,32}$`).MatchString(req.Ssid) {

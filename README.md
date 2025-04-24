@@ -10,6 +10,16 @@ To get started, you should visit our [documentation](https://partyhall.github.io
 
 Note that the whole software has been rewritten in v0.8 and is no longer compatible at all with previous versions.
 
+## Known issue
+
+- Setup the hotspot doesn't work on real hw (run the script manually and it works)
+	- 200 but bad request
+	- Golang code only (the script works)
+	- "The specified eth iface was not found"
+	- Probably will fail too for the wifi one
+	- Added logging in latest beta to check this out
+- Spotify no longer works (no clue why, I need to debug this??)
+
 ## Architecture todo
 Some stuff are truely ugly in the architecture of the app. I know, I need to fix them. Here's a todo list.
 

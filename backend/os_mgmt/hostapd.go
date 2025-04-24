@@ -39,6 +39,7 @@ func SetHostapdConfig(
 
 	setupCmd := exec.Command(
 		"sudo",
+		"bash",
 		"-c",
 		fmt.Sprintf("/usr/bin/setup-hotspot %s %s %s %s", ethIface, wifiIface, ssid, password),
 	)

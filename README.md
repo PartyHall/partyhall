@@ -18,6 +18,7 @@ Note that the whole software has been rewritten in v0.8 and is no longer compati
 	- "The specified eth iface was not found"
 	- Probably will fail too for the wifi one
 	- Added logging in latest beta to check this out
+	- iface passed to the script is empty
 - Spotify no longer works (no clue why, I need to debug this??)
 
 ## Architecture todo

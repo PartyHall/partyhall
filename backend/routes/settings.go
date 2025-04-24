@@ -389,14 +389,12 @@ func (h RoutesSettings) setAp(c *gin.Context) {
 
 	// Everything is ok and saved? Now and only now we can
 	// trigger the config update
-	ap := config.GET.UserSettings.WirelessAp
-
 	err := os_mgmt.SetHostapdConfig(
-		ap.WiredInterface,
-		ap.WirelessInterface,
-		ap.Enabled,
-		ap.Ssid,
-		ap.Password,
+		req.WiredInterface,
+		req.WirelessInterface,
+		req.Enabled,
+		req.Ssid,
+		req.Password,
 	)
 
 	if err != nil {

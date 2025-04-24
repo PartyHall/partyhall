@@ -35,13 +35,12 @@ func SetHostapdConfig(
 		return nil
 	}
 
+	log.Info("Setting new hotspot settings", "ethIface", ethIface, "wifiIface", wifiIface, "ssid", ssid, "password", password)
+
 	setupCmd := exec.Command(
 		"sudo",
-		"/usr/bin/setup-hotspot",
-		ethIface,
-		wifiIface,
-		ssid,
-		password,
+		"-c",
+		fmt.Sprintf("/usr/bin/setup-hotspot %s %s %s %s", ethIface, wifiIface, ssid, password),
 	)
 
 	// err := setupCmd.Run()

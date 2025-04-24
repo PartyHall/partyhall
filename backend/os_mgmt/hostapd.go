@@ -3,6 +3,8 @@ package os_mgmt
 import (
 	"fmt"
 	"os/exec"
+
+	"github.com/partyhall/partyhall/log"
 )
 
 var (
@@ -42,8 +44,13 @@ func SetHostapdConfig(
 		password,
 	)
 
-	err := setupCmd.Run()
+	// err := setupCmd.Run()
+
+	out, err := setupCmd.CombinedOutput()
+
 	if err != nil {
+		log.Error("Failed to setup hotspot", "output", string(out))
+
 		exitError, ok := err.(*exec.ExitError)
 		if ok {
 			switch exitError.ExitCode() {

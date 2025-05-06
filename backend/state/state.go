@@ -26,6 +26,7 @@ type State struct {
 	ModeSetAt    time.Time           `json:"-"`
 	IpAddresses  map[string][]string `json:"ip_addresses"`
 
+	AdminCreated         bool                `json:"admin_created"`
 	UserSettings         config.UserSettings `json:"user_settings"`
 	HardwareFlashPowered bool                `json:"hardware_flash_powered"`
 

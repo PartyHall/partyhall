@@ -7,6 +7,7 @@ import { RouterProvider, createHashRouter } from 'react-router-dom';
 import AuthProvider from './hooks/auth';
 import AuthedLayout from './pages/layout/authed_layout';
 import Backend from 'i18next-http-backend';
+import CreateAdminPage from './pages/createAdmin';
 import EditEventPage from './pages/admin/edit_event';
 import EventsPage from './pages/admin/events';
 import Index from './pages';
@@ -45,6 +46,10 @@ i18n.use(Backend)
     });
 
 const router = createHashRouter([
+    {
+        path: '/create-admin',
+        element: <CreateAdminPage />,
+    },
     {
         path: '/login',
         element: <LoginPage />,

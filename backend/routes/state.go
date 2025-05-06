@@ -14,6 +14,7 @@ import (
 	"github.com/partyhall/partyhall/dal"
 	"github.com/partyhall/partyhall/mercure_client"
 	"github.com/partyhall/partyhall/middlewares"
+	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/mqtt"
 	"github.com/partyhall/partyhall/os_mgmt"
 	"github.com/partyhall/partyhall/state"
@@ -32,34 +33,30 @@ func (h RoutesState) Register(router *gin.RouterGroup) {
 	// Unauthenticated
 	router.GET("ap-qr", h.getApQrCode)
 
-	// Onboarded & Admin
+	// Admin
 	router.PUT(
 		"event",
-		middlewares.Onboarded(true),
-		middlewares.Authorized("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.setEvent,
 	)
 
-	// Onboarded & Admin
+	// Admin
 	router.PUT(
 		"mode",
-		middlewares.Onboarded(true),
-		middlewares.Authorized("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.setMode,
 	)
 
-	// Onboarded & Authenticated
+	// Authenticated
 	router.PUT(
 		"backdrops",
-		middlewares.Onboarded(true),
 		middlewares.Authorized(),
 		h.setBackdrops,
 	)
 
-	// Onboarded & Authenticated
+	// Authenticated
 	router.PUT(
 		"flash",
-		middlewares.Onboarded(true),
 		middlewares.Authorized(),
 		h.setFlash,
 	)

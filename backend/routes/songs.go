@@ -19,34 +19,29 @@ import (
 type RoutesSong struct{}
 
 func (h RoutesSong) Register(router *gin.RouterGroup) {
-	// Onboarded & Authenticated
+	// Authenticated
 	router.GET(
 		"",
-		middlewares.Onboarded(true),
 		middlewares.Authorized(),
 		h.getCollection,
 	)
 
-	// Onboarded & Authenticated
+	// Authenticated
 	router.GET(
 		":songId",
-		middlewares.Onboarded(true),
 		middlewares.Authorized(),
 		h.get,
 	)
 
-	// Onboarded
 	router.GET(
 		":songId/cover",
-		middlewares.Onboarded(true),
 		h.getCover,
 	)
 
-	// Onboarded & Appliance
+	// Appliance
 	router.GET(
 		":songId/file/:songFilename",
-		middlewares.Onboarded(true),
-		// middlewares.Authorized("APPLIANCE"), // too lazy to get the files manually to authenticate
+		// middlewares.Authorized(models.ROLE_APPLIANCE), // too lazy to get the files manually to authenticate
 		h.getFile,
 	)
 }

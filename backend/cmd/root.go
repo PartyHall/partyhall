@@ -62,6 +62,21 @@ var rootCmd = &cobra.Command{
 			return
 		}
 
+		dal.DB = services.DB
+
+		hasAnAdmin, err := dal.USERS.HasAnAdmin()
+		if err != nil {
+			log.LOG.Error(err)
+
+			return
+		}
+
+		_, err = mercure_client.NewClient()
+		if err != nil {
+			log.LOG.Error(err)
+			return
+		}
+
 		us := config.GET.UserSettings
 
 		// If the wireless access point is configured
@@ -88,15 +103,7 @@ var rootCmd = &cobra.Command{
 			return
 		}
 
-		_, err = mercure_client.NewClient()
-		if err != nil {
-			log.LOG.Error(err)
-			return
-		}
-
 		state.STATE.SetMode(state.MODE_PHOTOBOOTH)
-
-		dal.DB = services.DB
 
 		event, err := dal.EVENTS.GetCurrent()
 		if err != nil {
@@ -122,6 +129,7 @@ var rootCmd = &cobra.Command{
 			utils.CURRENT_COMMIT = utils.CURRENT_COMMIT[:7]
 		}
 
+		state.STATE.AdminCreated = hasAnAdmin
 		state.STATE.UserSettings = config.GET.UserSettings
 		state.STATE.GuestsAllowed = config.GET.GuestsAllowed
 		state.STATE.Version = utils.CURRENT_VERSION

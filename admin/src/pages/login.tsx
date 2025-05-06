@@ -15,6 +15,7 @@ type FormType = {
 };
 
 export default function LoginPage() {
+    const { adminCreated } = useSettings();
     const { t } = useTranslation();
     const { guestsAllowed } = useSettings();
     const [admin, setAdmin] = useState<boolean>(!guestsAllowed);
@@ -62,7 +63,11 @@ export default function LoginPage() {
         if (isLoggedIn()) {
             navigate('/');
         }
-    }, [api]);
+
+        if (!adminCreated) {
+            navigate('/create-admin');
+        }
+    }, [api, adminCreated]);
 
     return (
         <Card>

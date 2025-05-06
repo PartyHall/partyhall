@@ -24,104 +24,104 @@ var spotifydNameRegex = regexp.MustCompile(`^[\p{L}0-9]{1,64}$`) // Letters + nu
 type RoutesSettings struct{}
 
 func (h RoutesSettings) Register(router *gin.RouterGroup) {
-	// Non-onboarded | Admin
+	// Admin
 	router.PUT(
 		"flash",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.setFlash,
 	)
 
-	// Non-onboarded | Admin
+	// Admin
 	// In post as it also sets the mode
 	router.POST(
 		"button-mappings",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.getButtonMappings,
 	)
 
-	// Non-onboarded | Admin
+	// Admin
 	router.PUT(
 		"button-mappings",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.setButtonMappings,
 	)
 
-	// Non-onboarded | Admin
+	// Admin
 	router.GET(
 		"button-mappings/actions",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.getButtonMappingsActions,
 	)
 
-	// Non-onboarded | Admin
+	// Admin
 	router.PUT(
 		"webcam",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.setWebcam,
 	)
 
-	// Non-onboarded | Admin
+	// Admin
 	router.PUT(
 		"unattended",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.setUnattended,
 	)
 
 	router.GET(
 		"ap",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.getAp,
 	)
 
 	router.PUT(
 		"ap",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.setAp,
 	)
 
 	router.GET(
 		"spotify",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.getSpotify,
 	)
 
 	router.PUT(
 		"spotify",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.setSpotify,
 	)
 
-	// Non-onboarded | Admin
+	// Admin
 	router.GET(
 		"nexus",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.getNexus,
 	)
 
 	router.PUT(
 		"nexus",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.setNexus,
 	)
 
 	//region Maybe to rework
-	// Non-onboarded | Admin
+	// Admin
 	router.GET(
 		"audio-devices",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.getAudioDevices,
 	)
-	// Non-onboarded | Admin
+	// Admin
 	router.POST(
 		"audio-devices",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.setAudioDevices,
 	)
 
-	// Non-onboarded | Admin
+	// Admin
 	router.PUT(
 		"audio-devices/:deviceId",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.setAudioDeviceVolume,
 	)
 	//endregion

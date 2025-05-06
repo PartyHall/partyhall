@@ -152,7 +152,7 @@ func routeLoginGuest(c *gin.Context) {
 		Id:       0,
 		Name:     loginRequest.Username,
 		Username: loginRequest.Username,
-		Roles:    []string{"GUEST"},
+		Roles:    []string{models.ROLE_GUEST},
 	}, true))
 
 	tokenString, err := token.SignedString(config.GET.Mercure.SubscriberKey)

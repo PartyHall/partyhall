@@ -152,3 +152,77 @@ func (u *Users) CreateRefreshToken(userId int, token string) (int, error) {
 
 	return rtId, err
 }
+
+func (u *Users) Delete(id int) error {
+	res, err := DB.Exec(`DELETE FROM ph_user WHERE id = ?`, id)
+	if err != nil {
+		return err
+	}
+
+	count, err := res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if count == 0 {
+		return sql.ErrNoRows
+	}
+
+	return nil
+}
+
+func (u *Users) GetCollection(amt, offset int) (*models.PaginatedResponse, error) {
+	resp := models.PaginatedResponse{}
+
+	row := DB.QueryRowx(`SELECT COUNT(*) FROM ph_user`)
+	if row.Err() != nil {
+		return nil, row.Err()
+	}
+
+	err := row.Scan(&resp.TotalCount)
+	if err != nil {
+		return nil, err
+	}
+
+	resp.CalculateMaxPage()
+
+	rows, err := DB.Queryx(`
+        SELECT id, username, name, password, roles
+        FROM ph_user
+        LIMIT ? OFFSET ?
+    `, amt, offset)
+
+	if err != nil {
+		return nil, err
+	}
+
+	users := []models.User{}
+	for rows.Next() {
+		usr := models.User{}
+		if err := rows.StructScan(&usr); err != nil {
+			return nil, err
+		}
+		users = append(users, usr)
+	}
+
+	resp.Results = users
+
+	return &resp, nil
+}
+
+func (u *Users) HasAnAdmin() (bool, error) {
+	var existsInt int
+
+	row := DB.QueryRowx(`
+        SELECT EXISTS(
+            SELECT 1 FROM ph_user, json_each(roles)
+            WHERE json_each.value = ?
+        )
+    `, models.ROLE_ADMIN)
+
+	if err := row.Scan(&existsInt); err != nil {
+		return false, err
+	}
+
+	return existsInt == 1, nil
+}

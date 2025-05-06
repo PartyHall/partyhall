@@ -24,46 +24,41 @@ import (
 type RoutesSongSession struct{}
 
 func (h RoutesSongSession) Register(router *gin.RouterGroup) {
-	// Onboarded & Has event & Authenticated
+	// Has event & Authenticated
 	router.POST(
 		"",
-		middlewares.Onboarded(true),
 		middlewares.HasEventLoaded(),
 		middlewares.Authorized(),
 		h.create,
 	)
 
-	// Onboarded & Has event & Authenticated
+	// Has event & Authenticated
 	router.POST(
 		":songSessionId/start",
-		middlewares.Onboarded(true),
 		middlewares.HasEventLoaded(),
 		middlewares.Authorized(),
 		h.start,
 	)
 
-	// Onboarded & Has event & Appliance
+	// Has event & Appliance
 	router.POST(
 		":songSessionId/ended",
-		middlewares.Onboarded(true),
 		middlewares.HasEventLoaded(),
-		middlewares.Authorized("APPLIANCE"),
+		middlewares.Authorized(models.ROLE_APPLIANCE),
 		h.ended,
 	)
 
-	// Onboarded & Has event & Authenticated
+	// Has event & Authenticated
 	router.POST(
 		":songSessionId/move/:direction",
-		middlewares.Onboarded(true),
 		middlewares.HasEventLoaded(),
 		middlewares.Authorized(),
 		h.moveInQueue,
 	)
 
-	// Onboarded & Has event & Authenticated
+	// Has event & Authenticated
 	router.DELETE(
 		":songSessionId",
-		middlewares.Onboarded(true),
 		middlewares.HasEventLoaded(),
 		middlewares.Authorized(),
 		h.delete,

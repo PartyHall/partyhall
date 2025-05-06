@@ -7,8 +7,19 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+type OnboardingStatus struct {
+}
+
+/**
+ * Onboarded means the full onboarding process was done
+ * OnboardingStatus gives whether each step of the process has been made
+ *
+ * This let us do:
+ *     - User can resume the onboarding process if they quit it
+ *     - New onboarding step after update when the user has already completed it
+ **/
 type UserSettings struct {
-	Onboarded bool `yaml:"onboarded" json:"onboarded"`
+	Onboarding OnboardingStatus `yaml:"onboarding" json:"onboarding"`
 
 	NexusURL       string `yaml:"nexus_url" json:"-"`
 	NexusIgnoreSSL bool   `yaml:"nexus_ignore_ssl" json:"-"`

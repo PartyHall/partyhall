@@ -15,6 +15,7 @@ import (
 	"github.com/partyhall/partyhall/log"
 	"github.com/partyhall/partyhall/mercure_client"
 	"github.com/partyhall/partyhall/middlewares"
+	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/nexus"
 	"github.com/partyhall/partyhall/state"
 )
@@ -22,21 +23,19 @@ import (
 type RoutesPhotobooth struct{}
 
 func (h RoutesPhotobooth) Register(router *gin.RouterGroup) {
-	// Onboarded & Has selected event & Authenticated
+	// Has selected event & Authenticated
 	router.POST(
 		"take-picture",
-		middlewares.Onboarded(true),
 		middlewares.HasEventLoaded(),
 		middlewares.Authorized(),
 		h.requestTakePicture,
 	)
 
-	// Onboarded & Has selected event & Appliance
+	// Has selected event & Appliance
 	router.POST(
 		"upload-picture",
-		middlewares.Onboarded(true),
 		middlewares.HasEventLoaded(),
-		middlewares.Authorized("APPLIANCE"),
+		middlewares.Authorized(models.ROLE_APPLIANCE),
 		h.uploadPicture,
 	)
 }

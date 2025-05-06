@@ -89,6 +89,7 @@ export class PhState {
     userSettings: PhUserSettings;
     hardwareFlashPowered: boolean;
     guestsAllowed: boolean;
+    adminCreated: boolean;
 
     backdropAlbum: BackdropAlbum | null;
     selectedBackdrop: number;
@@ -106,6 +107,7 @@ export class PhState {
         this.userSettings = new PhUserSettings(data['user_settings']);
         this.hardwareFlashPowered = data['hardware_flash_powered'];
         this.guestsAllowed = data['guests_allowed'];
+        this.adminCreated = data['admin_created'];
 
         this.backdropAlbum = BackdropAlbum.fromJson(data['backdrop_album']);
         this.selectedBackdrop = data['selected_backdrop'];

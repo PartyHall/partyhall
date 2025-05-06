@@ -1,12 +1,22 @@
+import { SDK, User } from './index';
 import { DateTime } from 'luxon';
 import { Log } from './models/log';
-import { SDK } from './index';
 
 export default class Admin {
     private sdk: SDK;
 
     constructor(sdk: SDK) {
         this.sdk = sdk;
+    }
+
+    public async createAdmin(displayName: string | null, username: string, password: string): Promise<User | null> {
+        const resp = await this.sdk.post('/api/admin/create-admin', {
+            name: displayName,
+            username,
+            password,
+        });
+
+        return User.fromJson(await resp.json());
     }
 
     public async getLogs(): Promise<Log[]> {

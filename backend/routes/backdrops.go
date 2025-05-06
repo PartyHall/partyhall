@@ -11,17 +11,14 @@ import (
 	"github.com/partyhall/partyhall/api_errors"
 	"github.com/partyhall/partyhall/config"
 	"github.com/partyhall/partyhall/dal"
-	"github.com/partyhall/partyhall/middlewares"
 	"github.com/partyhall/partyhall/utils"
 )
 
 type RoutesBackdrops struct{}
 
 func (h RoutesBackdrops) Register(router *gin.RouterGroup) {
-	// Onboarded only (Too lazy to implement the authenticated images)
 	router.GET(
 		":backdropId/download",
-		middlewares.Onboarded(true),
 		h.download,
 	)
 }

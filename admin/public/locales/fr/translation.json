@@ -46,9 +46,17 @@
             "unexpected": "Une erreur inconnue s'est produite"
         }
     },
-    "onboarding": {
-        "not_onboarded": "Cet appareil n'a pas été configuré",
-        "already_onboarded": "Cet appareil a déjà été configuré"
+    "create_admin": {
+        "title": "Bievenue sur PartyHall",
+        "p1": "La première étape avant d'utiliser votre appareil est de créer un compte administrateur.",
+        "display_name": "Nom d'affichage",
+        "password_repeat": "Répéter le mot de passe",
+        "passwords_mismatch": "Les mots de passe ne correspondent pas",
+        "register": "Créer le compte",
+        "success": {
+            "title": "Compte {{username}} créé",
+            "description": "Vous pouvez maintenant vous connecter avec votre nouveau compte"
+        }
     },
     "login": {
         "username": "Pseudo",

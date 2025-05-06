@@ -10,6 +10,7 @@ import (
 	"github.com/partyhall/partyhall/api_errors"
 	"github.com/partyhall/partyhall/mercure_client"
 	"github.com/partyhall/partyhall/middlewares"
+	"github.com/partyhall/partyhall/models"
 	"github.com/partyhall/partyhall/nexus"
 	"github.com/partyhall/partyhall/state"
 	"github.com/partyhall/partyhall/utils"
@@ -18,20 +19,18 @@ import (
 type RoutesNexus struct{}
 
 func (h RoutesNexus) Register(router *gin.RouterGroup) {
-	// Onboarded & Has an event & Admin
+	// Has an event & Admin
 	router.POST(
 		"create_event/:eventId",
-		middlewares.Onboarded(true),
 		middlewares.HasEventLoaded(),
-		middlewares.Authorized("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.createEventOnNexus,
 	)
 
-	// Onboarded & Admin
+	// Admin
 	router.POST(
 		"sync",
-		middlewares.Onboarded(true),
-		middlewares.Authorized("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.sync,
 	)
 }

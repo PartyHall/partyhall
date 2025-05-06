@@ -59,3 +59,25 @@ export class PhTokenUser {
         return PhTokenUser.fromJson(data);
     }
 }
+
+export class User {
+    id: number;
+    displayName: string | null;
+    username: string;
+    roles: string[];
+
+    constructor(data: Record<string, any>) {
+        this.id = data.id;
+        this.displayName = data.name;
+        this.username = data.username;
+        this.roles = data.roles;
+    }
+
+    public static fromJson(json: Record<string, any> | null) {
+        if (!json) {
+            return null;
+        }
+
+        return new User(json);
+    }
+}

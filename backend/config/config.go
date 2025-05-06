@@ -64,7 +64,7 @@ func Load(isInDev bool) error {
 		// Creating the default settings file
 		us := UserSettings{}
 
-		us.Onboarded = false
+		us.Onboarding = OnboardingStatus{}
 		us.NexusIgnoreSSL = false
 		us.Photobooth.Countdown = 3
 		us.Photobooth.FlashBrightness = 100

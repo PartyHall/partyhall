@@ -2,7 +2,6 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/partyhall/partyhall/middlewares"
 )
 
 /**
@@ -15,6 +14,11 @@ import (
 		- hasEvent: An event was created and is currently selected
 
 		Note: The appliance frontend has the USER, ADMIN, APPLIANCE roles
+
+	@TODO
+	Nouvelle règle:
+	    - Onboarded no longer exists as we have onboarding for multiple stuff
+		- We should re-check to be sure that EVENT IS LOADED before most of the routes
 
 	#region API:
 	/
@@ -72,6 +76,7 @@ import (
 		POST /events/:id    onboarded & hasEvent & admin
 
 	/admin
+		POST /create-admin           Only if no admin was created
 		GET /logs                    onboarded & admin
 		POST /shutdown               onboarded & admin
 
@@ -119,9 +124,9 @@ import (
 **/
 
 func RegisterRoutes(router *gin.RouterGroup) {
-	router.POST("/login", middlewares.Onboarded(true), routeLogin)
-	router.POST("/guest-login", middlewares.Onboarded(true), routeLoginGuest)
-	router.POST("/refresh", middlewares.Onboarded(true), routeLoginRefresh)
+	router.POST("/login", routeLogin)
+	router.POST("/guest-login", routeLoginGuest)
+	router.POST("/refresh", routeLoginRefresh)
 
 	// Special endpoints
 	(RoutesState{}).Register(router.Group("/state"))
@@ -137,4 +142,5 @@ func RegisterRoutes(router *gin.RouterGroup) {
 	(RoutesBackdrops{}).Register(router.Group("/backdrops"))
 	(RoutesSong{}).Register(router.Group("/songs"))
 	(RoutesSongSession{}).Register(router.Group("/song_sessions"))
+	(RoutesUser{}).Register(router.Group("/users"))
 }

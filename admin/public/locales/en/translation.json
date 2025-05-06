@@ -46,9 +46,17 @@
             "unexpected": "An unexpected error occured"
         }
     },
-    "onboarding": {
-        "not_onboarded": "This appliance was not setup",
-        "already_onboarded": "This appliance was already setup"
+    "create_admin": {
+        "title": "Welcome to PartyHall",
+        "p1": "The first step before using your appliance is to create an admin account.",
+        "display_name": "Display name",
+        "password_repeat": "Repeat password",
+        "passwords_mismatch": "Passwords do not match",
+        "register": "Create account",
+        "success": {
+            "title": "Account {{username}} created",
+            "description": "You can now login with your new account"
+        }
     },
     "login": {
         "username": "Username",

@@ -24,18 +24,16 @@ import (
 type RoutesKaraoke struct{}
 
 func (h RoutesKaraoke) Register(router *gin.RouterGroup) {
-	// Onboarded & hasEvent & Appliance
+	// hasEvent & Appliance
 	router.PUT(
 		"timecode",
-		middlewares.Onboarded(true),
 		middlewares.HasEventLoaded(),
-		middlewares.Authorized("APPLIANCE"),
+		middlewares.Authorized(models.ROLE_APPLIANCE),
 		h.setTimecode,
 	)
 
 	router.PUT(
 		"playing_status",
-		middlewares.Onboarded(true),
 		middlewares.HasEventLoaded(),
 		middlewares.Authorized(),
 		h.setPlayingStatus,
@@ -43,7 +41,6 @@ func (h RoutesKaraoke) Register(router *gin.RouterGroup) {
 
 	router.PUT(
 		"volume",
-		middlewares.Onboarded(true),
 		middlewares.HasEventLoaded(),
 		middlewares.Authorized(),
 		h.setVolume,

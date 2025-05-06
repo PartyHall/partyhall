@@ -25,6 +25,7 @@ type SettingsProps = {
     userSettings: PhUserSettings | null;
 
     guestsAllowed: boolean;
+    adminCreated: boolean;
 
     version: string;
     commit: string;
@@ -37,6 +38,7 @@ type SettingsContextProps = SettingsProps & {
     setPageName: (name: string, mercureTopics?: string[]) => void;
     setUserSettings: (userSettings: PhUserSettings) => void;
     setHardwareFlashBrightness: (b: number) => void;
+    setAdminCreated: (adminCreated: boolean) => void;
 };
 
 const defaultProps: SettingsProps = {
@@ -47,6 +49,7 @@ const defaultProps: SettingsProps = {
     userSettings: null,
 
     guestsAllowed: false,
+    adminCreated: true,
 
     version: 'INDEV',
     commit: 'XXXXXX',
@@ -58,6 +61,7 @@ const SettingsContext = createContext<SettingsContextProps>({
     setPageName: () => {},
     setUserSettings: () => {},
     setHardwareFlashBrightness: () => {},
+    setAdminCreated: () => {},
 });
 
 export default function SettingsProvider({ children }: { children: ReactNode }) {
@@ -75,6 +79,7 @@ export default function SettingsProvider({ children }: { children: ReactNode }) 
             loaded: true,
             userSettings: state.userSettings,
             guestsAllowed: state.guestsAllowed,
+            adminCreated: state.adminCreated,
             version: state.version,
             commit: state.commit,
         }));
@@ -109,11 +114,24 @@ export default function SettingsProvider({ children }: { children: ReactNode }) 
         setUserSettings(settings);
     };
 
+    const setAdminCreated = (adminCreated: boolean) =>
+        setCtx((oldCtx) => ({
+            ...oldCtx,
+            adminCreated,
+        }));
+
     useAsyncEffect(fetchStatus, []);
 
     return (
         <SettingsContext.Provider
-            value={{ ...ctx, fetch: fetchStatus, setPageName, setUserSettings, setHardwareFlashBrightness }}
+            value={{
+                ...ctx,
+                fetch: fetchStatus,
+                setPageName,
+                setUserSettings,
+                setHardwareFlashBrightness,
+                setAdminCreated,
+            }}
         >
             <Loader loading={!ctx.loaded}>{children}</Loader>
         </SettingsContext.Provider>

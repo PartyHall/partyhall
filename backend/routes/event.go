@@ -32,36 +32,34 @@ func (h RoutesEvent) Register(router *gin.RouterGroup) {
 	// Not onboarded or Admin
 	router.GET(
 		"",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.getCollection,
 	)
 
 	// Not onboarded or Admin
 	router.GET(
 		":eventId",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.get,
 	)
 
 	// Not onboarded or Admin
 	router.POST(
 		"",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.create,
 	)
 
 	// Not onboarded or Admin
 	router.PUT(
 		":eventId",
-		middlewares.NotOnboardedOrRole("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.update,
 	)
 
-	// Onboarded and Admin
 	router.DELETE(
 		":eventId",
-		middlewares.Onboarded(true),
-		middlewares.Authorized("ADMIN"),
+		middlewares.Authorized(models.ROLE_ADMIN),
 		h.delete,
 	)
 }

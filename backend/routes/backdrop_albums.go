@@ -16,18 +16,14 @@ import (
 type RoutesBackdropAlbums struct{}
 
 func (h RoutesBackdropAlbums) Register(router *gin.RouterGroup) {
-	// Onboarded & Authenticated
 	router.GET(
 		"",
-		middlewares.Onboarded(true),
 		middlewares.Authorized(),
 		h.getCollection,
 	)
 
-	// Onboarded & Authenticated
 	router.GET(
 		":backdropAlbumId",
-		middlewares.Onboarded(true),
 		middlewares.Authorized(),
 		h.getCollection,
 	)

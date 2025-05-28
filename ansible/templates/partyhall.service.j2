@@ -7,11 +7,14 @@ Description=PartyHall service
 Before=graphical.target systemd-user-sessions.service
 
 [Service]
+Type=notify
+NotifyAccess=all
 WorkingDirectory=/home/{{ ansible_user }}
 ExecStart=partyhall
 Restart=always
 RestartSec=3s
+TimeoutStartSec=120s
 
 # @TODO: "is added as a dependency to a non-existent unit multi-user.target"
 [Install]
-WantedBy=default.target
+WantedBy=graphical.target

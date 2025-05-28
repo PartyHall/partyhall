@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/coreos/go-systemd/v22/daemon"
 	"github.com/dunglas/mercure"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -249,9 +250,16 @@ var rootCmd = &cobra.Command{
 		routes.RegisterRoutes(apiRouter)
 
 		// Running the appliance
-		log.LOG.Infow("Now listening...", "addr", config.GET.ListeningAddr)
+		log.Info("Now listening...", "addr", config.GET.ListeningAddr)
 
 		cron.RunCron()
+
+		sent, err := daemon.SdNotify(false, "READY=1")
+		if err != nil {
+			log.Error("Failed to notify systemd", "err", err)
+		} else if !sent {
+			log.Error("Failed to notify systemd: not sent")
+		}
 
 		if err := r.Run(config.GET.ListeningAddr); err != nil {
 			log.LOG.Fatalw("Failed to run the server", "err", err)

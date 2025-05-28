@@ -3,6 +3,7 @@ module github.com/partyhall/partyhall
 go 1.22.5
 
 require (
+	github.com/coreos/go-systemd/v22 v22.3.2
 	github.com/dunglas/mercure v0.16.3
 	github.com/eclipse/paho.mqtt.golang v1.5.0
 	github.com/gin-gonic/gin v1.10.0

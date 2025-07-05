@@ -1,0 +1,12 @@
+[Unit]
+Description=Firefox Kiosk
+Wants=partyhall.service
+After=partyhall.service graphical-session.target
+
+[Service]
+Type=simple
+Environment=DISPLAY=:0
+ExecStart=firefox --kiosk http://localhost:8039 --foreground -P "default"
+
+[Install]
+WantedBy=graphical-session.target

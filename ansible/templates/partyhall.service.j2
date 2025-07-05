@@ -4,7 +4,6 @@
 
 [Unit]
 Description=PartyHall service
-Before=graphical.target systemd-user-sessions.service
 
 [Service]
 Type=notify
@@ -17,4 +16,4 @@ TimeoutStartSec=120s
 
 # @TODO: "is added as a dependency to a non-existent unit multi-user.target"
 [Install]
-WantedBy=graphical.target
+WantedBy=default.target

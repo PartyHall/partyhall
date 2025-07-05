@@ -1,3 +1,5 @@
+exec --no-startup-id feh --bg-fill /usr/share/plymouth/themes/simple-image/bootscreen.png
+
 set $mod Mod4
 font pango:DejaVu Sans Mono 10 
 floating_modifier $mod
@@ -18,7 +20,10 @@ exec --no-startup-id xset s off
 
 exec --no-startup-id unclutter
 
-exec --no-startup-id firefox --kiosk http://localhost:8039 --foreground -P "default"
+# exec --no-startup-id firefox --kiosk http://localhost:8039 --foreground -P "default"
+
+# Yeah this is ugly but this works
+exec systemctl start --user firefox
 
 bar {
         status_command i3status

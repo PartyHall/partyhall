@@ -60,7 +60,7 @@
         src: 'templates/{{ item }}.service.j2'
         dest: '/usr/lib/systemd/user/{{ item }}.service'
         mode: '0644'
-      loop: ['partyhall', 'hardware_handler']
+      loop: ['partyhall', 'hardware_handler', 'firefox']
 
     - name: 'Creating the pipewire config dirs'
       become: yes

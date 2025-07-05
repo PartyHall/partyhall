@@ -18,7 +18,7 @@
     - name: 'Setting up xorg'
       become: yes
       apt:
-        name: [ 'lightdm', 'unclutter', 'xorg', 'i3', 'dmenu', 'pavucontrol', 'suckless-tools', 'lxterminal', 'fonts-dejavu-core', 'fonts-dejavu-extra' ]
+        name: [ 'lightdm', 'unclutter', 'xorg', 'i3', 'dmenu', 'pavucontrol', 'suckless-tools', 'lxterminal', 'fonts-dejavu-core', 'fonts-dejavu-extra', 'feh' ]
     
     - name: 'Enable lightdm autologin'
       become: yes

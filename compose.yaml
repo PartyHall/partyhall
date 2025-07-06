@@ -53,4 +53,4 @@ services:
     extra_hosts:
       - 'host.docker.internal:host-gateway'
     ports:
-      - '127.0.0.1:5174:5173'
+      - '5174:5173'

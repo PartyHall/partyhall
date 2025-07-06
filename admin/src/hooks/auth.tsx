@@ -1,5 +1,5 @@
 import { BackdropAlbum, PhEvent, PhKaraoke, PhSongSession, SDK } from '@partyhall/sdk';
-import { ReactNode, createContext, useCallback, useContext, useState } from 'react';
+import { ReactNode, createContext, useCallback, useContext, useEffect, useState } from 'react';
 import Cookies from 'js-cookie';
 import { DateTime } from 'luxon';
 import MercureProvider from './mercure';
@@ -46,6 +46,8 @@ type AuthProps = {
     syncInProgress: boolean;
     version: string | null;
     commit: string | null;
+
+    kioskMode: boolean;
 };
 
 type AuthContextProps = AuthProps & {
@@ -87,6 +89,7 @@ const defaultProps: AuthProps = {
     syncInProgress: false,
     version: null,
     commit: null,
+    kioskMode: false,
 };
 
 const AuthContext = createContext<AuthContextProps>({
@@ -219,6 +222,18 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
             hardwareFlashPowered: status.hardwareFlashPowered,
         }));
     }, [context.api]);
+
+    useEffect(() => {
+        const username = context.api.tokenUser?.username;
+        if (!username) {
+            return;
+        }
+
+        setContext((oldCtx) => ({
+            ...oldCtx,
+            kioskMode: username.toLowerCase() === 'kiosk',
+        }));
+    }, [context.api.tokenUser]);
 
     return (
         <AuthContext.Provider

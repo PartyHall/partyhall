@@ -11,7 +11,8 @@ type Event struct {
 	Date     time.Time `db:"date" json:"date"`
 	Location string    `db:"location" json:"location"`
 
-	NexusId JsonnableNullstring `db:"nexus_id" json:"nexus_id"`
+	NexusId             JsonnableNullstring `db:"nexus_id" json:"nexus_id"`
+	UserRegistrationUrl JsonnableNullstring `db:"registration_url" json:"registration_url"`
 
 	AmtImageHandtaken  int `db:"amt_images_handtaken" json:"amt_images_handtaken"`
 	AmtImageUnattended int `db:"amt_images_unattended" json:"amt_images_unattended"`

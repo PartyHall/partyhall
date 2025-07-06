@@ -18,12 +18,13 @@ import (
 )
 
 type upsertEventRequest struct {
-	Id       int                        `json:"id"`
-	Name     string                     `json:"name" binding:"required"`
-	Author   string                     `json:"author"`
-	Date     string                     `json:"date" binding:"iso8601,required"`
-	Location string                     `json:"location"`
-	NexusID  models.JsonnableNullstring `json:"nexus_id"`
+	Id              int                        `json:"id"`
+	Name            string                     `json:"name" binding:"required"`
+	Author          string                     `json:"author"`
+	Date            string                     `json:"date" binding:"iso8601,required"`
+	Location        string                     `json:"location"`
+	NexusID         models.JsonnableNullstring `json:"nexus_id"`
+	RegistrationUrl models.JsonnableNullstring `json:"registration_url"`
 }
 
 type RoutesEvent struct{}
@@ -41,6 +42,12 @@ func (h RoutesEvent) Register(router *gin.RouterGroup) {
 		":eventId",
 		middlewares.Authorized(models.ROLE_ADMIN),
 		h.get,
+	)
+
+	// Anyone
+	router.GET(
+		":eventId/registration-qr",
+		h.getQr,
 	)
 
 	// Not onboarded or Admin
@@ -107,6 +114,37 @@ func (h RoutesEvent) get(c *gin.Context) {
 	c.JSON(http.StatusOK, evt)
 }
 
+func (h RoutesEvent) getQr(c *gin.Context) {
+	id, parseErr := utils.ParamAsIntOrError(c, "eventId")
+	if parseErr {
+		return
+	}
+
+	evt, err := dal.EVENTS.Get(id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			c.Status(http.StatusNotFound)
+			return
+		}
+
+		c.Render(http.StatusInternalServerError, api_errors.DATABASE_ERROR.WithExtra(map[string]any{
+			"err": err,
+		}))
+
+		return
+	}
+
+	if !evt.UserRegistrationUrl.Valid || len(evt.UserRegistrationUrl.String) == 0 {
+		c.Render(http.StatusBadRequest, api_errors.INVALID_PARAMETERS.WithExtra(map[string]any{
+			"eventId": "This event does not have a registration URL set-up",
+		}))
+
+		return
+	}
+
+	utils.GenerateQrCodeWithoutLogo(evt.UserRegistrationUrl.String, c)
+}
+
 func (h RoutesEvent) create(c *gin.Context) {
 	var req upsertEventRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -117,10 +155,11 @@ func (h RoutesEvent) create(c *gin.Context) {
 	date, _ := time.Parse(time.RFC3339, req.Date)
 
 	evt := models.Event{
-		Name:     req.Name,
-		Author:   req.Author,
-		Date:     date,
-		Location: req.Location,
+		Name:                req.Name,
+		Author:              req.Author,
+		Date:                date,
+		Location:            req.Location,
+		UserRegistrationUrl: req.RegistrationUrl,
 	}
 
 	err := dal.EVENTS.Create(&evt)
@@ -154,12 +193,13 @@ func (h RoutesEvent) update(c *gin.Context) {
 
 	/** @TODO: No, the id should come from the queryParams, not the body **/
 	evt := models.Event{
-		Id:       int64(req.Id),
-		Name:     req.Name,
-		Author:   req.Author,
-		Date:     date,
-		Location: req.Location,
-		NexusId:  req.NexusID,
+		Id:                  int64(req.Id),
+		Name:                req.Name,
+		Author:              req.Author,
+		Date:                date,
+		Location:            req.Location,
+		NexusId:             req.NexusID,
+		UserRegistrationUrl: req.RegistrationUrl,
 	}
 
 	err := dal.EVENTS.Update(&evt)

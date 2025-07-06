@@ -7,6 +7,7 @@ export class PhEvent {
     date: DateTime;
     location: string | null;
     nexusId: string | null;
+    registrationUrl: string | null;
 
     amtImagesHandtaken: number = 0;
     amtImagesUnattended: number = 0;
@@ -17,7 +18,8 @@ export class PhEvent {
         author: string | null,
         date: DateTime,
         location: string | null,
-        nexusId: string | null
+        nexusId: string | null,
+        registrationUrl: string | null
     ) {
         this.id = id;
         this.name = name;
@@ -25,6 +27,7 @@ export class PhEvent {
         this.date = date;
         this.location = location;
         this.nexusId = nexusId;
+        this.registrationUrl = registrationUrl;
     }
 
     static fromJson(json: Record<string, any> | null): PhEvent | null {
@@ -38,7 +41,8 @@ export class PhEvent {
             json.author,
             DateTime.fromISO(json.date),
             json.location,
-            json.nexus_id
+            json.nexus_id,
+            json.registration_url,
         );
 
         phEvent.amtImagesHandtaken = json['amt_images_handtaken'];
@@ -55,6 +59,7 @@ export class PhEvent {
             date: this.date.toISO(),
             location: this.location,
             nexus_id: this.nexusId,
+            registration_url: this.registrationUrl,
         };
     }
 }

@@ -12,6 +12,7 @@ import EditEventPage from './pages/admin/edit_event';
 import EventsPage from './pages/admin/events';
 import Index from './pages';
 import Karaoke from './pages/karaoke';
+import KioskPage from './pages/kiosk';
 import LoginPage from './pages/login';
 import LogsPage from './pages/admin/logs';
 import NewEventPage from './pages/admin/new_event';
@@ -58,6 +59,10 @@ const router = createHashRouter([
         path: '/',
         element: <AuthedLayout />,
         children: [
+            {
+                path: '/kiosk',
+                element: <KioskPage />,
+            },
             {
                 path: '/',
                 element: <Index />,

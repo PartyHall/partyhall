@@ -18,6 +18,7 @@ export default function SessionCard({ session, isFirst, isLast }: Props) {
     const { t: tG } = useTranslation('', { keyPrefix: 'generic' });
     const { setKaraokeQueue, api } = useAuth();
     const [notif, notifCtx] = useNotification();
+    const { kioskMode } = useAuth();
 
     const directPlay = async () => {
         await api.songSessions.directPlay(session.id);
@@ -52,13 +53,15 @@ export default function SessionCard({ session, isFirst, isLast }: Props) {
                 <Flex gap={16} align="center">
                     <Flex vertical gap={8}>
                         <Button
-                            icon={<IconCaretUpFilled size={18} />}
+                            style={{ padding: kioskMode ? '1.5em' : 0 }}
+                            icon={<IconCaretUpFilled size={kioskMode ? 30 : 18} />}
                             shape="circle"
                             disabled={isFirst}
                             onClick={() => moveSession('up')}
                         />
                         <Button
-                            icon={<IconCaretDownFilled size={18} />}
+                            style={{ padding: kioskMode ? '1.5em' : 0 }}
+                            icon={<IconCaretDownFilled size={kioskMode ? 30 : 18} />}
                             shape="circle"
                             disabled={isLast}
                             onClick={() => moveSession('down')}
@@ -81,22 +84,38 @@ export default function SessionCard({ session, isFirst, isLast }: Props) {
                     <Flex vertical gap={8}>
                         <Tooltip title={t('tooltip_play_directly')}>
                             <Popconfirm
-                                title={t('confirm_play_directly')}
+                                title={
+                                    <span className={kioskMode ? 'tooltipKiosk' : ''}>
+                                        {t('confirm_play_directly')}
+                                    </span>
+                                }
+                                okButtonProps={{ style: { padding: kioskMode ? '1.5em' : 0 } }}
+                                cancelButtonProps={{ style: { padding: kioskMode ? '1.5em' : 0 } }}
                                 onConfirm={directPlay}
                                 okText={tG('actions.ok')}
                                 cancelText={tG('actions.cancel')}
                             >
-                                <Button icon={<IconPlayerPlayFilled size={18} />} shape="circle" />
+                                <Button
+                                    icon={<IconPlayerPlayFilled size={kioskMode ? 30 : 18} />}
+                                    shape="circle"
+                                    style={{ padding: kioskMode ? '1.5em' : 0 }}
+                                />
                             </Popconfirm>
                         </Tooltip>
                         <Tooltip title={tG('actions.cancel')}>
                             <Popconfirm
-                                title={t('confirm_cancel')}
+                                title={<span className={kioskMode ? 'tooltipKiosk' : ''}>{t('confirm_cancel')}</span>}
+                                okButtonProps={{ style: { padding: kioskMode ? '1.5em' : 0 } }}
+                                cancelButtonProps={{ style: { padding: kioskMode ? '1.5em' : 0 } }}
                                 onConfirm={cancelSession}
                                 okText={tG('actions.ok')}
                                 cancelText={tG('actions.cancel')}
                             >
-                                <Button icon={<IconTrash size={18} />} shape="circle" />
+                                <Button
+                                    style={{ padding: kioskMode ? '1.5em' : 0 }}
+                                    icon={<IconTrash size={kioskMode ? 30 : 18} />}
+                                    shape="circle"
+                                />
                             </Popconfirm>
                         </Tooltip>
                     </Flex>

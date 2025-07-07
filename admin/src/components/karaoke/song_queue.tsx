@@ -5,7 +5,11 @@ import SessionCard from './session_card';
 import { useAuth } from '../../hooks/auth';
 import { useTranslation } from 'react-i18next';
 
-export default function SongQueue() {
+type Props = {
+    hideCurrent?: boolean;
+};
+
+export default function SongQueue({ hideCurrent }: Props) {
     const { t } = useTranslation('', { keyPrefix: 'karaoke' });
     const { karaoke, karaokeQueue } = useAuth();
 
@@ -16,9 +20,9 @@ export default function SongQueue() {
     return (
         <Flex vertical gap={8} className="fullheight overflowAuto" align="center">
             <Flex vertical style={{ width: 'min(500px, 100%)' }} className="fullheight overflowAuto">
-                {karaoke.current && <CurrentCard />}
+                {!hideCurrent && karaoke.current && <CurrentCard />}
 
-                <Typography.Title>{t('in_queue')}</Typography.Title>
+                {!hideCurrent && <Typography.Title>{t('in_queue')}</Typography.Title>}
                 <Flex vertical gap={8} style={{ overflowY: 'scroll' }}>
                     {karaokeQueue.map((x) => (
                         <SessionCard

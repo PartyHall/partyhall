@@ -38,6 +38,7 @@ func (e Events) GetCollection(amt, offset int) (*models.PaginatedResponse, error
 			date,
 			location,
 			nexus_id,
+			registration_url,
 			amt_images_handtaken,
 			amt_images_unattended
 		FROM event
@@ -75,6 +76,7 @@ func (e Events) GetCurrent() (*models.Event, error) {
 			e.author AS author,
 			e.date AS date,
 			e.location AS location,
+			e.registration_url AS registration_url,
 			e.nexus_id AS nexus_id,
 			e.amt_images_handtaken AS amt_images_handtaken,
 			e.amt_images_unattended AS amt_images_unattended
@@ -102,9 +104,9 @@ func (e Events) GetCurrent() (*models.Event, error) {
 
 func (e Events) Create(evt *models.Event) error {
 	_, err := DB.Exec(`
-		INSERT INTO event (name, author, date, location, nexus_id)
-		VALUES (?, ?, ?, ?, ?);
-	`, evt.Name, evt.Author, evt.Date, evt.Location, evt.NexusId)
+		INSERT INTO event (name, author, date, location, nexus_id, registration_url)
+		VALUES (?, ?, ?, ?, ?, ?);
+	`, evt.Name, evt.Author, evt.Date, evt.Location, evt.NexusId, evt.UserRegistrationUrl)
 
 	if err != nil {
 		return err
@@ -131,9 +133,9 @@ func (e Events) Create(evt *models.Event) error {
 func (e Events) Update(evt *models.Event) error {
 	_, err := DB.Exec(`
 		UPDATE event
-		SET name = ?, author = ?, date = ?, location = ?, nexus_id = ?
+		SET name = ?, author = ?, date = ?, location = ?, nexus_id = ?, registration_url = ?
 		WHERE id = ?;
-	`, evt.Name, evt.Author, evt.Date, evt.Location, evt.NexusId, evt.Id)
+	`, evt.Name, evt.Author, evt.Date, evt.Location, evt.NexusId, evt.UserRegistrationUrl, evt.Id)
 
 	if err != nil {
 		return err
@@ -159,6 +161,7 @@ func (e Events) Get(id int64) (*models.Event, error) {
 			author AS author,
 			date AS date,
 			location AS location,
+			registration_url AS registration_url,
 			nexus_id AS nexus_id,
 			amt_images_handtaken AS amt_images_handtaken,
 			amt_images_unattended AS amt_images_unattended
@@ -187,6 +190,7 @@ func (e Events) GetAndSetAny() (*models.Event, error) {
 			e.author AS author,
 			e.date AS date,
 			e.location AS location,
+			e.registration_url AS registration_url,
 			e.nexus_id AS nexus_id,
 			e.amt_images_handtaken AS amt_images_handtaken,
 			e.amt_images_unattended AS amt_images_unattended

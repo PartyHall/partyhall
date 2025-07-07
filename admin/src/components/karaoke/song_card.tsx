@@ -18,7 +18,7 @@ type Props = {
 export default function SongCard({ song, type }: Props) {
     const { t } = useTranslation('', { keyPrefix: 'karaoke' });
     const { t: tG } = useTranslation('', { keyPrefix: 'generic' });
-    const { displayName, api, karaoke } = useAuth();
+    const { displayName, api, karaoke, kioskMode } = useAuth();
     const [notif, notifCtx] = useNotification();
 
     const addToQueue = async (directPlay: boolean) => {
@@ -78,18 +78,29 @@ export default function SongCard({ song, type }: Props) {
                         {karaoke?.current && (
                             <Tooltip title={t('tooltip_play_directly')}>
                                 <Popconfirm
-                                    title={t('confirm_play_directly')}
+                                    title={
+                                        <span className={kioskMode ? 'tooltipKiosk' : ''}>
+                                            {t('confirm_play_directly')}
+                                        </span>
+                                    }
                                     okText={tG('actions.ok')}
                                     cancelText={tG('actions.cancel')}
                                     onConfirm={() => addToQueue(true)}
+                                    okButtonProps={{ style: { padding: kioskMode ? '1.5em' : 0 } }}
+                                    cancelButtonProps={{ style: { padding: kioskMode ? '1.5em' : 0 } }}
                                 >
-                                    <Button icon={<IconPlayerPlay size={20} />} shape="circle" />
+                                    <Button
+                                        style={{ padding: kioskMode ? '1.5em' : 0 }}
+                                        icon={<IconPlayerPlay size={kioskMode ? 30 : 20} />}
+                                        shape="circle"
+                                    />
                                 </Popconfirm>
                             </Tooltip>
                         )}
                         <Tooltip title={t('tooltip_add_to_queue')}>
                             <Button
-                                icon={<IconCirclePlus size={20} />}
+                                style={{ padding: kioskMode ? '1.5em' : 0 }}
+                                icon={<IconCirclePlus size={kioskMode ? 30 : 20} />}
                                 shape="circle"
                                 onClick={() => addToQueue(false)}
                             />

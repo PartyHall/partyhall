@@ -19,6 +19,7 @@ type EventFormData = {
     date: DateTime;
     location: string;
     nexusId: string;
+    registrationUrl: string;
 };
 
 type Props = {
@@ -42,6 +43,7 @@ export default function EventForm({ event, onSaved }: Props) {
             date: event?.date || DateTime.now(),
             location: event?.location || '',
             nexusId: event?.nexusId || '',
+            registrationUrl: event?.registrationUrl || '',
         },
     });
 
@@ -60,13 +62,22 @@ export default function EventForm({ event, onSaved }: Props) {
 
         let formEvent = event;
         if (!formEvent) {
-            formEvent = new PhEvent(null, data.name, data.author, data.date, data.location, data.nexusId);
+            formEvent = new PhEvent(
+                null,
+                data.name,
+                data.author,
+                data.date,
+                data.location,
+                data.nexusId,
+                data.registrationUrl
+            );
         } else {
             formEvent.name = data.name;
             formEvent.author = data.author;
             formEvent.date = data.date;
             formEvent.location = data.location;
             formEvent.nexusId = data.nexusId;
+            formEvent.registrationUrl = data.registrationUrl;
         }
 
         const isEdit = !!formEvent.id;
@@ -143,6 +154,10 @@ export default function EventForm({ event, onSaved }: Props) {
                     {t('create_on_pn')}
                 </Button>
             </Flex>
+
+            <FormItem control={control} name="registrationUrl" label="Registration URL">
+                <Input />
+            </FormItem>
 
             <Form.Item>
                 <Button type="primary" htmlType="submit" style={{ width: '100%' }}>

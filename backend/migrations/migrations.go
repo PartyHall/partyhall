@@ -213,6 +213,15 @@ var migrations = []Migration{
 		Down:        "",
 		MigrationTS: 1742849939, // 2025-03-24 @ 21:58
 	},
+	{
+		Name: "Event user registration link",
+		Up: `
+			ALTER TABLE event
+			ADD COLUMN registration_url TEXT NULL DEFAULT NULL;
+		`,
+		Down:        "",
+		MigrationTS: 1751832793, // 2025-07-06 @ 22:13
+	},
 }
 
 func reverse(s []Migration) {

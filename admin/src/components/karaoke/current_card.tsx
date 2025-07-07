@@ -17,10 +17,14 @@ function formatSeconds(seconds: number): string {
     return `${formattedMinutes}:${formattedSeconds}`;
 }
 
-export default function CurrentCard() {
+type Props = {
+    className?: string;
+};
+
+export default function CurrentCard({ className }: Props) {
     const { t } = useTranslation('', { keyPrefix: 'karaoke' });
     const { t: tG } = useTranslation('', { keyPrefix: 'generic' });
-    const { karaoke, api } = useAuth();
+    const { karaoke, api, kioskMode } = useAuth();
 
     if (!karaoke || !karaoke.current) {
         return;
@@ -37,7 +41,7 @@ export default function CurrentCard() {
     };
 
     return (
-        <Card className="SongCard">
+        <Card className={`SongCard ${className || ''}`}>
             <Flex gap={10} vertical align="stretch">
                 <Flex gap={8} align="center">
                     <Image
@@ -60,7 +64,8 @@ export default function CurrentCard() {
                         {!karaoke.isPlaying && (
                             <Tooltip title={tG('actions.resume')}>
                                 <Button
-                                    icon={<IconPlayerPlay size={20} />}
+                                    style={{ padding: kioskMode ? '1.5em' : 0 }}
+                                    icon={<IconPlayerPlay size={kioskMode ? 30 : 20} />}
                                     shape="circle"
                                     onClick={() => setStatus(true)}
                                 />
@@ -69,7 +74,8 @@ export default function CurrentCard() {
                         {karaoke.isPlaying && (
                             <Tooltip title={tG('actions.pause')}>
                                 <Button
-                                    icon={<IconPlayerPause size={20} />}
+                                    style={{ padding: kioskMode ? '1.5em' : 0 }}
+                                    icon={<IconPlayerPause size={kioskMode ? 30 : 20} />}
                                     shape="circle"
                                     onClick={() => setStatus(false)}
                                 />
@@ -77,12 +83,18 @@ export default function CurrentCard() {
                         )}
                         <Tooltip title={tG('actions.cancel')}>
                             <Popconfirm
-                                title={t('confirm_cancel')}
+                                title={<span className={kioskMode ? 'tooltipKiosk' : ''}>{t('confirm_cancel')}</span>}
+                                okButtonProps={{ style: { padding: kioskMode ? '1.5em' : 0 } }}
+                                cancelButtonProps={{ style: { padding: kioskMode ? '1.5em' : 0 } }}
                                 onConfirm={cancelCurrentSong}
                                 okText={tG('actions.ok')}
                                 cancelText={tG('actions.cancel')}
                             >
-                                <Button icon={<IconX size={20} />} shape="circle" />
+                                <Button
+                                    style={{ padding: kioskMode ? '1.5em' : 0 }}
+                                    icon={<IconX size={kioskMode ? 30 : 20} />}
+                                    shape="circle"
+                                />
                             </Popconfirm>
                         </Tooltip>
                     </Flex>

@@ -78,13 +78,16 @@ export default function SongCard({ song, type }: Props) {
                         {karaoke?.current && (
                             <Tooltip title={t('tooltip_play_directly')}>
                                 <Popconfirm
-                                    title={<span className={kioskMode ? 'tooltipKiosk' : ''}>{t('confirm_play_directly')}</span>}
+                                    title={
+                                        <span className={kioskMode ? 'tooltipKiosk' : ''}>
+                                            {t('confirm_play_directly')}
+                                        </span>
+                                    }
                                     okText={tG('actions.ok')}
                                     cancelText={tG('actions.cancel')}
                                     onConfirm={() => addToQueue(true)}
-                                    okButtonProps={{style: { padding: kioskMode ? '1.5em' : 0 }}}
-                                    cancelButtonProps={{style: { padding: kioskMode ? '1.5em' : 0 }}}
-
+                                    okButtonProps={{ style: { padding: kioskMode ? '1.5em' : 0 } }}
+                                    cancelButtonProps={{ style: { padding: kioskMode ? '1.5em' : 0 } }}
                                 >
                                     <Button
                                         style={{ padding: kioskMode ? '1.5em' : 0 }}

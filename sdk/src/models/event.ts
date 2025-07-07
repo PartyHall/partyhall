@@ -42,7 +42,7 @@ export class PhEvent {
             DateTime.fromISO(json.date),
             json.location,
             json.nexus_id,
-            json.registration_url,
+            json.registration_url
         );
 
         phEvent.amtImagesHandtaken = json['amt_images_handtaken'];

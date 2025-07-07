@@ -27,28 +27,29 @@ export default function KioskPage() {
         setPageName('karaoke', ['/karaoke-queue', '/karaoke-timecode', '/karaoke']);
     }, []);
 
-    return <div className="kioskMode">
-        <div className='topBar'>
-            <Flex vertical align='center' gap={20}>
-                <img src={PhLogo} style={{ height: '4em' }} />
-                <span style={{ fontWeight: 'bold', color: 'white' }}>Inscrivez-vous pour accéder aux photos de la soirée via ce QR code:</span>
-            </Flex>
-            <img
-                className='qr'
-                src={`/api/events/${event?.id}/registration-qr`}
-            />
-        </div>
+    return (
+        <div className="kioskMode">
+            <div className="topBar">
+                <Flex vertical align="center" gap={20}>
+                    <img src={PhLogo} style={{ height: '4em' }} />
+                    <span style={{ fontWeight: 'bold', color: 'white' }}>
+                        Inscrivez-vous pour accéder aux photos de la soirée via ce QR code:
+                    </span>
+                </Flex>
+                <img className="qr" src={`/api/events/${event?.id}/registration-qr`} />
+            </div>
 
-        <div className='leftSide'>
-            <h1>Rechercher une musique</h1>
-            <SongSearch />
-        </div>
+            <div className="leftSide">
+                <h1>Rechercher une musique</h1>
+                <SongSearch />
+            </div>
 
-        <div className='rightSide'>
-            <h1>File d&apos;attente</h1>
-            <SongQueue hideCurrent />
-        </div>
+            <div className="rightSide">
+                <h1>File d&apos;attente</h1>
+                <SongQueue hideCurrent />
+            </div>
 
-        <CurrentCard className='bottomSide' />
-    </div>
+            <CurrentCard className="bottomSide" />
+        </div>
+    );
 }

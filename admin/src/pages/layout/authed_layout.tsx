@@ -61,9 +61,8 @@ export default function AuthedLayout() {
 
     return (
         <Layout>
-            {
-                !kioskMode && <>
-
+            {!kioskMode && (
+                <>
                     <Sider
                         style={{
                             display: 'flex',
@@ -89,16 +88,17 @@ export default function AuthedLayout() {
 
                     {!collapsed && <div className="menu-backdrop" onClick={() => setCollapsed(true)} />}
                 </>
-            }
+            )}
 
             <Layout>
-                {
-                    !kioskMode &&
-                    <Header style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                    }}>
+                {!kioskMode && (
+                    <Header
+                        style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                        }}
+                    >
                         {/* @TODO: Make it a real link for accessibility */}
                         <img
                             src={PhLogo}
@@ -110,7 +110,7 @@ export default function AuthedLayout() {
                             onClick={() => navigate('/')}
                         />
                     </Header>
-                }
+                )}
                 <Content>
                     <Flex
                         vertical
@@ -124,9 +124,8 @@ export default function AuthedLayout() {
                         <Outlet />
                     </Flex>
                 </Content>
-                {
-                    !kioskMode
-                    && <Footer style={{ textAlign: 'center' }}>
+                {!kioskMode && (
+                    <Footer style={{ textAlign: 'center' }}>
                         <Typography>
                             PartyHall -{' '}
                             <a href="https://github.com/partyhall/PartyHall" target="_blank" rel="noopener noreferrer">
@@ -134,7 +133,7 @@ export default function AuthedLayout() {
                             </a>
                         </Typography>
                     </Footer>
-                }
+                )}
             </Layout>
         </Layout>
     );

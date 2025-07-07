@@ -46,7 +46,7 @@ export default function MercureProvider({
     const { setEvent, setMode, isLoggedIn, setSyncInProgress, setHardwareFlashPowered, setBackdrops } = useAuth();
     const [notif, ctxHolder] = notification.useNotification();
 
-    const eventSource = useRef<EventSource>();
+    const eventSource = useRef<EventSource>(null);
     const listenersRef = useRef<{ event: string; callback: EventListener }[]>([]);
 
     const createEventSource = () => {
@@ -140,7 +140,7 @@ export default function MercureProvider({
         const es = createEventSource();
 
         return () => {
-            eventSource.current = undefined;
+            eventSource.current = null;
             es.close();
         };
     }, [sdk, topics]);

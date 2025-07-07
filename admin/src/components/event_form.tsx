@@ -62,7 +62,15 @@ export default function EventForm({ event, onSaved }: Props) {
 
         let formEvent = event;
         if (!formEvent) {
-            formEvent = new PhEvent(null, data.name, data.author, data.date, data.location, data.nexusId, data.registrationUrl);
+            formEvent = new PhEvent(
+                null,
+                data.name,
+                data.author,
+                data.date,
+                data.location,
+                data.nexusId,
+                data.registrationUrl
+            );
         } else {
             formEvent.name = data.name;
             formEvent.author = data.author;

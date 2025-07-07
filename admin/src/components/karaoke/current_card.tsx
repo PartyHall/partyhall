@@ -19,7 +19,7 @@ function formatSeconds(seconds: number): string {
 
 type Props = {
     className?: string;
-}
+};
 
 export default function CurrentCard({ className }: Props) {
     const { t } = useTranslation('', { keyPrefix: 'karaoke' });
@@ -84,8 +84,8 @@ export default function CurrentCard({ className }: Props) {
                         <Tooltip title={tG('actions.cancel')}>
                             <Popconfirm
                                 title={<span className={kioskMode ? 'tooltipKiosk' : ''}>{t('confirm_cancel')}</span>}
-                                okButtonProps={{style: { padding: kioskMode ? '1.5em' : 0 }}}
-                                cancelButtonProps={{style: { padding: kioskMode ? '1.5em' : 0 }}}
+                                okButtonProps={{ style: { padding: kioskMode ? '1.5em' : 0 } }}
+                                cancelButtonProps={{ style: { padding: kioskMode ? '1.5em' : 0 } }}
                                 onConfirm={cancelCurrentSong}
                                 okText={tG('actions.ok')}
                                 cancelText={tG('actions.cancel')}

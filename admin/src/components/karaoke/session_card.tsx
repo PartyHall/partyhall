@@ -84,7 +84,11 @@ export default function SessionCard({ session, isFirst, isLast }: Props) {
                     <Flex vertical gap={8}>
                         <Tooltip title={t('tooltip_play_directly')}>
                             <Popconfirm
-                                title={<span className={kioskMode ? 'tooltipKiosk' : ''}>{t('confirm_play_directly')}</span>}
+                                title={
+                                    <span className={kioskMode ? 'tooltipKiosk' : ''}>
+                                        {t('confirm_play_directly')}
+                                    </span>
+                                }
                                 okButtonProps={{ style: { padding: kioskMode ? '1.5em' : 0 } }}
                                 cancelButtonProps={{ style: { padding: kioskMode ? '1.5em' : 0 } }}
                                 onConfirm={directPlay}
@@ -108,7 +112,6 @@ export default function SessionCard({ session, isFirst, isLast }: Props) {
                                 cancelText={tG('actions.cancel')}
                             >
                                 <Button
-
                                     style={{ padding: kioskMode ? '1.5em' : 0 }}
                                     icon={<IconTrash size={kioskMode ? 30 : 18} />}
                                     shape="circle"

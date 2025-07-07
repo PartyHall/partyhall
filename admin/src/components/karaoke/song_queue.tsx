@@ -7,9 +7,9 @@ import { useTranslation } from 'react-i18next';
 
 type Props = {
     hideCurrent?: boolean;
-}
+};
 
-export default function SongQueue({hideCurrent}: Props) {
+export default function SongQueue({ hideCurrent }: Props) {
     const { t } = useTranslation('', { keyPrefix: 'karaoke' });
     const { karaoke, karaokeQueue } = useAuth();
 

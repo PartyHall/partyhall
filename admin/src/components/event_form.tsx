@@ -155,7 +155,7 @@ export default function EventForm({ event, onSaved }: Props) {
                 </Button>
             </Flex>
 
-            <FormItem control={control} name="registrationUrl" label={tG('registration_url')}>
+            <FormItem control={control} name="registrationUrl" label="Registration URL">
                 <Input />
             </FormItem>
 

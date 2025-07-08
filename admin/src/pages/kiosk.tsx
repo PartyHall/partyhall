@@ -2,7 +2,6 @@ import '../assets/css/kiosk.css';
 import { PhKaraoke, PhSongSession } from '@partyhall/sdk';
 import CurrentCard from '../components/karaoke/current_card';
 import { Flex } from 'antd';
-import PhLogo from '../assets/ph_logo_sd.webp';
 import SongQueue from '../components/karaoke/song_queue';
 import SongSearch from '../components/karaoke/song_search';
 import { useAuth } from '../hooks/auth';
@@ -30,11 +29,9 @@ export default function KioskPage() {
     return (
         <div className="kioskMode">
             <div className="topBar">
-                <Flex vertical align="center" gap={20}>
-                    <img src={PhLogo} style={{ height: '4em' }} />
-                    <span style={{ fontWeight: 'bold', color: 'white' }}>
-                        Inscrivez-vous pour accéder aux photos de la soirée via ce QR code:
-                    </span>
+                <Flex vertical align="center" gap={20} style={{ fontSize: '1.5em', fontWeight: 'bold', color: 'white' }}>
+                    <span>Inscrivez-vous pour accéder aux photos de la soirée via ce QR code:</span>
+                    <span>La tablette est molle, soyez patient</span>
                 </Flex>
                 <img className="qr" src={`/api/events/${event?.id}/registration-qr`} />
             </div>

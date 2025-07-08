@@ -209,9 +209,10 @@ func unlinkDevices() error {
 	}
 
 	for _, l := range devices.Links {
+		log.Info("Unlinking Pipewire link", "linkID", l.ID)
 		err = exec.Command("pw-link", "-d", fmt.Sprintf("%v", l.ID)).Run()
-
 		if err != nil {
+			log.Error("Failed to unlink pipewire link", "linkID", l.ID, "err", err)
 			return err
 		}
 	}
@@ -312,8 +313,8 @@ func LinkDevice(source, sink *models.PwDevice) error {
 	}
 
 	// Setting the volume of the source is safe as its only used for
-	// the karaoke
-	SetVolume(source, 1.0)
+	// the karaoke 0.8 to prevent saturation
+	SetVolume(source, 0.8)
 
 	return nil
 }

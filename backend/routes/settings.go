@@ -380,6 +380,8 @@ func (h RoutesSettings) setAp(c *gin.Context) {
 	}
 
 	// Save configuration
+	config.GET.UserSettings.WirelessAp.WiredInterface = req.WiredInterface
+	config.GET.UserSettings.WirelessAp.WirelessInterface = req.WirelessInterface
 	config.GET.UserSettings.WirelessAp.Enabled = req.Enabled
 	config.GET.UserSettings.WirelessAp.Ssid = req.Ssid
 	config.GET.UserSettings.WirelessAp.Password = req.Password

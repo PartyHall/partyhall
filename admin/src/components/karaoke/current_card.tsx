@@ -56,9 +56,12 @@ export default function CurrentCard({ className }: Props) {
                     <Flex vertical flex={1}>
                         <Typography.Text className="SongCard__Title">{karaoke.current.title}</Typography.Text>
                         <Typography.Text>{karaoke.current.artist}</Typography.Text>
-                        <Typography.Text className="SongCard__Singer">
-                            {t('singer')}: {karaoke.current.sung_by}
-                        </Typography.Text>
+                        {
+                            karaoke.current.sung_by.toLowerCase() !== 'kiosk'
+                            && <Typography.Text className="SongCard__Singer">
+                                {t('singer')}: {karaoke.current.sung_by}
+                            </Typography.Text>
+                        }
                     </Flex>
                     <Flex vertical gap={8}>
                         {!karaoke.isPlaying && (

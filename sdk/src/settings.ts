@@ -92,7 +92,7 @@ export default class Settings {
     }
 
     public async setAudioDeviceVolume(device: AudioDevice, volume: number) {
-        const resp = await this.sdk.post(`/api/webapp/settings/audio-devices/${device.id}/volume`, { volume });
+        const resp = await this.sdk.put(`/api/webapp/settings/audio-devices/${device.id}`, { volume });
 
         return AudioDevices.fromJson(await resp.json());
     }

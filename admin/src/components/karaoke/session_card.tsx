@@ -77,9 +77,12 @@ export default function SessionCard({ session, isFirst, isLast }: Props) {
                     <Flex vertical flex={1}>
                         <Typography.Text className="SongCard__Title">{session.title}</Typography.Text>
                         <Typography.Text>{session.artist}</Typography.Text>
-                        <Typography.Text className="SongCard__Singer">
-                            {t('singer')}: {session.sung_by}
-                        </Typography.Text>
+                        {
+                            session.sung_by.toLowerCase() !== 'kiosk'
+                            && <Typography.Text className="SongCard__Singer">
+                                {t('singer')}: {session.sung_by}
+                            </Typography.Text>
+                        }
                     </Flex>
                     <Flex vertical gap={8}>
                         <Tooltip title={t('tooltip_play_directly')}>

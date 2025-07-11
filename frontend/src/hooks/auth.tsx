@@ -123,12 +123,12 @@ export default function AuthProvider({ children, token }: { children: ReactNode;
             }))
         );
 
-        es.addEventListener('/event', (x) =>
+        es.addEventListener('/event', (x) => {
             setCtx((oldCtx) => ({
                 ...oldCtx,
                 currentEvent: JSON.parse(x.data),
-            }))
-        );
+            }));
+        });
 
         es.addEventListener('/mode', (x) =>
             setCtx((oldCtx) => ({

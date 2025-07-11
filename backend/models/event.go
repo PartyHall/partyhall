@@ -14,20 +14,29 @@ type Event struct {
 	NexusId             JsonnableNullstring `db:"nexus_id" json:"nexus_id"`
 	UserRegistrationUrl JsonnableNullstring `db:"registration_url" json:"registration_url"`
 
+	DisplayText          JsonnableNullstring `db:"display_text" json:"display_text"`
+	DisplayTextAppliance bool                `db:"display_text_appliance" json:"display_text_appliance"`
+
 	AmtImageHandtaken  int `db:"amt_images_handtaken" json:"amt_images_handtaken"`
 	AmtImageUnattended int `db:"amt_images_unattended" json:"amt_images_unattended"`
 }
 
 func (e Event) AsJson() map[string]any {
-	return map[string]any{
-		"id":                    e.Id,
-		"name":                  e.Name,
-		"author":                e.Author,
-		"date":                  e.Date.Format(time.RFC3339),
-		"location":              e.Location,
-		"amt_images_handtaken":  e.AmtImageHandtaken,
-		"amt_images_unattended": e.AmtImageUnattended,
+	data := map[string]any{
+		"id":                     e.Id,
+		"name":                   e.Name,
+		"author":                 e.Author,
+		"date":                   e.Date.Format(time.RFC3339),
+		"location":               e.Location,
+		"nexus_id":               e.NexusId,
+		"user_registration_url":  e.UserRegistrationUrl,
+		"display_text":           e.DisplayText,
+		"display_text_appliance": e.DisplayTextAppliance,
+		"amt_images_handtaken":   e.AmtImageHandtaken,
+		"amt_images_unattended":  e.AmtImageUnattended,
 	}
+
+	return data
 }
 
 type Picture struct {

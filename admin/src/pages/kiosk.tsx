@@ -29,7 +29,12 @@ export default function KioskPage() {
     return (
         <div className="kioskMode">
             <div className="topBar">
-                <Flex vertical align="center" gap={20} style={{ fontSize: '1.5em', fontWeight: 'bold', color: 'white' }}>
+                <Flex
+                    vertical
+                    align="center"
+                    gap={20}
+                    style={{ fontSize: '1.5em', fontWeight: 'bold', color: 'white' }}
+                >
                     <span>Inscrivez-vous pour accéder aux photos de la soirée via ce QR code:</span>
                     <span>La tablette est molle, soyez patient</span>
                 </Flex>

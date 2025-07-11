@@ -46,7 +46,7 @@ export default function MercureProvider({
     const { setEvent, setMode, isLoggedIn, setSyncInProgress, setHardwareFlashPowered, setBackdrops } = useAuth();
     const [notif, ctxHolder] = notification.useNotification();
 
-    const eventSource = useRef<EventSource|null>(null);
+    const eventSource = useRef<EventSource | null>(null);
     const listenersRef = useRef<{ event: string; callback: EventListener }[]>([]);
 
     const createEventSource = () => {

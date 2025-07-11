@@ -18,13 +18,15 @@ import (
 )
 
 type upsertEventRequest struct {
-	Id              int                        `json:"id"`
-	Name            string                     `json:"name" binding:"required"`
-	Author          string                     `json:"author"`
-	Date            string                     `json:"date" binding:"iso8601,required"`
-	Location        string                     `json:"location"`
-	NexusID         models.JsonnableNullstring `json:"nexus_id"`
-	RegistrationUrl models.JsonnableNullstring `json:"registration_url"`
+	Id                   int                        `json:"id"`
+	Name                 string                     `json:"name" binding:"required"`
+	Author               string                     `json:"author"`
+	Date                 string                     `json:"date" binding:"iso8601,required"`
+	Location             string                     `json:"location"`
+	NexusID              models.JsonnableNullstring `json:"nexus_id"`
+	RegistrationUrl      models.JsonnableNullstring `json:"registration_url"`
+	DisplayText          models.JsonnableNullstring `json:"display_text"`
+	DisplayTextAppliance bool                       `json:"display_text_appliance"`
 }
 
 type RoutesEvent struct{}
@@ -155,11 +157,13 @@ func (h RoutesEvent) create(c *gin.Context) {
 	date, _ := time.Parse(time.RFC3339, req.Date)
 
 	evt := models.Event{
-		Name:                req.Name,
-		Author:              req.Author,
-		Date:                date,
-		Location:            req.Location,
-		UserRegistrationUrl: req.RegistrationUrl,
+		Name:                 req.Name,
+		Author:               req.Author,
+		Date:                 date,
+		Location:             req.Location,
+		UserRegistrationUrl:  req.RegistrationUrl,
+		DisplayText:          req.DisplayText,
+		DisplayTextAppliance: req.DisplayTextAppliance,
 	}
 
 	err := dal.EVENTS.Create(&evt)
@@ -193,13 +197,15 @@ func (h RoutesEvent) update(c *gin.Context) {
 
 	/** @TODO: No, the id should come from the queryParams, not the body **/
 	evt := models.Event{
-		Id:                  int64(req.Id),
-		Name:                req.Name,
-		Author:              req.Author,
-		Date:                date,
-		Location:            req.Location,
-		NexusId:             req.NexusID,
-		UserRegistrationUrl: req.RegistrationUrl,
+		Id:                   int64(req.Id),
+		Name:                 req.Name,
+		Author:               req.Author,
+		Date:                 date,
+		Location:             req.Location,
+		NexusId:              req.NexusID,
+		UserRegistrationUrl:  req.RegistrationUrl,
+		DisplayText:          req.DisplayText,
+		DisplayTextAppliance: req.DisplayTextAppliance,
 	}
 
 	err := dal.EVENTS.Update(&evt)
@@ -213,6 +219,7 @@ func (h RoutesEvent) update(c *gin.Context) {
 
 	if state.STATE.CurrentEvent != nil && state.STATE.CurrentEvent.Id == evt.Id {
 		state.STATE.CurrentEvent = &evt
+		mercure_client.CLIENT.SetCurrentEvent(&evt)
 	}
 
 	c.JSON(200, evt)

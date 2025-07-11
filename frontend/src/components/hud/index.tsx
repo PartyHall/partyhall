@@ -1,5 +1,6 @@
 import '../../assets/hud.scss';
 import DateTimeRender from './datetime';
+import DisplayText from './display_text';
 import EventRenderer from './event';
 import { FORCE_DEBUG } from './debug';
 import WifiRenderer from './wifi_renderer';
@@ -15,7 +16,10 @@ export default function Hud() {
                 <DateTimeRender />
             </div>
 
-            <div className="hud-bottom">{(debug || FORCE_DEBUG) && <WifiRenderer />}</div>
+            <div className="hud-bottom">
+                {(debug || FORCE_DEBUG) && <WifiRenderer />}
+                {!debug && !FORCE_DEBUG && <DisplayText />}
+            </div>
         </div>
     );
 }

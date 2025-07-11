@@ -35,10 +35,9 @@ export default function KaraokeHud() {
                     <span className="blue-glow title">{karaoke.current.title}</span>
                     <span className="blue-glow artist">{karaoke.current.artist}</span>
                     <span className="countdown">{karaoke.countdown}</span>
-                    {
-                        karaoke.current.sung_by.toLowerCase() !== 'kiosk' &&
+                    {karaoke.current.sung_by.toLowerCase() !== 'kiosk' && (
                         <span className="singer">Singer: {karaoke.current.sung_by}</span>
-                    }
+                    )}
                 </div>
             )}
 

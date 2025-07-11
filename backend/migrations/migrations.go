@@ -20,6 +20,10 @@ type Migration struct {
 // @TODO: This should be in a separate library and the software using it
 // should then just provide the migrations array
 
+// Note: well since then it IS its own library, I need
+// to take the time to implement it properly
+// https://github.com/oxodao/micromigrations
+
 // @TODO: migration_ts should be PK
 
 var migrations = []Migration{
@@ -221,6 +225,15 @@ var migrations = []Migration{
 		`,
 		Down:        "",
 		MigrationTS: 1751832793, // 2025-07-06 @ 22:13
+	},
+	{
+		Name: "Custom display text",
+		Up: `
+			ALTER TABLE event ADD COLUMN display_text TEXT NULL DEFAULT NULL;
+			ALTER TABLE event ADD COLUMN display_text_appliance BOOLEAN NOT NULL DEFAULT FALSE;
+		`,
+		Down:        "",
+		MigrationTS: 1752266635, // 2025-07-11 @ 22:44
 	},
 }
 

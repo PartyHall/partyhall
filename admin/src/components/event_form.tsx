@@ -1,4 +1,4 @@
-import { Button, Flex, Form, Input, notification } from 'antd';
+import { Button, Checkbox, Flex, Form, Input, notification } from 'antd';
 import { DateTime } from 'luxon';
 import { FormItem } from 'react-hook-form-antd';
 import { PhEvent } from '@partyhall/sdk';
@@ -20,6 +20,8 @@ type EventFormData = {
     location: string;
     nexusId: string;
     registrationUrl: string;
+    displayText: string | null;
+    displayTextAppliance: boolean;
 };
 
 type Props = {
@@ -36,6 +38,7 @@ export default function EventForm({ event, onSaved }: Props) {
 
     const [isCreatingNexus, setCreatingNexus] = useState<boolean>(false);
 
+    console.log('EventForm', event);
     const { control, handleSubmit, setValue } = useForm<EventFormData>({
         defaultValues: {
             name: event?.name || '',
@@ -44,6 +47,8 @@ export default function EventForm({ event, onSaved }: Props) {
             location: event?.location || '',
             nexusId: event?.nexusId || '',
             registrationUrl: event?.registrationUrl || '',
+            displayText: event?.displayText || '',
+            displayTextAppliance: event?.displayTextAppliance || false,
         },
     });
 
@@ -62,15 +67,17 @@ export default function EventForm({ event, onSaved }: Props) {
 
         let formEvent = event;
         if (!formEvent) {
-            formEvent = new PhEvent(
-                null,
-                data.name,
-                data.author,
-                data.date,
-                data.location,
-                data.nexusId,
-                data.registrationUrl
-            );
+            formEvent = new PhEvent({
+                id: null,
+                name: data.name,
+                author: data.author,
+                date: data.date,
+                location: data.location,
+                nexus_id: data.nexusId,
+                registration_url: data.registrationUrl,
+                display_text: data.displayText,
+                display_text_appliance: data.displayTextAppliance,
+            });
         } else {
             formEvent.name = data.name;
             formEvent.author = data.author;
@@ -78,6 +85,8 @@ export default function EventForm({ event, onSaved }: Props) {
             formEvent.location = data.location;
             formEvent.nexusId = data.nexusId;
             formEvent.registrationUrl = data.registrationUrl;
+            formEvent.displayText = data.displayText;
+            formEvent.displayTextAppliance = data.displayTextAppliance;
         }
 
         const isEdit = !!formEvent.id;
@@ -157,6 +166,19 @@ export default function EventForm({ event, onSaved }: Props) {
 
             <FormItem control={control} name="registrationUrl" label="Registration URL">
                 <Input />
+            </FormItem>
+
+            <FormItem control={control} name="displayText" label="Display Text">
+                <Input />
+            </FormItem>
+
+            <FormItem
+                control={control}
+                name="displayTextAppliance"
+                label="Display Text on the appliance"
+                valuePropName="checked"
+            >
+                <Checkbox />
             </FormItem>
 
             <Form.Item>

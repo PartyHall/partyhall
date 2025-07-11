@@ -39,6 +39,8 @@ func (e Events) GetCollection(amt, offset int) (*models.PaginatedResponse, error
 			location,
 			nexus_id,
 			registration_url,
+			display_text,
+			display_text_appliance,
 			amt_images_handtaken,
 			amt_images_unattended
 		FROM event
@@ -77,6 +79,8 @@ func (e Events) GetCurrent() (*models.Event, error) {
 			e.date AS date,
 			e.location AS location,
 			e.registration_url AS registration_url,
+			e.display_text AS display_text,
+			e.display_text_appliance AS display_text_appliance,
 			e.nexus_id AS nexus_id,
 			e.amt_images_handtaken AS amt_images_handtaken,
 			e.amt_images_unattended AS amt_images_unattended
@@ -104,9 +108,9 @@ func (e Events) GetCurrent() (*models.Event, error) {
 
 func (e Events) Create(evt *models.Event) error {
 	_, err := DB.Exec(`
-		INSERT INTO event (name, author, date, location, nexus_id, registration_url)
-		VALUES (?, ?, ?, ?, ?, ?);
-	`, evt.Name, evt.Author, evt.Date, evt.Location, evt.NexusId, evt.UserRegistrationUrl)
+		INSERT INTO event (name, author, date, location, nexus_id, registration_url, display_text, display_text_appliance)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+	`, evt.Name, evt.Author, evt.Date, evt.Location, evt.NexusId, evt.UserRegistrationUrl, evt.DisplayText, evt.DisplayTextAppliance)
 
 	if err != nil {
 		return err
@@ -133,9 +137,9 @@ func (e Events) Create(evt *models.Event) error {
 func (e Events) Update(evt *models.Event) error {
 	_, err := DB.Exec(`
 		UPDATE event
-		SET name = ?, author = ?, date = ?, location = ?, nexus_id = ?, registration_url = ?
+		SET name = ?, author = ?, date = ?, location = ?, nexus_id = ?, registration_url = ?, display_text = ?, display_text_appliance = ?
 		WHERE id = ?;
-	`, evt.Name, evt.Author, evt.Date, evt.Location, evt.NexusId, evt.UserRegistrationUrl, evt.Id)
+	`, evt.Name, evt.Author, evt.Date, evt.Location, evt.NexusId, evt.UserRegistrationUrl, evt.DisplayText, evt.DisplayTextAppliance, evt.Id)
 
 	if err != nil {
 		return err
@@ -162,6 +166,8 @@ func (e Events) Get(id int64) (*models.Event, error) {
 			date AS date,
 			location AS location,
 			registration_url AS registration_url,
+			display_text AS display_text,
+			display_text_appliance AS display_text_appliance,
 			nexus_id AS nexus_id,
 			amt_images_handtaken AS amt_images_handtaken,
 			amt_images_unattended AS amt_images_unattended
@@ -191,6 +197,8 @@ func (e Events) GetAndSetAny() (*models.Event, error) {
 			e.date AS date,
 			e.location AS location,
 			e.registration_url AS registration_url,
+			e.display_text AS display_text,
+			e.display_text_appliance AS display_text_appliance,
 			e.nexus_id AS nexus_id,
 			e.amt_images_handtaken AS amt_images_handtaken,
 			e.amt_images_unattended AS amt_images_unattended

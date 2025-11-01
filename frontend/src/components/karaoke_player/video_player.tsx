@@ -19,7 +19,7 @@ type Props = {
 
 export default function VideoPlayer({ session, isPlaying, volumeInstru, volumeVocals, onProgress, onEnded }: Props) {
     const videoRef = useRef<HTMLVideoElement | null>(null);
-    const vocalsRef = useRef<HTMLAudioElement | null>(null);
+    // const vocalsRef = useRef<HTMLAudioElement | null>(null);
     const timingObjectRef = useRef<any | null>(null);
     const cleanupRef = useRef<{ video?: () => void; vocals?: () => void }>({});
 
@@ -28,7 +28,7 @@ export default function VideoPlayer({ session, isPlaying, volumeInstru, volumeVo
 
         return () => {
             if (cleanupRef.current.video) cleanupRef.current.video();
-            if (cleanupRef.current.vocals) cleanupRef.current.vocals();
+            // if (cleanupRef.current.vocals) cleanupRef.current.vocals();
         };
     }, []);
 
@@ -39,18 +39,22 @@ export default function VideoPlayer({ session, isPlaying, volumeInstru, volumeVo
 
         cleanupRef.current.video = setTimingsrc(videoRef.current, timingObjectRef.current);
 
+        /*
         if (vocalsRef.current) {
             cleanupRef.current.vocals = setTimingsrc(vocalsRef.current, timingObjectRef.current);
         }
+        */
 
         return () => {
             if (cleanupRef.current.video) {
                 cleanupRef.current.video();
             }
 
+            /*
             if (cleanupRef.current.vocals) {
                 cleanupRef.current.vocals();
             }
+                */
         };
     }, []);
 
@@ -72,9 +76,11 @@ export default function VideoPlayer({ session, isPlaying, volumeInstru, volumeVo
         }
 
         videoRef.current.volume = volumeInstru / 100;
+        /*
         if (vocalsRef.current) {
             vocalsRef.current.volume = volumeVocals / 100;
         }
+        */
     }, [volumeInstru, volumeVocals]);
 
     return (
@@ -88,7 +94,7 @@ export default function VideoPlayer({ session, isPlaying, volumeInstru, volumeVo
                     await onProgress(Math.floor(video.currentTime));
                 }}
             />
-            {session.song.has_vocals && <audio src={session.song.getVocalsUrl()} ref={vocalsRef} />}
+            {/*session.song.has_vocals && <audio src={session.song.getVocalsUrl()} ref={vocalsRef} />*/}
         </>
     );
 }

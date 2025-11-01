@@ -120,9 +120,9 @@ export default function CurrentCard({ className }: Props) {
                 />
 
                 <VolumeSlider type="instrumental" icon={<IconVolume size={20} />} tooltip={t('volume')} />
-                {karaoke.current.song.has_vocals && (
+                {/*karaoke.current.song.has_vocals && (
                     <VolumeSlider type="vocals" icon={<IconRecordMail size={20} />} tooltip={t('voices')} />
-                )}
+                )*/}
             </Flex>
         </Card>
     );

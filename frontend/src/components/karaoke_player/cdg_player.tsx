@@ -39,7 +39,7 @@ export default function CDGPlayer({
 }: CDGPlayerProps) {
     // Refs
     const audioRef = useRef<HTMLAudioElement>(null);
-    const vocalsRef = useRef<HTMLAudioElement>(null);
+    // const vocalsRef = useRef<HTMLAudioElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const canvasCtxRef = useRef<CanvasRenderingContext2D | null>(null);
     const cdgRef = useRef<CDGraphics | null>(null);
@@ -66,10 +66,12 @@ export default function CDGPlayer({
             cleanupFunctionsRef.current.push(cleanup);
         }
 
+        /*
         if (vocalsRef.current) {
             const cleanup = setTimingsrc(vocalsRef.current, timingObjectRef.current);
             cleanupFunctionsRef.current.push(cleanup);
         }
+            */
 
         updateSources();
 
@@ -103,9 +105,11 @@ export default function CDGPlayer({
         }
 
         audioRef.current.volume = volumeInstru / 100;
+        /*
         if (vocalsRef.current) {
             vocalsRef.current.volume = volumeVocals / 100;
         }
+            */
     }, [volumeInstru, volumeVocals]);
 
     useEffect(() => {
@@ -127,10 +131,12 @@ export default function CDGPlayer({
             audioRef.current.src = session.song.getInstrumentalUrl();
             audioRef.current.load();
 
+            /*
             if (vocalsRef.current) {
                 vocalsRef.current.src = session.song.getVocalsUrl();
                 vocalsRef.current.load();
             }
+                */
         } catch (err) {
             console.error(err);
         }
@@ -230,7 +236,7 @@ export default function CDGPlayer({
             <canvas ref={canvasRef} width={300 * scale} height={216 * scale} className="karaoke__canvas" />
             <br />
             <audio preload="auto" onEnded={handleEnded} onTimeUpdate={handleTimeUpdate} ref={audioRef} />
-            {session.song.has_vocals && <audio preload="auto" ref={vocalsRef} />}
+            {/*session.song.has_vocals && <audio preload="auto" ref={vocalsRef} />*/}
         </div>
     );
 }

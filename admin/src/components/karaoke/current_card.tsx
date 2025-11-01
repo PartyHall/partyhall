@@ -1,6 +1,6 @@
 import '../../assets/css/song_card.scss';
 import { Button, Card, Flex, Popconfirm, Tooltip, Typography } from 'antd';
-import { IconPlayerPause, IconPlayerPlay, IconRecordMail, IconVolume, IconX } from '@tabler/icons-react';
+import { IconPlayerPause, IconPlayerPlay, IconVolume, IconX } from '@tabler/icons-react';
 import Image from '../image';
 import TextSlider from '../text_slider';
 import VolumeSlider from './volume_slider';
